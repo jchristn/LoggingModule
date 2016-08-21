@@ -50,7 +50,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SyslogLogging\LoggingModule.csproj">
+    <ProjectReference Include="..\LoggingModule\LoggingModule.csproj">
       <Project>{e803f5e9-2ca6-48ad-95c2-e8ce9a8f858c}</Project>
       <Name>LoggingModule</Name>
     </ProjectReference>

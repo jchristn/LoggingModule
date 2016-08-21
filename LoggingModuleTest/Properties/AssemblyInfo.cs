@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("LoggingModuleTest")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Test program for LoggingModule")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Personal")]
+[assembly: AssemblyCompany("Marauder Software Inc")]
 [assembly: AssemblyProduct("LoggingModuleTest")]
-[assembly: AssemblyCopyright("Copyright © Personal 2016")]
+[assembly: AssemblyCopyright("Copyright (c)2016 Marauder Software Inc")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
