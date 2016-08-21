@@ -179,6 +179,36 @@ namespace SyslogLogging
             Log(Severity.Alert, message);
         }
 
+        private static void ConsoleException(string module, string method, Exception e)
+        {
+            if (e == null) throw new ArgumentNullException(nameof(e));
+            var st = new StackTrace(e, true);
+            var frame = st.GetFrame(0);
+            int fileLine = frame.GetFileLineNumber();
+            string filename = frame.GetFileName();
+
+            string message =
+                Environment.NewLine +
+                "---" + Environment.NewLine +
+                "An exception was encountered which triggered this message" + Environment.NewLine +
+                "  Module     : " + module + Environment.NewLine +
+                "  Method     : " + method + Environment.NewLine +
+                "  Type       : " + e.GetType().ToString() + Environment.NewLine +
+                "  Data       : " + e.Data + Environment.NewLine +
+                "  Inner      : " + e.InnerException + Environment.NewLine +
+                "  Message    : " + e.Message + Environment.NewLine +
+                "  Source     : " + e.Source + Environment.NewLine +
+                "  StackTrace : " + e.StackTrace + Environment.NewLine +
+                "  Stack      : " + StaticStackToString() + Environment.NewLine +
+                "  Line       : " + fileLine + Environment.NewLine +
+                "  File       : " + filename + Environment.NewLine +
+                "  ToString   : " + e.ToString() + Environment.NewLine +
+                "  Servername : " + Dns.GetHostName() + Environment.NewLine +
+                "---";
+
+            Console.WriteLine(message);
+        }
+
         #endregion
 
         #region Private-Methods
@@ -229,34 +259,24 @@ namespace SyslogLogging
             return ret;
         }
 
-        private void ConsoleException(string module, string method, Exception e)
+        private static string StaticStackToString()
         {
-            if (e == null) throw new ArgumentNullException(nameof(e));
-            var st = new StackTrace(e, true);
-            var frame = st.GetFrame(0);
-            int fileLine = frame.GetFileLineNumber();
-            string filename = frame.GetFileName();
+            string ret = "";
 
-            string message =
-                Environment.NewLine +
-                "---" + Environment.NewLine +
-                "An exception was encountered which triggered this message" + Environment.NewLine +
-                "  Module     : " + module + Environment.NewLine +
-                "  Method     : " + method + Environment.NewLine +
-                "  Type       : " + e.GetType().ToString() + Environment.NewLine +
-                "  Data       : " + e.Data + Environment.NewLine +
-                "  Inner      : " + e.InnerException + Environment.NewLine +
-                "  Message    : " + e.Message + Environment.NewLine +
-                "  Source     : " + e.Source + Environment.NewLine +
-                "  StackTrace : " + e.StackTrace + Environment.NewLine +
-                "  Stack      : " + StackToString() + Environment.NewLine +
-                "  Line       : " + fileLine + Environment.NewLine +
-                "  File       : " + filename + Environment.NewLine +
-                "  ToString   : " + e.ToString() + Environment.NewLine +
-                "  Servername : " + Dns.GetHostName() + Environment.NewLine +
-                "---";
+            StackTrace t = new StackTrace();
+            for (int i = 0; i < t.FrameCount; i++)
+            {
+                if (i == 0)
+                {
+                    ret += t.GetFrame(i).GetMethod().Name;
+                }
+                else
+                {
+                    ret += " <= " + t.GetFrame(i).GetMethod().Name;
+                }
+            }
 
-            Console.WriteLine(message);
+            return ret;
         }
 
         #endregion
