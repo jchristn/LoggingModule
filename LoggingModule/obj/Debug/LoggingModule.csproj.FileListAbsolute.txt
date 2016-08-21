@@ -1,0 +1,4 @@
+D:\code\misc\SyslogLogging\SyslogLogging\bin\Debug\SyslogLogging.dll
+D:\code\misc\SyslogLogging\SyslogLogging\bin\Debug\SyslogLogging.pdb
+D:\code\misc\SyslogLogging\SyslogLogging\obj\Debug\SyslogLogging.dll
+D:\code\misc\SyslogLogging\SyslogLogging\obj\Debug\SyslogLogging.pdb

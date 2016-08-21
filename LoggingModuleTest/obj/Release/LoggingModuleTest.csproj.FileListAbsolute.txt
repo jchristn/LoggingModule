@@ -1,0 +1,8 @@
+D:\Code\Misc\SyslogLogging\LoggingModuleTest\bin\Release\LoggingModuleTest.exe.config
+D:\Code\Misc\SyslogLogging\LoggingModuleTest\bin\Release\LoggingModuleTest.exe
+D:\Code\Misc\SyslogLogging\LoggingModuleTest\bin\Release\LoggingModuleTest.pdb
+D:\Code\Misc\SyslogLogging\LoggingModuleTest\bin\Release\SyslogLogging.dll
+D:\Code\Misc\SyslogLogging\LoggingModuleTest\bin\Release\SyslogLogging.pdb
+D:\Code\Misc\SyslogLogging\LoggingModuleTest\obj\Release\LoggingModuleTest.csprojResolveAssemblyReference.cache
+D:\Code\Misc\SyslogLogging\LoggingModuleTest\obj\Release\LoggingModuleTest.exe
+D:\Code\Misc\SyslogLogging\LoggingModuleTest\obj\Release\LoggingModuleTest.pdb
