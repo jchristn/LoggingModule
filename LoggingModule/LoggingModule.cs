@@ -179,7 +179,7 @@ namespace SyslogLogging
             Log(Severity.Alert, message);
         }
 
-        private static void ConsoleException(string module, string method, Exception e)
+        public static void ConsoleException(string module, string method, Exception e)
         {
             if (e == null) throw new ArgumentNullException(nameof(e));
             var st = new StackTrace(e, true);
