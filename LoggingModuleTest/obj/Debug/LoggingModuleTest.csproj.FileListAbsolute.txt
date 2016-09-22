@@ -1,8 +1,8 @@
-D:\code\misc\SyslogLogging\LoggingModuleTest\bin\Debug\LoggingModuleTest.exe.config
-D:\code\misc\SyslogLogging\LoggingModuleTest\bin\Debug\LoggingModuleTest.exe
-D:\code\misc\SyslogLogging\LoggingModuleTest\bin\Debug\LoggingModuleTest.pdb
-D:\code\misc\SyslogLogging\LoggingModuleTest\bin\Debug\SyslogLogging.dll
-D:\code\misc\SyslogLogging\LoggingModuleTest\bin\Debug\SyslogLogging.pdb
-D:\code\misc\SyslogLogging\LoggingModuleTest\obj\Debug\LoggingModuleTest.csprojResolveAssemblyReference.cache
-D:\code\misc\SyslogLogging\LoggingModuleTest\obj\Debug\LoggingModuleTest.exe
-D:\code\misc\SyslogLogging\LoggingModuleTest\obj\Debug\LoggingModuleTest.pdb
+D:\code\misc\sysloglogging\LoggingModuleTest\bin\Debug\LoggingModuleTest.exe.config
+D:\code\misc\sysloglogging\LoggingModuleTest\bin\Debug\LoggingModuleTest.exe
+D:\code\misc\sysloglogging\LoggingModuleTest\bin\Debug\LoggingModuleTest.pdb
+D:\code\misc\sysloglogging\LoggingModuleTest\bin\Debug\SyslogLogging.dll
+D:\code\misc\sysloglogging\LoggingModuleTest\bin\Debug\SyslogLogging.pdb
+D:\code\misc\sysloglogging\LoggingModuleTest\obj\Debug\LoggingModuleTest.csprojResolveAssemblyReference.cache
+D:\code\misc\sysloglogging\LoggingModuleTest\obj\Debug\LoggingModuleTest.exe
+D:\code\misc\sysloglogging\LoggingModuleTest\obj\Debug\LoggingModuleTest.pdb

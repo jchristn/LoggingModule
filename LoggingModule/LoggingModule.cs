@@ -79,7 +79,22 @@ namespace SyslogLogging
 
             if (!String.IsNullOrEmpty(SyslogServerIp) && SyslogServerPort > 0)
             {
-                UDP = new UdpClient(SyslogServerIp, SyslogServerPort);
+                try
+                {
+                    UDP = new UdpClient(SyslogServerIp, SyslogServerPort);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("---");
+                    Console.WriteLine("");
+                    Console.WriteLine("NOTICE:");
+                    Console.WriteLine("");
+                    Console.WriteLine("Exception while initializing UDP syslog client: " + e.Message);
+                    Console.WriteLine("Syslog logging to server " + SyslogServerIp + ":" + SyslogServerPort + " is DISABLED as a result");
+                    Console.WriteLine("");
+                    Console.WriteLine("---");
+                    UDP = null;
+                }
             }
             else
             {
