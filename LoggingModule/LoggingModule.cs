@@ -242,12 +242,12 @@ namespace SyslogLogging
             if (!String.IsNullOrEmpty(SyslogServerIp)
                 && SyslogServerPort > 0)
             {
-                if (UDP != null)
+                lock (SendLock)
                 {
-                    byte[] data = Encoding.UTF8.GetBytes(msg);
-
-                    lock (SendLock)
+                    if (UDP != null)
                     {
+                        byte[] data = Encoding.UTF8.GetBytes(msg);
+
                         try
                         {
                             UDP.Send(data, data.Length);
