@@ -248,7 +248,15 @@ namespace SyslogLogging
 
                     lock (SendLock)
                     {
-                        UDP.Send(data, data.Length);
+                        try
+                        {
+                            UDP.Send(data, data.Length);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Exception while sending to syslog server " + SyslogServerIp + ":" + SyslogServerPort + ", disabling: " + e.Message);
+                            UDP = null;
+                        }
                     }
                 }
             }
