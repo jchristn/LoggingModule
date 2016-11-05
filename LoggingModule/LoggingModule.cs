@@ -125,7 +125,22 @@ namespace SyslogLogging
 
         public void Log(Severity sev, string msg)
         {
+            if (String.IsNullOrEmpty(msg)) return;
+
             string message = "";
+            string currMsg = "";
+            string remainder = "";
+
+            if (msg.Length > 1024)
+            {
+                currMsg = msg.Substring(0, 1024);
+                remainder = msg.Substring(1024, (msg.Length - 1024));
+            }
+            else
+            {
+                currMsg = msg;
+            }
+
             if (IncludeUtcTimestamp) message += DateTime.Now.ToUniversalTime().ToString("MM/dd/yyyy HH:mm:ss") + " ";
             if (IncludeSeverity) message += sev.ToString() + " ";
             if (IncludeHostname) message += Hostname + " ";
@@ -143,7 +158,7 @@ namespace SyslogLogging
                 }
             }
 
-            message += msg;
+            message += currMsg;
 
             if (ConsoleEnable)
             {
@@ -161,6 +176,11 @@ namespace SyslogLogging
                     if (!AsyncLogging) SendToSyslog(message);
                     else Task.Run(() => SendToSyslog(message));
                 }
+            }
+
+            if (!String.IsNullOrEmpty(remainder))
+            {
+                Log(sev, remainder);
             }
         }
 

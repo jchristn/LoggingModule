@@ -2,7 +2,7 @@ D:\code\misc\SyslogLogging\SyslogLogging\bin\Release\SyslogLogging.dll
 D:\code\misc\SyslogLogging\SyslogLogging\bin\Release\SyslogLogging.pdb
 D:\code\misc\SyslogLogging\SyslogLogging\obj\Release\SyslogLogging.dll
 D:\code\misc\SyslogLogging\SyslogLogging\obj\Release\SyslogLogging.pdb
-D:\code\misc\sysloglogging\LoggingModule\bin\Release\SyslogLogging.dll
-D:\code\misc\sysloglogging\LoggingModule\bin\Release\SyslogLogging.pdb
-D:\code\misc\sysloglogging\LoggingModule\obj\Release\SyslogLogging.dll
-D:\code\misc\sysloglogging\LoggingModule\obj\Release\SyslogLogging.pdb
+D:\code\misc\SyslogLogging\LoggingModule\bin\Release\SyslogLogging.dll
+D:\code\misc\SyslogLogging\LoggingModule\bin\Release\SyslogLogging.pdb
+D:\code\misc\SyslogLogging\LoggingModule\obj\Release\SyslogLogging.dll
+D:\code\misc\SyslogLogging\LoggingModule\obj\Release\SyslogLogging.pdb

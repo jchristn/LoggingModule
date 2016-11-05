@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>SyslogLogging</id>
+        <version>1.0.6</version>
+        <title>SyslogLogging</title>
+        <authors>Joel Christner</authors>
+        <owners>Joel Christner</owners>
+        <licenseUrl>https://github.com/jchristn/LoggingModule/blob/master/LICENSE.txt</licenseUrl>
+        <projectUrl>https://github.com/jchristn/LoggingModule</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Simple C# class library for logging to syslog and to the console</description>
+        <summary>Simple C# class library for logging to syslog and to the console</summary>
+        <releaseNotes>Limit msg size to 1024 bytes</releaseNotes>
+        <copyright>Copyright 2016 Marauder Software Inc</copyright>
+        <tags>syslog logging console</tags>
+    </metadata>
+    <files>
+        <file src="..\LoggingModule\bin\Release\SyslogLogging.dll" target="lib\SyslogLogging.dll" />
+        <file src="..\LoggingModule\bin\Release\SyslogLogging.pdb" target="lib\SyslogLogging.pdb" />
+    </files>
+</package>
