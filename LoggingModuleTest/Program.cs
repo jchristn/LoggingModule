@@ -15,6 +15,7 @@ namespace SyslogLogging
         {
             Logging = new LoggingModule("localhost", 514, true, LoggingModule.Severity.Debug, false, true, true, true, true, true);
             Logging.Log(LoggingModule.Severity.Debug, "Hello from Main!");
+            Logging.Log("Hello from Main (without severity)!");
             Method1();
             Logging.Log(LoggingModule.Severity.Debug, "Back from Method1!  Press ENTER to exit");
             Console.ReadLine();

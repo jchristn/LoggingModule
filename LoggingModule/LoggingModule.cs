@@ -123,6 +123,11 @@ namespace SyslogLogging
             if (UDP != null) UDP.Close();
         }
 
+        public void Log(string msg)
+        {
+            Log(Severity.Debug, msg);
+        }
+
         public void Log(Severity sev, string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;

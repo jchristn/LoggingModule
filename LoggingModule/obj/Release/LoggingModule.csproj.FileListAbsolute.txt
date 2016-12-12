@@ -6,3 +6,4 @@ D:\code\misc\SyslogLogging\LoggingModule\bin\Release\SyslogLogging.dll
 D:\code\misc\SyslogLogging\LoggingModule\bin\Release\SyslogLogging.pdb
 D:\code\misc\SyslogLogging\LoggingModule\obj\Release\SyslogLogging.dll
 D:\code\misc\SyslogLogging\LoggingModule\obj\Release\SyslogLogging.pdb
+D:\code\misc\SyslogLogging\LoggingModule\obj\Release\LoggingModule.csprojResolveAssemblyReference.cache
