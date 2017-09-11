@@ -77,6 +77,12 @@ namespace SyslogLogging
             IncludeThreadId = includeThreadId;
             IndentByStackSize = indentByStackSize;
 
+            if (!ConsoleExists() && ConsoleEnable)
+            {
+                Debug.WriteLine("Console logging disabled (console does not exist)");
+                ConsoleEnable = false;
+            }
+
             if (!String.IsNullOrEmpty(SyslogServerIp) && SyslogServerPort > 0)
             {
                 try
@@ -85,14 +91,14 @@ namespace SyslogLogging
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("---");
-                    Console.WriteLine("");
-                    Console.WriteLine("NOTICE:");
-                    Console.WriteLine("");
-                    Console.WriteLine("Exception while initializing UDP syslog client: " + e.Message);
-                    Console.WriteLine("Syslog logging to server " + SyslogServerIp + ":" + SyslogServerPort + " is DISABLED as a result");
-                    Console.WriteLine("");
-                    Console.WriteLine("---");
+                    Debug.WriteLine("---");
+                    Debug.WriteLine("");
+                    Debug.WriteLine("NOTICE:");
+                    Debug.WriteLine("");
+                    Debug.WriteLine("Exception while initializing UDP syslog client: " + e.Message);
+                    Debug.WriteLine("Syslog logging to server " + SyslogServerIp + ":" + SyslogServerPort + " is DISABLED as a result");
+                    Debug.WriteLine("");
+                    Debug.WriteLine("---");
                     UDP = null;
                 }
             }
@@ -253,6 +259,18 @@ namespace SyslogLogging
 
         #region Private-Methods
 
+        private bool ConsoleExists()
+        {
+            try
+            {
+                return (Console.WindowHeight > 0);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
         private void SendToConsole(string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;
@@ -279,7 +297,7 @@ namespace SyslogLogging
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("Exception while sending to syslog server " + SyslogServerIp + ":" + SyslogServerPort + ", disabling: " + e.Message);
+                            Debug.WriteLine("Exception while sending to syslog server " + SyslogServerIp + ":" + SyslogServerPort + ", disabling: " + e.Message);
                             UDP = null;
                         }
                     }
