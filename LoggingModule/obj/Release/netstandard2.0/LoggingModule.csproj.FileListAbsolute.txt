@@ -1,0 +1,8 @@
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\bin\Release\netstandard2.0\LoggingModule.deps.json
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\bin\Release\netstandard2.0\LoggingModule.dll
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\bin\Release\netstandard2.0\LoggingModule.pdb
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Release\netstandard2.0\LoggingModule.csproj.CoreCompileInputs.cache
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Release\netstandard2.0\LoggingModule.AssemblyInfoInputs.cache
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Release\netstandard2.0\LoggingModule.AssemblyInfo.cs
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Release\netstandard2.0\LoggingModule.dll
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Release\netstandard2.0\LoggingModule.pdb

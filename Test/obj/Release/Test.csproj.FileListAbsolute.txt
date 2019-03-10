@@ -1,0 +1,10 @@
+C:\Code\Misc\SyslogLoggingRetarget\Test\bin\Release\LoggingModuleTest.exe.config
+C:\Code\Misc\SyslogLoggingRetarget\Test\bin\Release\LoggingModuleTest.exe
+C:\Code\Misc\SyslogLoggingRetarget\Test\bin\Release\LoggingModuleTest.pdb
+C:\Code\Misc\SyslogLoggingRetarget\Test\bin\Release\LoggingModule.dll
+C:\Code\Misc\SyslogLoggingRetarget\Test\bin\Release\LoggingModule.pdb
+C:\Code\Misc\SyslogLoggingRetarget\Test\obj\Release\Test.csprojAssemblyReference.cache
+C:\Code\Misc\SyslogLoggingRetarget\Test\obj\Release\Test.csproj.CoreCompileInputs.cache
+C:\Code\Misc\SyslogLoggingRetarget\Test\obj\Release\Test.csproj.CopyComplete
+C:\Code\Misc\SyslogLoggingRetarget\Test\obj\Release\LoggingModuleTest.exe
+C:\Code\Misc\SyslogLoggingRetarget\Test\obj\Release\LoggingModuleTest.pdb

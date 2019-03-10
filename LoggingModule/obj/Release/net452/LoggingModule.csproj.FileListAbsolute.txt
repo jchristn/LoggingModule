@@ -1,0 +1,7 @@
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\bin\Release\net452\LoggingModule.dll
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\bin\Release\net452\LoggingModule.pdb
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Release\net452\LoggingModule.csproj.CoreCompileInputs.cache
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Release\net452\LoggingModule.AssemblyInfoInputs.cache
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Release\net452\LoggingModule.AssemblyInfo.cs
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Release\net452\LoggingModule.dll
+C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Release\net452\LoggingModule.pdb
