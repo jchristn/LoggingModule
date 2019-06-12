@@ -5,3 +5,11 @@ C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Release\net452\LoggingModul
 C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Release\net452\LoggingModule.AssemblyInfo.cs
 C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Release\net452\LoggingModule.dll
 C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Release\net452\LoggingModule.pdb
+C:\code\Misc\SyslogLogging\LoggingModule\bin\Release\net452\LoggingModule.dll
+C:\code\Misc\SyslogLogging\LoggingModule\bin\Release\net452\LoggingModule.pdb
+C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\net452\LoggingModule.csprojAssemblyReference.cache
+C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\net452\LoggingModule.csproj.CoreCompileInputs.cache
+C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\net452\LoggingModule.AssemblyInfoInputs.cache
+C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\net452\LoggingModule.AssemblyInfo.cs
+C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\net452\LoggingModule.dll
+C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\net452\LoggingModule.pdb

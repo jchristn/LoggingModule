@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.10</Version>
+    <Version>1.0.11</Version>
     <Authors>Joel Christner</Authors>
     <PackageId>SyslogLogging</PackageId>
     <Product>SyslogLogging</Product>
@@ -14,7 +14,8 @@
     <RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageLicenseUrl>https://github.com/jchristn/LoggingModule/blob/master/LICENSE.TXT</PackageLicenseUrl>
-    <PackageReleaseNotes>Retargeted to both .NET Core 2.0 and .NET Framework 4.5.2</PackageReleaseNotes>
+    <PackageReleaseNotes>Icon</PackageReleaseNotes>
+    <PackageIconUrl>https://raw.githubusercontent.com/jchristn/loggingmodule/master/assets/logo.ico</PackageIconUrl>
   </PropertyGroup>
 
 </Project>

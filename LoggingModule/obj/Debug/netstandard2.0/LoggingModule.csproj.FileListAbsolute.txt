@@ -7,3 +7,12 @@ C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Debug\netstandard2.0\Loggin
 C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.AssemblyInfo.cs
 C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.dll
 C:\Code\Misc\SyslogLoggingRetarget\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.pdb
+C:\code\Misc\SyslogLogging\LoggingModule\bin\Debug\netstandard2.0\LoggingModule.deps.json
+C:\code\Misc\SyslogLogging\LoggingModule\bin\Debug\netstandard2.0\LoggingModule.dll
+C:\code\Misc\SyslogLogging\LoggingModule\bin\Debug\netstandard2.0\LoggingModule.pdb
+C:\code\Misc\SyslogLogging\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.csprojAssemblyReference.cache
+C:\code\Misc\SyslogLogging\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.csproj.CoreCompileInputs.cache
+C:\code\Misc\SyslogLogging\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.AssemblyInfoInputs.cache
+C:\code\Misc\SyslogLogging\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.AssemblyInfo.cs
+C:\code\Misc\SyslogLogging\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.dll
+C:\code\Misc\SyslogLogging\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.pdb
