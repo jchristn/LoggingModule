@@ -273,8 +273,7 @@ namespace SyslogLogging
 
         private void SendToConsole(string msg)
         {
-            if (String.IsNullOrEmpty(msg)) return;
-            if (Console.CursorLeft != 0) Console.WriteLine("");
+            if (String.IsNullOrEmpty(msg)) return; 
             Console.WriteLine(msg);
         }
 

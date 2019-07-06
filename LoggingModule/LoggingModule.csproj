@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.11</Version>
+    <Version>1.0.12</Version>
     <Authors>Joel Christner</Authors>
     <PackageId>SyslogLogging</PackageId>
     <Product>SyslogLogging</Product>
@@ -14,7 +14,7 @@
     <RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageLicenseUrl>https://github.com/jchristn/LoggingModule/blob/master/LICENSE.TXT</PackageLicenseUrl>
-    <PackageReleaseNotes>Icon</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed blocking issue on console send</PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/jchristn/loggingmodule/master/assets/logo.ico</PackageIconUrl>
   </PropertyGroup>
 
