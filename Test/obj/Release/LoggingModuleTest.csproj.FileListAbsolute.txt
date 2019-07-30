@@ -1,8 +1,0 @@
-D:\code\misc\SyslogLogging\LoggingModuleTest\bin\Release\LoggingModuleTest.exe.config
-D:\code\misc\SyslogLogging\LoggingModuleTest\bin\Release\LoggingModuleTest.exe
-D:\code\misc\SyslogLogging\LoggingModuleTest\bin\Release\LoggingModuleTest.pdb
-D:\code\misc\SyslogLogging\LoggingModuleTest\bin\Release\SyslogLogging.dll
-D:\code\misc\SyslogLogging\LoggingModuleTest\bin\Release\SyslogLogging.pdb
-D:\code\misc\SyslogLogging\LoggingModuleTest\obj\Release\LoggingModuleTest.csprojResolveAssemblyReference.cache
-D:\code\misc\SyslogLogging\LoggingModuleTest\obj\Release\LoggingModuleTest.exe
-D:\code\misc\SyslogLogging\LoggingModuleTest\obj\Release\LoggingModuleTest.pdb

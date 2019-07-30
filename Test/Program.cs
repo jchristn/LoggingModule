@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SyslogLogging;
 
-namespace SyslogLogging
+namespace Test
 {
     class Program
     {
@@ -13,45 +13,29 @@ namespace SyslogLogging
 
         static void Main(string[] args)
         {
-            Logging = new LoggingModule("localhost", 514, true, LoggingModule.Severity.Debug, false, true, true, true, true, true);
-            Logging.Log(LoggingModule.Severity.Debug, "Hello from Main!");
-            Logging.Log("Hello from Main (without severity)!");
-            Method1();
-            Logging.Log(LoggingModule.Severity.Debug, "Back from Method1!  Press ENTER to exit");
-            Console.ReadLine();
-        }
+            Logging = new LoggingModule("127.0.0.1", 514);
+            Logging.ConsoleEnable = true;
+            Logging.IncludeUtcTimestamp = false;
 
-        static void Method1()
-        {
-            Logging.Log(LoggingModule.Severity.Warn, "Warning from Method1!");
-            Method2();
-            Logging.Log(LoggingModule.Severity.Debug, "Back from Method2!");
-        }
+            Logging.Debug("Hello!");
+            Logging.Info("Let's test logging an exception.");
 
-        static void Method2()
-        {
-            Logging.Log(LoggingModule.Severity.Alert, "Alert from Method2!");
-            Method3();
-            Logging.Log(LoggingModule.Severity.Debug, "Back from Method3!");
-        }
+            int numerator = 15;
+            int denominator = 0;
 
-        static void Method3()
-        {
             try
             {
-                Logging.Log(LoggingModule.Severity.Critical, "We're about to get an exception!");
-                Method4(null);
-                Logging.Log(LoggingModule.Severity.Debug, "You shouldn't see me");
+                Logging.Critical("Shall we divide by zero?");
+                int testVal = numerator / denominator;
+                Logging.Warn("If you see this, there's a problem.");
             }
             catch (Exception e)
             {
-                Logging.LogException("Program", "Method3", e);
+                Logging.Exception("Program", "Main", e);
             }
-        }
 
-        static void Method4(object someArg)
-        {
-            throw new ArgumentNullException(nameof(someArg));
+            Logging.Alert("Press ENTER to exit");
+            Console.ReadLine();
         }
     }
 }

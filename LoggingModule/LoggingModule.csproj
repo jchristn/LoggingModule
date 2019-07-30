@@ -3,18 +3,18 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.12</Version>
+    <Version>1.1.0</Version>
     <Authors>Joel Christner</Authors>
     <PackageId>SyslogLogging</PackageId>
     <Product>SyslogLogging</Product>
     <Description>Simple C# class library for logging to syslog and to the console</Description>
     <Copyright>(c)2019 Joel Christner</Copyright>
-    <PackageTags>syslog logging console</PackageTags>
+    <PackageTags>syslog logging console log logger udp event</PackageTags>
     <PackageProjectUrl>https://github.com/jchristn/LoggingModule</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageLicenseUrl>https://github.com/jchristn/LoggingModule/blob/master/LICENSE.TXT</PackageLicenseUrl>
-    <PackageReleaseNotes>Fixed blocking issue on console send</PackageReleaseNotes>
+    <PackageReleaseNotes>Significant simplification of both constructors and methods.</PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/jchristn/loggingmodule/master/assets/logo.ico</PackageIconUrl>
   </PropertyGroup>
 

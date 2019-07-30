@@ -7,28 +7,40 @@
 
 Simple C# class library for logging to syslog and console.  For a sample app please refer to the included test project.
 
-## help or feedback
-first things first - do you need help or have feedback?  Contact me at joel at maraudersoftware.com dot com or file an issue here!
+## Help or Feedback
 
-## it's easy
+First things first - do you need help or have feedback?  File an issue here!  We'd love to hear from you.
+
+## New in v1.1.x
+
+- Simplified constructors
+- Simplified methods
+- Added IDisposable support
+- Cleanup and fixes, minor refactoring
+
+## It's Really Easy
+
 ```
 using SyslogLogging;
 
-LoggingModule logging = new LoggingModule(
-   "localhost",                              // hostname of the syslog server
-   514,                                      // syslog server port
-   true,                                     // also log to console
-   LoggingModule.Severity.Debug,             // minimum severity to send
-   false,                                    // use async logging (start a task)
-   true,                                     // include timestamp
-   true,                                     // include severity
-   true,                                     // include hostname
-   true,                                     // include thread ID
-   true);                                    // indent by stack depth
+LoggingModule logging = new LoggingModule("127.0.0.1", 514);
+logging.ConsoleEnable = true;
 
-logging.Log(Severity.Debug, "This is a debug message!");
-logging.LogException("Program", "Main", e);
+logging.Debug("This is a debug message!");
+logging.Exception("Program", "Main", e);
 ```
 
-## running under Mono
-Should work well in Mono environments.  
+## Supported Environments
+
+Tested and works well in Windows in .NET Framework 4.5.2 or later or .NET Core.
+
+Tested and works well in Linux and OSX environments, too.
+
+Should work well in Mono environments.  You may want to use the Mono Ahead-of-time compiler (AOT).
+
+## Version History
+
+v1.0.x
+
+- Initial release
+- Bugfixes and stability
