@@ -102,7 +102,7 @@ namespace SyslogLogging
 
         /// <summary>
         /// Include the severity in the message.
-        /// </summary>
+        /// </summary>s
         public bool IncludeSeverity = true;
 
         /// <summary>
@@ -119,7 +119,12 @@ namespace SyslogLogging
         /// Indent outgoing messages based on stack depth.
         /// </summary>
         public bool IndentByStackSize = false;
-         
+
+        /// <summary>
+        /// Colors to use for console messages based on message severity.
+        /// </summary>
+        public ColorSchema Colors = new ColorSchema();
+
         #endregion
 
         #region Private-Members
@@ -131,7 +136,7 @@ namespace SyslogLogging
         private string _Hostname = null;
         private object _SendLock = new object();
         private int _BaseDepth = 0;
-        private bool _ConsoleEnable = false;
+        private bool _ConsoleEnable = true;
 
         #endregion
 
@@ -214,28 +219,7 @@ namespace SyslogLogging
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
-        /// <summary>
-        /// DEPRECATED.  Close the UDP client.  
-        /// </summary>
-        public void Close()
-        {
-            if (_UDP != null)
-            {
-                _UDP.Close();
-                _UDP = null;
-            }
-        }
-
-        /// <summary>
-        /// DEPRECATED.  Send a log message using 'Debug' severity.
-        /// </summary>
-        /// <param name="msg">Message to send.</param>
-        public void Log(string msg)
-        {
-            Log(Severity.Debug, msg);
-        }
-
+          
         /// <summary>
         /// Send a log message using 'Debug' severity.
         /// </summary>
@@ -305,12 +289,85 @@ namespace SyslogLogging
             if (String.IsNullOrEmpty(msg)) return;
             Log(Severity.Emergency, msg);
         }
-
+         
         /// <summary>
-        /// DEPRECATED.  Send a log message using a supplied severity.
+        /// Send log messages containing Exception details using 'Alert' severity.
         /// </summary>
-        /// <param name="msg">Message to send.</param>
-        public void Log(Severity sev, string msg)
+        /// <param name="module">Module name (user-specified).</param>
+        /// <param name="method">Method name (user-specified).</param>
+        /// <param name="e">Exception.</param>
+        public void Exception(string module, string method, Exception e)
+        {
+            if (e == null) throw new ArgumentNullException(nameof(e));
+            var st = new StackTrace(e, true);
+            var frame = st.GetFrame(0);
+            int fileLine = frame.GetFileLineNumber();
+            string filename = frame.GetFileName();
+
+            string message =
+                Environment.NewLine +
+                "---" + Environment.NewLine +
+                "An exception was encountered which triggered this message" + Environment.NewLine +
+                "  Module     : " + module + Environment.NewLine +
+                "  Method     : " + method + Environment.NewLine +
+                "  Type       : " + e.GetType().ToString() + Environment.NewLine +
+                "  Data       : " + e.Data + Environment.NewLine +
+                "  Inner      : " + e.InnerException + Environment.NewLine +
+                "  Message    : " + e.Message + Environment.NewLine +
+                "  Source     : " + e.Source + Environment.NewLine +
+                "  StackTrace : " + e.StackTrace + Environment.NewLine +
+                "  Stack      : " + StackToString() + Environment.NewLine +
+                "  Line       : " + fileLine + Environment.NewLine +
+                "  File       : " + filename + Environment.NewLine +
+                "  ToString   : " + e.ToString() + Environment.NewLine +
+                "  Servername : " + Dns.GetHostName() + Environment.NewLine +
+                "---";
+
+            Log(Severity.Alert, message);
+        }
+         
+        #endregion
+
+        #region Private-Methods
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_Disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                if (_UDP != null)
+                {
+                    try
+                    {
+                        _UDP.Close();
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                }
+            }
+
+            _Disposed = true;
+        }
+
+        private bool ConsoleExists()
+        {
+            try
+            {
+                return (Console.WindowHeight > 0);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private void Log(Severity sev, string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;
 
@@ -351,8 +408,8 @@ namespace SyslogLogging
             {
                 if (sev >= MinimumSeverity)
                 {
-                    if (!AsyncLogging) SendConsole(message);
-                    else Task.Run(() => SendConsole(message));
+                    if (!AsyncLogging) SendConsole(sev, message);
+                    else Task.Run(() => SendConsole(sev, message));
                 }
             }
 
@@ -368,91 +425,55 @@ namespace SyslogLogging
             if (!String.IsNullOrEmpty(remainder))
             {
                 Log(sev, remainder);
+            }
+        }
+
+        private void SendConsole(Severity sev, string msg)
+        {
+            if (String.IsNullOrEmpty(msg)) return;
+            if (!_ConsoleEnable) return;
+
+            ConsoleColor prevForeground = Console.ForegroundColor;
+            ConsoleColor prevBackground = Console.BackgroundColor;
+
+            if (Colors != null)
+            {
+                switch (sev)
+                {
+                    case Severity.Debug:
+                        Console.ForegroundColor = Colors.Debug.Foreground;
+                        Console.BackgroundColor = Colors.Debug.Background;
+                        break;
+                    case Severity.Info:
+                        Console.ForegroundColor = Colors.Info.Foreground;
+                        Console.BackgroundColor = Colors.Info.Background;
+                        break;
+                    case Severity.Warn:
+                        Console.ForegroundColor = Colors.Warn.Foreground;
+                        Console.BackgroundColor = Colors.Warn.Background;
+                        break;
+                    case Severity.Error:
+                        Console.ForegroundColor = Colors.Error.Foreground;
+                        Console.BackgroundColor = Colors.Error.Background;
+                        break;
+                    case Severity.Alert:
+                        Console.ForegroundColor = Colors.Alert.Foreground;
+                        Console.BackgroundColor = Colors.Alert.Background;
+                        break;
+                    case Severity.Critical:
+                        Console.ForegroundColor = Colors.Critical.Foreground;
+                        Console.BackgroundColor = Colors.Critical.Background;
+                        break;
+                    case Severity.Emergency:
+                        Console.ForegroundColor = Colors.Emergency.Foreground;
+                        Console.BackgroundColor = Colors.Emergency.Background;
+                        break;
+                }
             } 
-        }
 
-        /// <summary>
-        /// Send log messages containing Exception details using 'Alert' severity.
-        /// </summary>
-        /// <param name="module">Module name (user-specified).</param>
-        /// <param name="method">Method name (user-specified).</param>
-        /// <param name="e">Exception.</param>
-        public void Exception(string module, string method, Exception e)
-        {
-            if (e == null) throw new ArgumentNullException(nameof(e));
-            var st = new StackTrace(e, true);
-            var frame = st.GetFrame(0);
-            int fileLine = frame.GetFileLineNumber();
-            string filename = frame.GetFileName();
-
-            string message =
-                Environment.NewLine +
-                "---" + Environment.NewLine +
-                "An exception was encountered which triggered this message" + Environment.NewLine +
-                "  Module     : " + module + Environment.NewLine +
-                "  Method     : " + method + Environment.NewLine +
-                "  Type       : " + e.GetType().ToString() + Environment.NewLine +
-                "  Data       : " + e.Data + Environment.NewLine +
-                "  Inner      : " + e.InnerException + Environment.NewLine +
-                "  Message    : " + e.Message + Environment.NewLine +
-                "  Source     : " + e.Source + Environment.NewLine +
-                "  StackTrace : " + e.StackTrace + Environment.NewLine +
-                "  Stack      : " + StackToString() + Environment.NewLine +
-                "  Line       : " + fileLine + Environment.NewLine +
-                "  File       : " + filename + Environment.NewLine +
-                "  ToString   : " + e.ToString() + Environment.NewLine +
-                "  Servername : " + Dns.GetHostName() + Environment.NewLine +
-                "---";
-
-            Log(Severity.Alert, message);
-        }
-
-        /// <summary>
-        /// DEPRECATED.  Send log messages containing Exception details using 'Alert' severity.
-        /// </summary>
-        /// <param name="module">Module name (user-specified).</param>
-        /// <param name="method">Method name (user-specified).</param>
-        /// <param name="e">Exception.</param>
-        public void LogException(string module, string method, Exception e)
-        {
-            Exception(module, method, e); 
-        }
-
-        #endregion
-
-        #region Private-Methods
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_Disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                Close();
-            }
-
-            _Disposed = true;
-        }
-
-        private bool ConsoleExists()
-        {
-            try
-            {
-                return (Console.WindowHeight > 0);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        private void SendConsole(string msg)
-        {
-            if (String.IsNullOrEmpty(msg)) return; 
             Console.WriteLine(msg);
+            Console.ForegroundColor = prevForeground;
+            Console.BackgroundColor = prevBackground;
         }
 
         private void SendSyslog(string msg)

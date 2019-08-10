@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Authors>Joel Christner</Authors>
     <PackageId>SyslogLogging</PackageId>
     <Product>SyslogLogging</Product>
@@ -14,8 +14,9 @@
     <RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageLicenseUrl>https://github.com/jchristn/LoggingModule/blob/master/LICENSE.TXT</PackageLicenseUrl>
-    <PackageReleaseNotes>Significant simplification of both constructors and methods.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added configurable color schema.</PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/jchristn/loggingmodule/master/assets/logo.ico</PackageIconUrl>
+    <RootNamespace>SyslogLogging</RootNamespace>
   </PropertyGroup>
 
 </Project>
