@@ -38,6 +38,14 @@ Tested and works well in Linux and OSX environments, too.
 
 Should work well in Mono environments.  You may want to use the Mono Ahead-of-time compiler (AOT).
 
+## Changing Console Message Color
+
+If you wish to change the colors used by the library, modify the ```LoggingModule.Colors``` property.  A variable of type ```ColorScheme``` exists for each severity level.  To disable color manipulation, set this property to ```null```.
+
+```
+log.Colors.Debug = new ColorScheme(ConsoleColor.DarkGray, ConsoleColor.Black);
+```
+
 ## Version History
 
 v1.0.x
