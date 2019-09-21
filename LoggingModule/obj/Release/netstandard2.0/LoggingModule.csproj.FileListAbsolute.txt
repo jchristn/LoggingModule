@@ -15,3 +15,4 @@ C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\netstandard2.0\LoggingModul
 C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\netstandard2.0\LoggingModule.AssemblyInfo.cs
 C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\netstandard2.0\LoggingModule.dll
 C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\netstandard2.0\LoggingModule.pdb
+C:\Code\Misc\SyslogLogging\LoggingModule\bin\Release\netstandard2.0\LoggingModule.xml

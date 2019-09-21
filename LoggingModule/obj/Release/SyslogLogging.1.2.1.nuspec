@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>SyslogLogging</id>
+    <version>1.2.1</version>
+    <authors>Joel Christner</authors>
+    <owners>Joel Christner</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE.md</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <projectUrl>https://github.com/jchristn/LoggingModule</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/jchristn/loggingmodule/master/assets/logo.ico</iconUrl>
+    <description>Simple C# class library for logging to syslog and to the console</description>
+    <releaseNotes>Added configurable color schema.</releaseNotes>
+    <copyright>(c)2019 Joel Christner</copyright>
+    <tags>syslog logging console log logger udp event</tags>
+    <repository type="Github" url="https://github.com/jchristn/LoggingModule" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.5.2" />
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="C:\Code\Misc\SyslogLogging\LoggingModule\bin\Release\net452\LoggingModule.dll" target="lib\net452\LoggingModule.dll" />
+    <file src="C:\Code\Misc\SyslogLogging\LoggingModule\bin\Release\netstandard2.0\LoggingModule.dll" target="lib\netstandard2.0\LoggingModule.dll" />
+    <file src="C:\Code\Misc\SyslogLogging\LoggingModule\bin\Release\netstandard2.0\LoggingModule.xml" target="lib\netstandard2.0\LoggingModule.xml" />
+    <file src="C:\Code\Misc\SyslogLogging\LICENSE.md" target="LICENSE.md" />
+  </files>
+</package>

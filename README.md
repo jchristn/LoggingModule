@@ -11,12 +11,9 @@ Simple C# class library for logging to syslog and console.  For a sample app ple
 
 First things first - do you need help or have feedback?  File an issue here!  We'd love to hear from you.
 
-## New in v1.1.x
+## New in v1.2.1
 
-- Simplified constructors
-- Simplified methods
-- Added IDisposable support
-- Cleanup and fixes, minor refactoring
+- XML documentation
 
 ## It's Really Easy
 
@@ -48,7 +45,4 @@ log.Colors.Debug = new ColorScheme(ConsoleColor.DarkGray, ConsoleColor.Black);
 
 ## Version History
 
-v1.0.x
-
-- Initial release
-- Bugfixes and stability
+Please refer to CHANGELOG.md.

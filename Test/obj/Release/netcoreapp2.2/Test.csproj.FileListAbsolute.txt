@@ -12,3 +12,4 @@ C:\Code\Misc\SyslogLogging\Test\obj\Release\netcoreapp2.2\Test.AssemblyInfo.cs
 C:\Code\Misc\SyslogLogging\Test\obj\Release\netcoreapp2.2\Test.csproj.CopyComplete
 C:\Code\Misc\SyslogLogging\Test\obj\Release\netcoreapp2.2\Test.dll
 C:\Code\Misc\SyslogLogging\Test\obj\Release\netcoreapp2.2\Test.pdb
+C:\Code\Misc\SyslogLogging\Test\bin\Release\netcoreapp2.2\LoggingModule.xml

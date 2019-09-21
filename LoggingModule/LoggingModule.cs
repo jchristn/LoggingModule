@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace SyslogLogging
 {
+    /// <summary>
+    /// Syslog and console logging module.
+    /// </summary>
     public class LoggingModule : IDisposable
     {
         #region Public-Enums
@@ -20,12 +23,33 @@ namespace SyslogLogging
         /// </summary>
         public enum Severity
         {
+            /// <summary>
+            /// Debug messages.
+            /// </summary>
             Debug = 0,
+            /// <summary>
+            /// Informational messages.
+            /// </summary>
             Info = 1,
+            /// <summary>
+            /// Warning messages.
+            /// </summary>
             Warn = 2,
+            /// <summary>
+            /// Error messages.
+            /// </summary>
             Error = 3,
+            /// <summary>
+            /// Alert messages.
+            /// </summary>
             Alert = 4,
+            /// <summary>
+            /// Critical messages.
+            /// </summary>
             Critical = 5,
+            /// <summary>
+            /// Emergency messages.
+            /// </summary>
             Emergency = 6
         }
 
@@ -330,6 +354,10 @@ namespace SyslogLogging
 
         #region Private-Methods
 
+        /// <summary>
+        /// Dispose of the resource.
+        /// </summary>
+        /// <param name="disposing">Disposing.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (_Disposed)
