@@ -11,29 +11,33 @@ Simple C# class library for logging to syslog and console.  For a sample app ple
 
 First things first - do you need help or have feedback?  File an issue here!  We'd love to hear from you.
 
-## New in v1.2.1
+## New in v1.3.0
 
-- XML documentation
+- Breaking changes
+- Enumerations now part of the namespace and not nested under LoggingModule class
+- Logging to file
+- Configurable maximum message length
+- Configuration exception logging severity (default: alert)
 
-## It's Really Easy
+## It's Really Easy...  I Mean, REALLY Easy
 
 ```
 using SyslogLogging;
 
 LoggingModule logging = new LoggingModule("127.0.0.1", 514);
 logging.ConsoleEnable = true;
+logging.FileLogging = FileLoggingMode.FileWithDate;  // or Disabled, or SingleLogFile
+logging.LogFilename = "syslog.txt";
 
 logging.Debug("This is a debug message!");
 logging.Exception("Program", "Main", e);
 ```
 
+When using ```FileLoggingMode.FileWithDate```, LoggingModule with append ```.yyyyMMdd``` to the supplied filename in ```LogFilename```.  When using ```FileLoggingMode.SingleLogFile```, the filename is left untouched.
+
 ## Supported Environments
 
-Tested and works well in Windows in .NET Framework 4.5.2 or later or .NET Core.
-
-Tested and works well in Linux and OSX environments, too.
-
-Should work well in Mono environments.  You may want to use the Mono Ahead-of-time compiler (AOT).
+Tested and works well in Windows in .NET Framework 4.5.2 or later or .NET Core.  Tested and works well in Linux and OSX environments, too.  Should work well in Mono environments.  You may want to use the Mono Ahead-of-time compiler (AOT).
 
 ## Changing Console Message Color
 

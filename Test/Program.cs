@@ -15,7 +15,9 @@ namespace Test
         {
             log = new LoggingModule("127.0.0.1", 514);
             log.ConsoleEnable = true;
-            log.IncludeUtcTimestamp = false; 
+            log.IncludeUtcTimestamp = true;
+            log.FileLogging = FileLoggingMode.FileWithDate;
+            log.LogFilename = "syslog";
 
             log.Debug("This is a Debug message.");
             log.Info("This is an Info message.");

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System; 
 using System.Diagnostics;
-using System.Linq;
+using System.IO; 
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -15,46 +13,7 @@ namespace SyslogLogging
     /// Syslog and console logging module.
     /// </summary>
     public class LoggingModule : IDisposable
-    {
-        #region Public-Enums
-
-        /// <summary>
-        /// Message severity.
-        /// </summary>
-        public enum Severity
-        {
-            /// <summary>
-            /// Debug messages.
-            /// </summary>
-            Debug = 0,
-            /// <summary>
-            /// Informational messages.
-            /// </summary>
-            Info = 1,
-            /// <summary>
-            /// Warning messages.
-            /// </summary>
-            Warn = 2,
-            /// <summary>
-            /// Error messages.
-            /// </summary>
-            Error = 3,
-            /// <summary>
-            /// Alert messages.
-            /// </summary>
-            Alert = 4,
-            /// <summary>
-            /// Critical messages.
-            /// </summary>
-            Critical = 5,
-            /// <summary>
-            /// Emergency messages.
-            /// </summary>
-            Emergency = 6
-        }
-
-        #endregion
-
+    { 
         #region Public-Members
 
         /// <summary>
@@ -149,6 +108,40 @@ namespace SyslogLogging
         /// </summary>
         public ColorSchema Colors = new ColorSchema();
 
+        /// <summary>
+        /// Enable or disable logging to a file.
+        /// Disabled: file logging will not be used.
+        /// SingleLogFile: all messages will be appended to a single file.
+        /// FileWithDate: all messages will be appended to a file, where the name of the file is the supplied filename followed by '.yyyyMMdd'.
+        /// </summary>
+        public FileLoggingMode FileLogging = FileLoggingMode.Disabled;
+
+        /// <summary>
+        /// The file to which log messages should be appended.
+        /// </summary>
+        public string LogFilename = null;
+
+        /// <summary>
+        /// The severity level to use when logging exceptions through the .Exception() method.  
+        /// </summary>
+        public Severity ExceptionSeverity = Severity.Alert;
+
+        /// <summary>
+        /// Maximum message length.  Must be greater than or equal to 32.  Default is 1024.
+        /// </summary>
+        public int MaxMessageLength
+        {
+            get
+            {
+                return _MaxMessageLength;
+            }
+            set
+            {
+                if (value < 32) throw new ArgumentException("Maximum message length must be at least 32.");
+                _MaxMessageLength = value;
+            }
+        }
+
         #endregion
 
         #region Private-Members
@@ -161,6 +154,7 @@ namespace SyslogLogging
         private object _SendLock = new object();
         private int _BaseDepth = 0;
         private bool _ConsoleEnable = true;
+        private int _MaxMessageLength = 1024;
 
         #endregion
 
@@ -347,7 +341,7 @@ namespace SyslogLogging
                 "  Servername : " + Dns.GetHostName() + Environment.NewLine +
                 "---";
 
-            Log(Severity.Alert, message);
+            Log(ExceptionSeverity, message);
         }
          
         #endregion
@@ -398,15 +392,16 @@ namespace SyslogLogging
         private void Log(Severity sev, string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;
+            if (sev < MinimumSeverity) return;
 
             string message = "";
             string currMsg = "";
             string remainder = "";
 
-            if (msg.Length > 1024)
+            if (msg.Length > _MaxMessageLength)
             {
-                currMsg = msg.Substring(0, 1024);
-                remainder = msg.Substring(1024, (msg.Length - 1024));
+                currMsg = msg.Substring(0, _MaxMessageLength);
+                remainder = msg.Substring(_MaxMessageLength, (msg.Length - _MaxMessageLength));
             }
             else
             {
@@ -431,29 +426,28 @@ namespace SyslogLogging
             }
 
             message += currMsg;
-
+             
             if (ConsoleEnable)
             {
-                if (sev >= MinimumSeverity)
-                {
-                    if (!AsyncLogging) SendConsole(sev, message);
-                    else Task.Run(() => SendConsole(sev, message));
-                }
+                if (!AsyncLogging) SendConsole(sev, message);
+                else Task.Run(() => SendConsole(sev, message));
+            }
+
+            if (!String.IsNullOrEmpty(LogFilename) && FileLogging != FileLoggingMode.Disabled)
+            {
+                SendFile(sev, message);
             }
 
             if (_UDP != null)
             {
-                if (sev >= MinimumSeverity)
-                {
-                    if (!AsyncLogging) SendSyslog(message);
-                    else Task.Run(() => SendSyslog(message));
-                }
+                if (!AsyncLogging) SendUdp(message);
+                else Task.Run(() => SendUdp(message));
             }
 
             if (!String.IsNullOrEmpty(remainder))
             {
                 Log(sev, remainder);
-            }
+            } 
         }
 
         private void SendConsole(Severity sev, string msg)
@@ -504,10 +498,30 @@ namespace SyslogLogging
             Console.BackgroundColor = prevBackground;
         }
 
-        private void SendSyslog(string msg)
+        private void SendFile(Severity sev, string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;
-             
+
+            switch (FileLogging)
+            {
+                case FileLoggingMode.Disabled:
+                    return;
+
+                case FileLoggingMode.SingleLogFile:
+                    File.AppendAllText(LogFilename, msg + Environment.NewLine);
+                    return;
+
+                case FileLoggingMode.FileWithDate:
+                    string filename = LogFilename + "." + DateTime.Now.ToString("yyyyMMdd");
+                    File.AppendAllText(filename, msg + Environment.NewLine);
+                    return;
+            }
+        }
+
+        private void SendUdp(string msg)
+        {
+            if (String.IsNullOrEmpty(msg)) return;
+            
             lock (_SendLock)
             {
                 if (_UDP != null)

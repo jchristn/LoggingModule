@@ -16,3 +16,13 @@ C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\netstandard2.0\LoggingModul
 C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\netstandard2.0\LoggingModule.dll
 C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\netstandard2.0\LoggingModule.pdb
 C:\Code\Misc\SyslogLogging\LoggingModule\bin\Release\netstandard2.0\LoggingModule.xml
+C:\code\misc\SyslogLogging-1.3\LoggingModule\bin\Release\netstandard2.0\LoggingModule.deps.json
+C:\code\misc\SyslogLogging-1.3\LoggingModule\bin\Release\netstandard2.0\LoggingModule.dll
+C:\code\misc\SyslogLogging-1.3\LoggingModule\bin\Release\netstandard2.0\LoggingModule.pdb
+C:\code\misc\SyslogLogging-1.3\LoggingModule\bin\Release\netstandard2.0\LoggingModule.xml
+C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\netstandard2.0\LoggingModule.csprojAssemblyReference.cache
+C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\netstandard2.0\LoggingModule.csproj.CoreCompileInputs.cache
+C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\netstandard2.0\LoggingModule.AssemblyInfoInputs.cache
+C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\netstandard2.0\LoggingModule.AssemblyInfo.cs
+C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\netstandard2.0\LoggingModule.dll
+C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\netstandard2.0\LoggingModule.pdb

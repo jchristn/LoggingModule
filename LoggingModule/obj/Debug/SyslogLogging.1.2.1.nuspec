@@ -21,8 +21,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="C:\Code\Misc\SyslogLogging\LoggingModule\bin\Debug\net452\LoggingModule.dll" target="lib\net452\LoggingModule.dll" />
-    <file src="C:\Code\Misc\SyslogLogging\LoggingModule\bin\Debug\netstandard2.0\LoggingModule.dll" target="lib\netstandard2.0\LoggingModule.dll" />
-    <file src="C:\Code\Misc\SyslogLogging\LICENSE.md" target="LICENSE.md" />
+    <file src="C:\code\misc\SyslogLogging-1.3\LoggingModule\bin\Debug\net452\LoggingModule.dll" target="lib\net452\LoggingModule.dll" />
+    <file src="C:\code\misc\SyslogLogging-1.3\LoggingModule\bin\Debug\netstandard2.0\LoggingModule.dll" target="lib\netstandard2.0\LoggingModule.dll" />
+    <file src="C:\code\misc\SyslogLogging-1.3\LICENSE.md" target="LICENSE.md" />
   </files>
 </package>

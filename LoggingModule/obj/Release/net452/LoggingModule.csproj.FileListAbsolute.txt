@@ -13,3 +13,11 @@ C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\net452\LoggingModule.Assemb
 C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\net452\LoggingModule.AssemblyInfo.cs
 C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\net452\LoggingModule.dll
 C:\code\Misc\SyslogLogging\LoggingModule\obj\Release\net452\LoggingModule.pdb
+C:\code\misc\SyslogLogging-1.3\LoggingModule\bin\Release\net452\LoggingModule.dll
+C:\code\misc\SyslogLogging-1.3\LoggingModule\bin\Release\net452\LoggingModule.pdb
+C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\net452\LoggingModule.csprojAssemblyReference.cache
+C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\net452\LoggingModule.csproj.CoreCompileInputs.cache
+C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\net452\LoggingModule.AssemblyInfoInputs.cache
+C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\net452\LoggingModule.AssemblyInfo.cs
+C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\net452\LoggingModule.dll
+C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\net452\LoggingModule.pdb
