@@ -11,13 +11,9 @@ Simple C# class library for logging to syslog and console.  For a sample app ple
 
 First things first - do you need help or have feedback?  File an issue here!  We'd love to hear from you.
 
-## New in v1.3.0
+## New in v1.3.1
 
-- Breaking changes
-- Enumerations now part of the namespace and not nested under LoggingModule class
-- Logging to file
-- Configurable maximum message length
-- Configuration exception logging severity (default: alert)
+- Bugfix for file logging
 
 ## It's Really Easy...  I Mean, REALLY Easy
 

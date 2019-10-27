@@ -22,7 +22,6 @@ C:\code\misc\SyslogLogging-1.3\Test\bin\Release\netcoreapp2.2\LoggingModule.dll
 C:\code\misc\SyslogLogging-1.3\Test\bin\Release\netcoreapp2.2\LoggingModule.pdb
 C:\code\misc\SyslogLogging-1.3\Test\bin\Release\netcoreapp2.2\LoggingModule.xml
 C:\code\misc\SyslogLogging-1.3\Test\obj\Release\netcoreapp2.2\Test.csprojAssemblyReference.cache
-C:\code\misc\SyslogLogging-1.3\Test\obj\Release\netcoreapp2.2\Test.csproj.CoreCompileInputs.cache
 C:\code\misc\SyslogLogging-1.3\Test\obj\Release\netcoreapp2.2\Test.AssemblyInfoInputs.cache
 C:\code\misc\SyslogLogging-1.3\Test\obj\Release\netcoreapp2.2\Test.AssemblyInfo.cs
 C:\code\misc\SyslogLogging-1.3\Test\obj\Release\netcoreapp2.2\Test.csproj.CopyComplete

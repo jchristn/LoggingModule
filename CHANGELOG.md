@@ -2,6 +2,12 @@
 
 ## Current Version
 
+v1.3.1
+
+- Bugfix for file logging
+
+## Previous Versions
+
 v1.3.0
 
 - Breaking changes
@@ -9,8 +15,6 @@ v1.3.0
 - Logging to file
 - Configurable maximum message length
 - Configuration exception logging severity (default: alert)
-
-## Previous Versions
 
 v1.2.1
 

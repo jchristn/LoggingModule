@@ -155,6 +155,7 @@ namespace SyslogLogging
         private int _BaseDepth = 0;
         private bool _ConsoleEnable = true;
         private int _MaxMessageLength = 1024;
+        private readonly object _FileLock = new object();
 
         #endregion
 
@@ -508,12 +509,18 @@ namespace SyslogLogging
                     return;
 
                 case FileLoggingMode.SingleLogFile:
-                    File.AppendAllText(LogFilename, msg + Environment.NewLine);
+                    lock (_FileLock)
+                    {
+                        File.AppendAllText(LogFilename, msg + Environment.NewLine);
+                    }
                     return;
 
                 case FileLoggingMode.FileWithDate:
                     string filename = LogFilename + "." + DateTime.Now.ToString("yyyyMMdd");
-                    File.AppendAllText(filename, msg + Environment.NewLine);
+                    lock (_FileLock)
+                    {
+                        File.AppendAllText(filename, msg + Environment.NewLine);
+                    }
                     return;
             }
         }
