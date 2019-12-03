@@ -104,6 +104,11 @@ namespace SyslogLogging
         public bool IndentByStackSize = false;
 
         /// <summary>
+        /// Enable or disable use of color for console messages.
+        /// </summary>
+        public bool EnableColors = true;
+
+        /// <summary>
         /// Colors to use for console messages based on message severity.
         /// </summary>
         public ColorSchema Colors = new ColorSchema();
@@ -456,47 +461,54 @@ namespace SyslogLogging
             if (String.IsNullOrEmpty(msg)) return;
             if (!_ConsoleEnable) return;
 
-            ConsoleColor prevForeground = Console.ForegroundColor;
-            ConsoleColor prevBackground = Console.BackgroundColor;
-
-            if (Colors != null)
+            if (EnableColors)
             {
-                switch (sev)
-                {
-                    case Severity.Debug:
-                        Console.ForegroundColor = Colors.Debug.Foreground;
-                        Console.BackgroundColor = Colors.Debug.Background;
-                        break;
-                    case Severity.Info:
-                        Console.ForegroundColor = Colors.Info.Foreground;
-                        Console.BackgroundColor = Colors.Info.Background;
-                        break;
-                    case Severity.Warn:
-                        Console.ForegroundColor = Colors.Warn.Foreground;
-                        Console.BackgroundColor = Colors.Warn.Background;
-                        break;
-                    case Severity.Error:
-                        Console.ForegroundColor = Colors.Error.Foreground;
-                        Console.BackgroundColor = Colors.Error.Background;
-                        break;
-                    case Severity.Alert:
-                        Console.ForegroundColor = Colors.Alert.Foreground;
-                        Console.BackgroundColor = Colors.Alert.Background;
-                        break;
-                    case Severity.Critical:
-                        Console.ForegroundColor = Colors.Critical.Foreground;
-                        Console.BackgroundColor = Colors.Critical.Background;
-                        break;
-                    case Severity.Emergency:
-                        Console.ForegroundColor = Colors.Emergency.Foreground;
-                        Console.BackgroundColor = Colors.Emergency.Background;
-                        break;
-                }
-            } 
+                ConsoleColor prevForeground = Console.ForegroundColor;
+                ConsoleColor prevBackground = Console.BackgroundColor;
 
-            Console.WriteLine(msg);
-            Console.ForegroundColor = prevForeground;
-            Console.BackgroundColor = prevBackground;
+                if (Colors != null)
+                {
+                    switch (sev)
+                    {
+                        case Severity.Debug:
+                            Console.ForegroundColor = Colors.Debug.Foreground;
+                            Console.BackgroundColor = Colors.Debug.Background;
+                            break;
+                        case Severity.Info:
+                            Console.ForegroundColor = Colors.Info.Foreground;
+                            Console.BackgroundColor = Colors.Info.Background;
+                            break;
+                        case Severity.Warn:
+                            Console.ForegroundColor = Colors.Warn.Foreground;
+                            Console.BackgroundColor = Colors.Warn.Background;
+                            break;
+                        case Severity.Error:
+                            Console.ForegroundColor = Colors.Error.Foreground;
+                            Console.BackgroundColor = Colors.Error.Background;
+                            break;
+                        case Severity.Alert:
+                            Console.ForegroundColor = Colors.Alert.Foreground;
+                            Console.BackgroundColor = Colors.Alert.Background;
+                            break;
+                        case Severity.Critical:
+                            Console.ForegroundColor = Colors.Critical.Foreground;
+                            Console.BackgroundColor = Colors.Critical.Background;
+                            break;
+                        case Severity.Emergency:
+                            Console.ForegroundColor = Colors.Emergency.Foreground;
+                            Console.BackgroundColor = Colors.Emergency.Background;
+                            break;
+                    }
+                }
+
+                Console.WriteLine(msg);
+                Console.ForegroundColor = prevForeground;
+                Console.BackgroundColor = prevBackground;
+            }
+            else
+            {
+                Console.WriteLine(msg);
+            }
         }
 
         private void SendFile(Severity sev, string msg)

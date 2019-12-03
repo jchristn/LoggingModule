@@ -5,7 +5,7 @@
   },
   "projects": {
     "C:\\code\\misc\\SyslogLogging-1.3\\LoggingModule\\LoggingModule.csproj": {
-      "version": "1.3.1",
+      "version": "1.3.2",
       "restore": {
         "projectUniqueName": "C:\\code\\misc\\SyslogLogging-1.3\\LoggingModule\\LoggingModule.csproj",
         "projectName": "SyslogLogging",

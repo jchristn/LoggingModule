@@ -2,11 +2,15 @@
 
 ## Current Version
 
+v1.3.2
+
+- EnableColors property for console logging
+
+## Previous Versions
+
 v1.3.1
 
 - Bugfix for file logging
-
-## Previous Versions
 
 v1.3.0
 

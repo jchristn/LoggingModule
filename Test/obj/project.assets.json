@@ -208,7 +208,7 @@
           "build/netstandard2.0/NETStandard.Library.targets": {}
         }
       },
-      "SyslogLogging/1.3.1": {
+      "SyslogLogging/1.3.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "compile": {
@@ -677,7 +677,7 @@
           "runtimes/win-x86/native/hostfxr.dll": {}
         }
       },
-      "SyslogLogging/1.3.1": {
+      "SyslogLogging/1.3.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "compile": {
@@ -689,7 +689,7 @@
       }
     },
     ".NETFramework,Version=v4.5.2": {
-      "SyslogLogging/1.3.1": {
+      "SyslogLogging/1.3.2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.2",
         "compile": {
@@ -701,7 +701,7 @@
       }
     },
     ".NETFramework,Version=v4.5.2/win7-x86": {
-      "SyslogLogging/1.3.1": {
+      "SyslogLogging/1.3.2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.2",
         "compile": {
@@ -1183,7 +1183,7 @@
       ]
     },
     "runtime.win-x86.Microsoft.NETCore.App/2.2.0": {
-      "sha512": "6wstJdLPjXFV8S4Xb84bUqvb4ANevx3dk/jxrWxk424doIbW+08ySrjuG74uwsLx20jqXS9u9IwTsGP+YagXUw==",
+      "sha512": "8EpvCIvlpAv5XWaeYmBOxiwLsQukE+qq32cuL8a+06JbyY0Oi13KGieqSNhsVvJr3vx/Mji2hJNQIQTWabKRKg==",
       "type": "package",
       "path": "runtime.win-x86.microsoft.netcore.app/2.2.0",
       "hasTools": true,
@@ -1411,7 +1411,7 @@
       ]
     },
     "runtime.win-x86.Microsoft.NETCore.DotNetAppHost/2.2.0": {
-      "sha512": "swMehmQwn+yo4UZWLOpByPGuQ1hkrMxSodd6SEnAH1RvF/JXLExxHHquVyRtuJoS2etGNWrbCIt04/guh0lAIA==",
+      "sha512": "0ezaub/8Gl8tWRQFV2FSxJMW8Rjtd07ecoUlUvbje5aazDuO8ua1OcRDFdisghpe8qmaIZqv0RV5ZB2jbwaGqQ==",
       "type": "package",
       "path": "runtime.win-x86.microsoft.netcore.dotnetapphost/2.2.0",
       "files": [
@@ -1426,7 +1426,7 @@
       ]
     },
     "runtime.win-x86.Microsoft.NETCore.DotNetHostPolicy/2.2.0": {
-      "sha512": "O1hzNG/RzDF9ZpaAzxYiKoJs1RWyuVNN/F9fmsx2f9mTEooaEZ/1cC6aJwenyr0HERhOUZXn/N9wFRGPAtTR1g==",
+      "sha512": "1cjbv3CM6UDYS7WXO3Eitf8frboYUUQ2TJmxqYBb2V+J9Gk+QKwMU2zf3vJBP3POqmNq32bd8ppms7IbbF3TKA==",
       "type": "package",
       "path": "runtime.win-x86.microsoft.netcore.dotnethostpolicy/2.2.0",
       "files": [
@@ -1441,7 +1441,7 @@
       ]
     },
     "runtime.win-x86.Microsoft.NETCore.DotNetHostResolver/2.2.0": {
-      "sha512": "z1cb9ImygCQbktPj89/KjLJ5pTGkznwzu2IypXB3SowFE8VanEwJs3XyEwnkcHpItvY3PPssjOCKTc/194BVeg==",
+      "sha512": "VzA0fPum2va19Qc2cmBEV9Tevi9qvcAuxhlda2SOw5rkbRVx/c2U6PwEKLsmrVAjWVhbQ1NK+zl1HMwtU3d/Iw==",
       "type": "package",
       "path": "runtime.win-x86.microsoft.netcore.dotnethostresolver/2.2.0",
       "files": [
@@ -1455,7 +1455,7 @@
         "version.txt"
       ]
     },
-    "SyslogLogging/1.3.1": {
+    "SyslogLogging/1.3.2": {
       "type": "project",
       "path": "../LoggingModule/LoggingModule.csproj",
       "msbuildProject": "../LoggingModule/LoggingModule.csproj"
@@ -1464,10 +1464,10 @@
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.2": [
       "Microsoft.NETCore.App >= 2.2.0",
-      "SyslogLogging >= 1.3.1"
+      "SyslogLogging >= 1.3.2"
     ],
     ".NETFramework,Version=v4.5.2": [
-      "SyslogLogging >= 1.3.1"
+      "SyslogLogging >= 1.3.2"
     ]
   },
   "packageFolders": {

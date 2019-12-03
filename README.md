@@ -11,9 +11,9 @@ Simple C# class library for logging to syslog and console.  For a sample app ple
 
 First things first - do you need help or have feedback?  File an issue here!  We'd love to hear from you.
 
-## New in v1.3.1
+## New in v1.3.2
 
-- Bugfix for file logging
+- EnableColors property for console logging
 
 ## It's Really Easy...  I Mean, REALLY Easy
 

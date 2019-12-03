@@ -144,6 +144,11 @@
             Indent outgoing messages based on stack depth.
             </summary>
         </member>
+        <member name="F:SyslogLogging.LoggingModule.EnableColors">
+            <summary>
+            Enable or disable use of color for console messages.
+            </summary>
+        </member>
         <member name="F:SyslogLogging.LoggingModule.Colors">
             <summary>
             Colors to use for console messages based on message severity.
