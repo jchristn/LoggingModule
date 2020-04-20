@@ -1,9 +1,6 @@
 # SyslogLogging
 
-[![][nuget-img]][nuget]
-
-[nuget]:     https://www.nuget.org/packages/SyslogLogging/
-[nuget-img]: https://badge.fury.io/nu/Object.svg
+[![NuGet Version](https://img.shields.io/nuget/v/SyslogLogging.svg?style=flat)](https://www.nuget.org/packages/SyslogLogging/) [![NuGet](https://img.shields.io/nuget/dt/SyslogLogging.svg)](https://www.nuget.org/packages/SyslogLogging) 
 
 Simple C# class library for logging to syslog and console.  For a sample app please refer to the included test project.
 
