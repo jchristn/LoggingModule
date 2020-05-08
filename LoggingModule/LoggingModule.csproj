@@ -3,12 +3,12 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.3.2</Version>
+    <Version>1.3.2.1</Version>
     <Authors>Joel Christner</Authors>
     <PackageId>SyslogLogging</PackageId>
     <Product>SyslogLogging</Product>
-    <Description>Simple C# class library for logging to syslog and to the console</Description>
-    <Copyright>(c)2019 Joel Christner</Copyright>
+    <Description>The easiest logging library to use to send log messages to syslog, the console, or the file system.  It's.  REALLY.  Easy.</Description>
+    <Copyright>(c)2020 Joel Christner</Copyright>
     <PackageTags>syslog logging console log logger udp event</PackageTags>
     <PackageProjectUrl>https://github.com/jchristn/LoggingModule</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
