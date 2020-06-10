@@ -5,7 +5,7 @@
   },
   "projects": {
     "C:\\Code\\Misc\\SyslogLogging-1.3\\LoggingModule\\LoggingModule.csproj": {
-      "version": "1.3.2.1",
+      "version": "1.3.2.2",
       "restore": {
         "projectUniqueName": "C:\\Code\\Misc\\SyslogLogging-1.3\\LoggingModule\\LoggingModule.csproj",
         "projectName": "SyslogLogging",
@@ -28,6 +28,7 @@
           "netstandard2.0"
         ],
         "sources": {
+          "C:\\NuGet": {},
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {},
           "https://nuget.pkg.github.com/jchristn/index.json": {}

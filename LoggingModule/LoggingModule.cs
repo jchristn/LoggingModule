@@ -63,8 +63,14 @@ namespace SyslogLogging
             }
             set
             {
-                if (value && !ConsoleExists()) throw new ArgumentException("Console not available.");
-                _ConsoleEnable = value;
+                if (value && !ConsoleExists())
+                {
+                    _ConsoleEnable = false;
+                }
+                else
+                {
+                    _ConsoleEnable = value;
+                }
             }
         }
 
@@ -387,7 +393,9 @@ namespace SyslogLogging
         {
             try
             {
-                return (Console.WindowHeight > 0);
+                bool test1 = Environment.UserInteractive;
+                bool test2 = Console.WindowHeight > 0;
+                return test1 && test2;
             }
             catch (Exception)
             {
