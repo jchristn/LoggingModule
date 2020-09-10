@@ -4,6 +4,8 @@
 
 Simple C# class library for logging to syslog and console.  For a sample app please refer to the included test project.
 
+SyslogLogging is targeted to .NET Core, .NET Standard, and .NET Framework.
+
 ## Help or Feedback
 
 First things first - do you need help or have feedback?  File an issue here!  We'd love to hear from you.
