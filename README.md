@@ -16,7 +16,7 @@ First things first - do you need help or have feedback?  File an issue here!  We
 
 ## It's Really Easy...  I Mean, REALLY Easy
 
-```
+```csharp
 using SyslogLogging;
 
 LoggingModule logging = new LoggingModule("127.0.0.1", 514);

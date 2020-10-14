@@ -1,4 +1,5 @@
-﻿using System; 
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO; 
 using System.Net;
@@ -340,8 +341,22 @@ namespace SyslogLogging
                 "An exception was encountered which triggered this message" + Environment.NewLine +
                 "  Module     : " + module + Environment.NewLine +
                 "  Method     : " + method + Environment.NewLine +
-                "  Type       : " + e.GetType().ToString() + Environment.NewLine +
-                "  Data       : " + e.Data + Environment.NewLine +
+                "  Type       : " + e.GetType().ToString() + Environment.NewLine;
+
+            if (e.Data != null && e.Data.Count > 0)
+            {
+                message += "  Data       : " + Environment.NewLine;
+                foreach (KeyValuePair<string, object> curr in e.Data)
+                {
+                    message += "    " + curr.Key + ": " + curr.Value + Environment.NewLine;
+                }
+            }
+            else
+            {
+                message += "  Data       : (none)" + Environment.NewLine;
+            }
+
+            message +=  
                 "  Inner      : " + e.InnerException + Environment.NewLine +
                 "  Message    : " + e.Message + Environment.NewLine +
                 "  Source     : " + e.Source + Environment.NewLine +
@@ -608,7 +623,7 @@ namespace SyslogLogging
                     throw new ArgumentException("Unknown severity: " + sev.ToString() + ".");
             }
         }
-
+         
         #endregion
     }
 }
