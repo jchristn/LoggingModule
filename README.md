@@ -13,6 +13,7 @@ First things first - do you need help or have feedback?  File an issue here!  We
 ## New in v1.3.2
 
 - EnableColors property for console logging
+- Expose ```Log``` API (thank you @dev-jan!)
 
 ## It's Really Easy...  I Mean, REALLY Easy
 

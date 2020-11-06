@@ -5,6 +5,7 @@
 v1.3.2
 
 - EnableColors property for console logging
+- Expose ```Log``` API (thank you @dev-jan!)
 
 ## Previous Versions
 

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace SyslogLogging
 {
     /// <summary>
-    /// Syslog and console logging module.
+    /// Syslog, console, and file logging module.
     /// </summary>
     public class LoggingModule : IDisposable
     { 
@@ -172,6 +172,21 @@ namespace SyslogLogging
         #endregion
 
         #region Constructor
+
+        /// <summary>
+        /// Instantiate the object using localhost syslog (UDP port 514).
+        /// </summary>
+        public LoggingModule()
+        {
+            ServerIp = "127.0.0.1";
+            ServerPort = 514;
+
+            _UDP = new UdpClient(ServerIp, ServerPort);
+            _Hostname = Dns.GetHostName();
+
+            StackTrace st = new StackTrace();
+            _BaseDepth = st.FrameCount - 1;
+        }
 
         /// <summary>
         /// Instantiate the object.
@@ -372,7 +387,7 @@ namespace SyslogLogging
         }
 
         /// <summary>
-        /// Send a log message using the given severity
+        /// Send a log message using the specified severity.
         /// </summary>
         /// <param name="sev">Severity of the message.</param>
         /// <param name="msg">Message to send.</param>

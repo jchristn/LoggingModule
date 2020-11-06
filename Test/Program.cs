@@ -27,7 +27,7 @@ namespace Test
             log.Critical("This is a Critical message.");
             log.Emergency("This is an Emergency message.");
             log.Info("Let's test logging an exception.");
-            log.Log(Severity.Info, "Just another way to create logs");
+            log.Log(Severity.Info, "Just another way to create log messages!");
 
             int numerator = 15;
             int denominator = 0;
