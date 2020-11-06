@@ -370,7 +370,73 @@ namespace SyslogLogging
 
             Log(ExceptionSeverity, message);
         }
-         
+
+        /// <summary>
+        /// Send a log message using the given severity
+        /// </summary>
+        /// <param name="sev">Severity of the message.</param>
+        /// <param name="msg">Message to send.</param>
+        public void Log(Severity sev, string msg)
+        {
+            if (String.IsNullOrEmpty(msg)) return;
+            if (sev < MinimumSeverity) return;
+
+            string message = "";
+            string currMsg = "";
+            string remainder = "";
+
+            if (msg.Length > _MaxMessageLength)
+            {
+                currMsg = msg.Substring(0, _MaxMessageLength);
+                remainder = msg.Substring(_MaxMessageLength, (msg.Length - _MaxMessageLength));
+            }
+            else
+            {
+                currMsg = msg;
+            }
+
+            if (IncludeUtcTimestamp) message += DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + " ";
+            if (IncludeSeverity) message += FormattedSeverity(sev) + " ";
+            if (IncludeHostname) message += _Hostname + " ";
+            if (IncludeThreadId) message += "thr-" + Thread.CurrentThread.ManagedThreadId + " ";
+            if (IndentByStackSize)
+            {
+                StackTrace st = new StackTrace();
+                int CurrentDepth = st.FrameCount;
+                if (CurrentDepth > _BaseDepth)
+                {
+                    for (int i = 0; i < (CurrentDepth - _BaseDepth); i++)
+                    {
+                        message += " ";
+                    }
+                }
+            }
+
+            message += currMsg;
+
+            if (ConsoleEnable)
+            {
+                if (!AsyncLogging) SendConsole(sev, message);
+                else Task.Run(() => SendConsole(sev, message));
+            }
+
+            if (!String.IsNullOrEmpty(LogFilename) && FileLogging != FileLoggingMode.Disabled)
+            {
+                SendFile(sev, message);
+            }
+
+            if (_UDP != null)
+            {
+                if (!AsyncLogging) SendUdp(message);
+                else Task.Run(() => SendUdp(message));
+            }
+
+            if (!String.IsNullOrEmpty(remainder))
+            {
+                Log(sev, remainder);
+            }
+        }
+
         #endregion
 
         #region Private-Methods
@@ -416,67 +482,6 @@ namespace SyslogLogging
             {
                 return false;
             }
-        }
-
-        private void Log(Severity sev, string msg)
-        {
-            if (String.IsNullOrEmpty(msg)) return;
-            if (sev < MinimumSeverity) return;
-
-            string message = "";
-            string currMsg = "";
-            string remainder = "";
-
-            if (msg.Length > _MaxMessageLength)
-            {
-                currMsg = msg.Substring(0, _MaxMessageLength);
-                remainder = msg.Substring(_MaxMessageLength, (msg.Length - _MaxMessageLength));
-            }
-            else
-            {
-                currMsg = msg;
-            }
-
-            if (IncludeUtcTimestamp) message += DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss") + " ";
-            if (IncludeSeverity) message += FormattedSeverity(sev) + " ";
-            if (IncludeHostname) message += _Hostname + " ";
-            if (IncludeThreadId) message += "thr-" + Thread.CurrentThread.ManagedThreadId + " ";
-            if (IndentByStackSize)
-            {
-                StackTrace st = new StackTrace();
-                int CurrentDepth = st.FrameCount;
-                if (CurrentDepth > _BaseDepth)
-                {
-                    for (int i = 0; i < (CurrentDepth - _BaseDepth); i++)
-                    {
-                        message += " ";
-                    }
-                }
-            }
-
-            message += currMsg;
-             
-            if (ConsoleEnable)
-            {
-                if (!AsyncLogging) SendConsole(sev, message);
-                else Task.Run(() => SendConsole(sev, message));
-            }
-
-            if (!String.IsNullOrEmpty(LogFilename) && FileLogging != FileLoggingMode.Disabled)
-            {
-                SendFile(sev, message);
-            }
-
-            if (_UDP != null)
-            {
-                if (!AsyncLogging) SendUdp(message);
-                else Task.Run(() => SendUdp(message));
-            }
-
-            if (!String.IsNullOrEmpty(remainder))
-            {
-                Log(sev, remainder);
-            } 
         }
 
         private void SendConsole(Severity sev, string msg)
