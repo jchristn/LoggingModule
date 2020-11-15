@@ -1,0 +1,12 @@
+C:\code\Misc\SyslogLogging-1.3\LoggingModule\bin\Release\net5.0\LoggingModule.deps.json
+C:\code\Misc\SyslogLogging-1.3\LoggingModule\bin\Release\net5.0\LoggingModule.dll
+C:\code\Misc\SyslogLogging-1.3\LoggingModule\bin\Release\net5.0\ref\LoggingModule.dll
+C:\code\Misc\SyslogLogging-1.3\LoggingModule\bin\Release\net5.0\LoggingModule.pdb
+C:\code\Misc\SyslogLogging-1.3\LoggingModule\obj\Release\net5.0\LoggingModule.csprojAssemblyReference.cache
+C:\code\Misc\SyslogLogging-1.3\LoggingModule\obj\Release\net5.0\LoggingModule.GeneratedMSBuildEditorConfig.editorconfig
+C:\code\Misc\SyslogLogging-1.3\LoggingModule\obj\Release\net5.0\LoggingModule.AssemblyInfoInputs.cache
+C:\code\Misc\SyslogLogging-1.3\LoggingModule\obj\Release\net5.0\LoggingModule.AssemblyInfo.cs
+C:\code\Misc\SyslogLogging-1.3\LoggingModule\obj\Release\net5.0\LoggingModule.csproj.CoreCompileInputs.cache
+C:\code\Misc\SyslogLogging-1.3\LoggingModule\obj\Release\net5.0\LoggingModule.dll
+C:\code\Misc\SyslogLogging-1.3\LoggingModule\obj\Release\net5.0\ref\LoggingModule.dll
+C:\code\Misc\SyslogLogging-1.3\LoggingModule\obj\Release\net5.0\LoggingModule.pdb

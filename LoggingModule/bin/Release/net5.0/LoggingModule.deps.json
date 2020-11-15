@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "LoggingModule/1.3.2.5": {
+        "runtime": {
+          "LoggingModule.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "LoggingModule/1.3.2.5": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
