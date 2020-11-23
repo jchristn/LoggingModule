@@ -91,7 +91,7 @@
         </member>
         <member name="T:SyslogLogging.LoggingModule">
             <summary>
-            Syslog and console logging module.
+            Syslog, console, and file logging module.
             </summary>
         </member>
         <member name="P:SyslogLogging.LoggingModule.ServerIp">
@@ -177,6 +177,11 @@
             Maximum message length.  Must be greater than or equal to 32.  Default is 1024.
             </summary>
         </member>
+        <member name="M:SyslogLogging.LoggingModule.#ctor">
+            <summary>
+            Instantiate the object using localhost syslog (UDP port 514).
+            </summary>
+        </member>
         <member name="M:SyslogLogging.LoggingModule.#ctor(System.String,System.Int32)">
             <summary>
             Instantiate the object.
@@ -253,6 +258,13 @@
             <param name="module">Module name (user-specified).</param>
             <param name="method">Method name (user-specified).</param>
             <param name="e">Exception.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.Log(SyslogLogging.Severity,System.String)">
+            <summary>
+            Send a log message using the specified severity.
+            </summary>
+            <param name="sev">Severity of the message.</param>
+            <param name="msg">Message to send.</param>
         </member>
         <member name="M:SyslogLogging.LoggingModule.Dispose(System.Boolean)">
             <summary>

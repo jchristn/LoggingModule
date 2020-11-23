@@ -1,0 +1,12 @@
+C:\code\misc\SyslogLogging-1.3\Test\bin\Debug\net451\Test.exe.config
+C:\code\misc\SyslogLogging-1.3\Test\bin\Debug\net451\Test.exe
+C:\code\misc\SyslogLogging-1.3\Test\bin\Debug\net451\Test.pdb
+C:\code\misc\SyslogLogging-1.3\Test\bin\Debug\net451\LoggingModule.dll
+C:\code\misc\SyslogLogging-1.3\Test\bin\Debug\net451\LoggingModule.pdb
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\net451\Test.csprojAssemblyReference.cache
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\net451\Test.AssemblyInfoInputs.cache
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\net451\Test.AssemblyInfo.cs
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\net451\Test.csproj.CoreCompileInputs.cache
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\net451\Test.csproj.CopyComplete
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\net451\Test.exe
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\net451\Test.pdb

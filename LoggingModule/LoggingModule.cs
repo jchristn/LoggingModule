@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO; 
@@ -270,7 +271,7 @@ namespace SyslogLogging
         /// Send a log message using 'Debug' severity.
         /// </summary>
         /// <param name="msg">Message to send.</param>
-        public void Debug(string msg)
+        public virtual void Debug(string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;
             Log(Severity.Debug, msg);
@@ -280,7 +281,7 @@ namespace SyslogLogging
         /// Send a log message using 'Info' severity.
         /// </summary>
         /// <param name="msg">Message to send.</param>
-        public void Info(string msg)
+        public virtual void Info(string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;
             Log(Severity.Info, msg); 
@@ -290,7 +291,7 @@ namespace SyslogLogging
         /// Send a log message using 'Warn' severity.
         /// </summary>
         /// <param name="msg">Message to send.</param>
-        public void Warn(string msg)
+        public virtual void Warn(string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;
             Log(Severity.Warn, msg);
@@ -300,7 +301,7 @@ namespace SyslogLogging
         /// Send a log message using 'Error' severity.
         /// </summary>
         /// <param name="msg">Message to send.</param>
-        public void Error(string msg)
+        public virtual void Error(string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;
             Log(Severity.Error, msg);
@@ -310,7 +311,7 @@ namespace SyslogLogging
         /// Send a log message using 'Alert' severity.
         /// </summary>
         /// <param name="msg">Message to send.</param>
-        public void Alert(string msg)
+        public virtual void Alert(string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;
             Log(Severity.Alert, msg);
@@ -320,7 +321,7 @@ namespace SyslogLogging
         /// Send a log message using 'Critical' severity.
         /// </summary>
         /// <param name="msg">Message to send.</param>
-        public void Critical(string msg)
+        public virtual void Critical(string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;
             Log(Severity.Critical, msg);
@@ -330,7 +331,7 @@ namespace SyslogLogging
         /// Send a log message using 'Emergency' severity.
         /// </summary>
         /// <param name="msg">Message to send.</param>
-        public void Emergency(string msg)
+        public virtual void Emergency(string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;
             Log(Severity.Emergency, msg);
@@ -342,7 +343,7 @@ namespace SyslogLogging
         /// <param name="module">Module name (user-specified).</param>
         /// <param name="method">Method name (user-specified).</param>
         /// <param name="e">Exception.</param>
-        public void Exception(string module, string method, Exception e)
+        public virtual void Exception(string module, string method, Exception e)
         {
             if (e == null) throw new ArgumentNullException(nameof(e));
             var st = new StackTrace(e, true);
@@ -352,8 +353,7 @@ namespace SyslogLogging
 
             string message =
                 Environment.NewLine +
-                "---" + Environment.NewLine +
-                "An exception was encountered which triggered this message" + Environment.NewLine +
+                "--- Exception details ---" + Environment.NewLine +
                 "  Module     : " + module + Environment.NewLine +
                 "  Method     : " + method + Environment.NewLine +
                 "  Type       : " + e.GetType().ToString() + Environment.NewLine;
@@ -361,9 +361,9 @@ namespace SyslogLogging
             if (e.Data != null && e.Data.Count > 0)
             {
                 message += "  Data       : " + Environment.NewLine;
-                foreach (KeyValuePair<string, object> curr in e.Data)
+                foreach (DictionaryEntry curr in e.Data)
                 {
-                    message += "    " + curr.Key + ": " + curr.Value + Environment.NewLine;
+                    message += "  | " + curr.Key + ": " + curr.Value + Environment.NewLine;
                 }
             }
             else
@@ -371,8 +371,34 @@ namespace SyslogLogging
                 message += "  Data       : (none)" + Environment.NewLine;
             }
 
-            message +=  
-                "  Inner      : " + e.InnerException + Environment.NewLine +
+            message +=
+                "  Inner      : ";
+
+            if (e.InnerException == null) message += "(null)" + Environment.NewLine;
+            else
+            {
+                message += e.InnerException.GetType().ToString() + Environment.NewLine;
+                message +=
+                    "    Message    : " + e.InnerException.Message + Environment.NewLine +
+                    "    Source     : " + e.InnerException.Source + Environment.NewLine +
+                    "    StackTrace : " + e.InnerException.StackTrace + Environment.NewLine +
+                    "    ToString   : " + e.InnerException.ToString() + Environment.NewLine;
+
+                if (e.InnerException.Data != null && e.InnerException.Data.Count > 0)
+                {
+                    message += "    Data       : " + Environment.NewLine;
+                    foreach (DictionaryEntry curr in e.Data)
+                    {
+                        message += "    | " + curr.Key + ": " + curr.Value + Environment.NewLine;
+                    }
+                }
+                else
+                {
+                    message += "    Data       : (none)" + Environment.NewLine;
+                } 
+            }
+
+            message += 
                 "  Message    : " + e.Message + Environment.NewLine +
                 "  Source     : " + e.Source + Environment.NewLine +
                 "  StackTrace : " + e.StackTrace + Environment.NewLine +
@@ -380,7 +406,6 @@ namespace SyslogLogging
                 "  Line       : " + fileLine + Environment.NewLine +
                 "  File       : " + filename + Environment.NewLine +
                 "  ToString   : " + e.ToString() + Environment.NewLine +
-                "  Servername : " + Dns.GetHostName() + Environment.NewLine +
                 "---";
 
             Log(ExceptionSeverity, message);
@@ -391,7 +416,7 @@ namespace SyslogLogging
         /// </summary>
         /// <param name="sev">Severity of the message.</param>
         /// <param name="msg">Message to send.</param>
-        public void Log(Severity sev, string msg)
+        public virtual void Log(Severity sev, string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;
             if (sev < MinimumSeverity) return;
@@ -606,9 +631,9 @@ namespace SyslogLogging
             string ret = "";
 
             StackTrace t = new StackTrace();
-            for (int i = 0; i < t.FrameCount; i++)
+            for (int i = 2; i < t.FrameCount; i++)
             {
-                if (i == 0)
+                if (i == 2)
                 {
                     ret += t.GetFrame(i).GetMethod().Name;
                 }
@@ -643,7 +668,7 @@ namespace SyslogLogging
                     throw new ArgumentException("Unknown severity: " + sev.ToString() + ".");
             }
         }
-         
+          
         #endregion
     }
 }

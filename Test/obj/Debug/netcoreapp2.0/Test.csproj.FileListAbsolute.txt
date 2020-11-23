@@ -1,0 +1,15 @@
+C:\code\misc\SyslogLogging-1.3\Test\bin\Debug\netcoreapp2.0\Test.deps.json
+C:\code\misc\SyslogLogging-1.3\Test\bin\Debug\netcoreapp2.0\Test.runtimeconfig.json
+C:\code\misc\SyslogLogging-1.3\Test\bin\Debug\netcoreapp2.0\Test.runtimeconfig.dev.json
+C:\code\misc\SyslogLogging-1.3\Test\bin\Debug\netcoreapp2.0\Test.dll
+C:\code\misc\SyslogLogging-1.3\Test\bin\Debug\netcoreapp2.0\Test.pdb
+C:\code\misc\SyslogLogging-1.3\Test\bin\Debug\netcoreapp2.0\LoggingModule.dll
+C:\code\misc\SyslogLogging-1.3\Test\bin\Debug\netcoreapp2.0\LoggingModule.pdb
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\netcoreapp2.0\Test.csprojAssemblyReference.cache
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\netcoreapp2.0\Test.AssemblyInfoInputs.cache
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\netcoreapp2.0\Test.AssemblyInfo.cs
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\netcoreapp2.0\Test.csproj.CoreCompileInputs.cache
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\netcoreapp2.0\Test.csproj.CopyComplete
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\netcoreapp2.0\Test.dll
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\netcoreapp2.0\Test.pdb
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\netcoreapp2.0\Test.genruntimeconfig.cache

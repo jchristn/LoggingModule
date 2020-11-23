@@ -21,3 +21,4 @@ C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\net452\Test.AssemblyInfo.cs
 C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\net452\Test.csproj.CopyComplete
 C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\net452\Test.exe
 C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\net452\Test.pdb
+C:\code\misc\SyslogLogging-1.3\Test\obj\Debug\net452\Test.csproj.CoreCompileInputs.cache

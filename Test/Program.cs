@@ -39,7 +39,8 @@ namespace Test
                 log.Warn("If you see this, there's a problem.");
             }
             catch (Exception e)
-            {
+            { 
+                e.Data.Add("foo", "bar");
                 log.Exception("Program", "Main", e);
             }
 
