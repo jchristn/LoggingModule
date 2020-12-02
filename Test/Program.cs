@@ -13,11 +13,23 @@ namespace Test
 
         static void Main(string[] args)
         {
+            log = new LoggingModule();
+
+            /*
             log = new LoggingModule("127.0.0.1", 514);
             log.ConsoleEnable = true;
             log.IncludeUtcTimestamp = true;
             log.FileLogging = FileLoggingMode.FileWithDate;
-            log.LogFilename = "syslog";
+            log.LogFilename = "test.log";
+            */
+
+            /*
+            log = new LoggingModule("test.log", true);
+            */
+
+            /*
+            log = new LoggingModule("test.log", FileLoggingMode.FileWithDate, true);
+            */
 
             log.Debug("This is a Debug message.");
             log.Info("This is an Info message.");

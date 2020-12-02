@@ -9,3 +9,4 @@ C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Debug\net5.0\LoggingModule.cspr
 C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Debug\net5.0\LoggingModule.dll
 C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Debug\net5.0\ref\LoggingModule.dll
 C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Debug\net5.0\LoggingModule.pdb
+C:\Code\Misc\SyslogLogging-1.3\LoggingModule\obj\Debug\net5.0\LoggingModule.csprojAssemblyReference.cache

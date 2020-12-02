@@ -190,7 +190,7 @@ namespace SyslogLogging
         }
 
         /// <summary>
-        /// Instantiate the object.
+        /// Instantiate the object using the specified syslog server IP address and UDP port.
         /// </summary>
         /// <param name="serverIp">Server IP address.</param>
         /// <param name="serverPort">Server port number.</param>
@@ -206,6 +206,61 @@ namespace SyslogLogging
 
             StackTrace st = new StackTrace();
             _BaseDepth = st.FrameCount - 1; 
+        }
+
+        /// <summary>
+        /// Instantiate the object to enable either file logging or console logging.
+        /// </summary>
+        /// <param name="filename">Filename.</param>
+        /// <param name="enableConsole">Enable or disable console logging.</param>
+        public LoggingModule(
+            string filename,
+            bool enableConsole)
+        {
+            if (String.IsNullOrEmpty(filename) && !enableConsole) throw new ArgumentException("Either a filename must be specified or console logging must be enabled.");
+
+            ServerIp = "127.0.0.1";
+            ServerPort = 514;
+            _UDP = null;
+            _Hostname = null;
+
+            StackTrace st = new StackTrace();
+            _BaseDepth = st.FrameCount - 1;
+
+            if (!String.IsNullOrEmpty(filename))
+            {
+                LogFilename = filename;
+                FileLogging = FileLoggingMode.SingleLogFile;
+            }
+
+            ConsoleEnable = enableConsole;
+        }
+
+        /// <summary>
+        /// Instantiate the object to enable either file logging or console logging.
+        /// </summary>
+        /// <param name="filename">Filename.</param>
+        /// <param name="fileLoggingMode">File logging mode.  If you specify 'FileWithDate', .yyyyMMdd will be appended to the specified filename.</param>
+        /// <param name="enableConsole">Enable or disable console logging.</param>
+        public LoggingModule(
+            string filename,
+            FileLoggingMode fileLoggingMode,
+            bool enableConsole)
+        {
+            if (String.IsNullOrEmpty(filename)) throw new ArgumentNullException(nameof(filename));
+
+            ServerIp = "127.0.0.1";
+            ServerPort = 514;
+            _UDP = null;
+            _Hostname = null;
+
+            StackTrace st = new StackTrace();
+            _BaseDepth = st.FrameCount - 1;
+
+            LogFilename = filename;
+            FileLogging = fileLoggingMode;
+
+            ConsoleEnable = enableConsole;
         }
 
         /// <summary>
