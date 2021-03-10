@@ -451,20 +451,17 @@ namespace SyslogLogging
 
             foreach (SyslogServer server in servers)
             {
-                Task.Run(() =>
+                lock (server.SendLock)
                 {
-                    lock (server.SendLock)
+                    try
                     {
-                        try
-                        {
-                            server.Udp.Send(data, data.Length);
-                        }
-                        catch (Exception)
-                        {
-
-                        }
+                        server.Udp.Send(data, data.Length);
                     }
-                }, _Token).ConfigureAwait(false);
+                    catch (Exception)
+                    {
+
+                    }
+                }
             } 
         }
          

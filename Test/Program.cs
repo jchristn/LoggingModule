@@ -15,11 +15,12 @@ namespace Test
         {
             List<SyslogServer> servers = new List<SyslogServer>
             {
-                new SyslogServer("logs.papertrailapp.com", 25722),
+                new SyslogServer("myhost.com", 514),
                 new SyslogServer("127.0.0.1", 514)
             };
 
             log = new LoggingModule(servers, true);
+            log.Settings.MinimumSeverity = Severity.Debug;
             log.Settings.FileLogging = FileLoggingMode.SingleLogFile;
             log.Settings.LogFilename = "test.log";
              
