@@ -2,12 +2,18 @@
 
 ## Current Version
 
+v2.0.1
+
+- Breaking changes including new constructors and minor API changes
+- Support for multiple syslog servers
+- Simplified class definitions
+
+## Previous Versions
+
 v1.3.2
 
 - EnableColors property for console logging
 - Expose ```Log``` API (thank you @dev-jan!)
-
-## Previous Versions
 
 v1.3.1
 

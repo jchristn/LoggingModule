@@ -7,3 +7,16 @@ C:\code\Misc\SyslogLogging-1.3\LoggingModule\obj\Release\netstandard2.1\LoggingM
 C:\code\Misc\SyslogLogging-1.3\LoggingModule\obj\Release\netstandard2.1\LoggingModule.csproj.CoreCompileInputs.cache
 C:\code\Misc\SyslogLogging-1.3\LoggingModule\obj\Release\netstandard2.1\LoggingModule.dll
 C:\code\Misc\SyslogLogging-1.3\LoggingModule\obj\Release\netstandard2.1\LoggingModule.pdb
+C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Release\netstandard2.1\assets\logo.ico
+C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Release\netstandard2.1\assets\logo.png
+C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Release\netstandard2.1\LoggingModule.xml
+C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Release\netstandard2.1\LICENSE.md
+C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Release\netstandard2.1\LoggingModule.deps.json
+C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Release\netstandard2.1\LoggingModule.dll
+C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Release\netstandard2.1\LoggingModule.pdb
+C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Release\netstandard2.1\LoggingModule.csprojAssemblyReference.cache
+C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Release\netstandard2.1\LoggingModule.AssemblyInfoInputs.cache
+C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Release\netstandard2.1\LoggingModule.AssemblyInfo.cs
+C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Release\netstandard2.1\LoggingModule.csproj.CoreCompileInputs.cache
+C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Release\netstandard2.1\LoggingModule.dll
+C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Release\netstandard2.1\LoggingModule.pdb

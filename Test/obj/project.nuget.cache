@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "zDWa1emBo/hXEJaNTUTjxLXVd9+FtLLfDB17nmt8FkvTke18HvJ8Ge+GfcqbeV1UIGA3oHOwS/L1ATqo1f2AIQ==",
+  "dgSpecHash": "6fJ2gcZlKdh2hKMXqCUuNGvNtmQMSeEtuwJCrIefX29YkLMfzlwpHinoE3BYKLvyMD4POMUPbXm32950GydT7g==",
   "success": true,
-  "projectFilePath": "C:\\Code\\Misc\\SyslogLogging-1.3\\Test\\Test.csproj",
+  "projectFilePath": "C:\\code\\misc\\SyslogLogging-2.0\\Test\\Test.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

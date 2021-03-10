@@ -13,24 +13,16 @@ namespace Test
 
         static void Main(string[] args)
         {
-            log = new LoggingModule();
+            List<SyslogServer> servers = new List<SyslogServer>
+            {
+                new SyslogServer("logs.papertrailapp.com", 25722),
+                new SyslogServer("127.0.0.1", 514)
+            };
 
-            /*
-            log = new LoggingModule("127.0.0.1", 514);
-            log.ConsoleEnable = true;
-            log.IncludeUtcTimestamp = true;
-            log.FileLogging = FileLoggingMode.FileWithDate;
-            log.LogFilename = "test.log";
-            */
-
-            /*
-            log = new LoggingModule("test.log", true);
-            */
-
-            /*
-            log = new LoggingModule("test.log", FileLoggingMode.FileWithDate, true);
-            */
-
+            log = new LoggingModule(servers, true);
+            log.Settings.FileLogging = FileLoggingMode.SingleLogFile;
+            log.Settings.LogFilename = "test.log";
+             
             log.Debug("This is a Debug message.");
             log.Info("This is an Info message.");
             log.Warn("This is a Warn message.");
@@ -53,7 +45,7 @@ namespace Test
             catch (Exception e)
             { 
                 e.Data.Add("foo", "bar");
-                log.Exception("Program", "Main", e);
+                log.Exception(e, "Program", "Main");
             }
 
             log.Alert("Press ENTER to exit");

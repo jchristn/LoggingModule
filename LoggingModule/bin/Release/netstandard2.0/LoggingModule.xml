@@ -94,87 +94,14 @@
             Syslog, console, and file logging module.
             </summary>
         </member>
-        <member name="P:SyslogLogging.LoggingModule.ServerIp">
+        <member name="P:SyslogLogging.LoggingModule.Settings">
             <summary>
-            Server IP address.
+            Logging settings.
             </summary>
         </member>
-        <member name="P:SyslogLogging.LoggingModule.ServerPort">
+        <member name="P:SyslogLogging.LoggingModule.Servers">
             <summary>
-            UDP port on which the syslog server is listening.
-            </summary>
-        </member>
-        <member name="P:SyslogLogging.LoggingModule.ConsoleEnable">
-            <summary>
-            Enable or disable console logging.
-            </summary>
-        </member>
-        <member name="F:SyslogLogging.LoggingModule.MinimumSeverity">
-            <summary>
-            Minimum severity required to send a message.
-            </summary>
-        </member>
-        <member name="F:SyslogLogging.LoggingModule.AsyncLogging">
-            <summary>
-            Enable or disable async logging.
-            </summary>
-        </member>
-        <member name="F:SyslogLogging.LoggingModule.IncludeUtcTimestamp">
-            <summary>
-            Include the UTC timestamp in the message.
-            </summary>
-        </member>
-        <member name="F:SyslogLogging.LoggingModule.IncludeSeverity">
-            <summary>
-            Include the severity in the message.
-            </summary>s
-        </member>
-        <member name="F:SyslogLogging.LoggingModule.IncludeHostname">
-            <summary>
-            Include the local hostname in the message.
-            </summary>
-        </member>
-        <member name="F:SyslogLogging.LoggingModule.IncludeThreadId">
-            <summary>
-            Include the local thread ID in the message.
-            </summary>
-        </member>
-        <member name="F:SyslogLogging.LoggingModule.IndentByStackSize">
-            <summary>
-            Indent outgoing messages based on stack depth.
-            </summary>
-        </member>
-        <member name="F:SyslogLogging.LoggingModule.EnableColors">
-            <summary>
-            Enable or disable use of color for console messages.
-            </summary>
-        </member>
-        <member name="F:SyslogLogging.LoggingModule.Colors">
-            <summary>
-            Colors to use for console messages based on message severity.
-            </summary>
-        </member>
-        <member name="F:SyslogLogging.LoggingModule.FileLogging">
-            <summary>
-            Enable or disable logging to a file.
-            Disabled: file logging will not be used.
-            SingleLogFile: all messages will be appended to a single file.
-            FileWithDate: all messages will be appended to a file, where the name of the file is the supplied filename followed by '.yyyyMMdd'.
-            </summary>
-        </member>
-        <member name="F:SyslogLogging.LoggingModule.LogFilename">
-            <summary>
-            The file to which log messages should be appended.
-            </summary>
-        </member>
-        <member name="F:SyslogLogging.LoggingModule.ExceptionSeverity">
-            <summary>
-            The severity level to use when logging exceptions through the .Exception() method.  
-            </summary>
-        </member>
-        <member name="P:SyslogLogging.LoggingModule.MaxMessageLength">
-            <summary>
-            Maximum message length.  Must be greater than or equal to 32.  Default is 1024.
+            List of syslog servers.
             </summary>
         </member>
         <member name="M:SyslogLogging.LoggingModule.#ctor">
@@ -182,18 +109,19 @@
             Instantiate the object using localhost syslog (UDP port 514).
             </summary>
         </member>
-        <member name="M:SyslogLogging.LoggingModule.#ctor(System.String,System.Int32)">
+        <member name="M:SyslogLogging.LoggingModule.#ctor(System.String,System.Int32,System.Boolean)">
             <summary>
             Instantiate the object using the specified syslog server IP address and UDP port.
             </summary>
             <param name="serverIp">Server IP address.</param>
             <param name="serverPort">Server port number.</param>
+            <param name="enableConsole">Enable or disable console logging.</param>
         </member>
-        <member name="M:SyslogLogging.LoggingModule.#ctor(System.String,System.Boolean)">
+        <member name="M:SyslogLogging.LoggingModule.#ctor(System.Collections.Generic.List{SyslogLogging.SyslogServer},System.Boolean)">
             <summary>
-            Instantiate the object to enable either file logging or console logging.
+            Instantiate the object using a series of servers.
             </summary>
-            <param name="filename">Filename.</param>
+            <param name="servers">Servers.</param>
             <param name="enableConsole">Enable or disable console logging.</param>
         </member>
         <member name="M:SyslogLogging.LoggingModule.#ctor(System.String,SyslogLogging.FileLoggingMode,System.Boolean)">
@@ -203,21 +131,6 @@
             <param name="filename">Filename.</param>
             <param name="fileLoggingMode">File logging mode.  If you specify 'FileWithDate', .yyyyMMdd will be appended to the specified filename.</param>
             <param name="enableConsole">Enable or disable console logging.</param>
-        </member>
-        <member name="M:SyslogLogging.LoggingModule.#ctor(System.String,System.Int32,System.Boolean,SyslogLogging.Severity,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
-            <summary>
-            Instantiate the object.
-            </summary>
-            <param name="serverIp">Server IP address.</param>
-            <param name="serverPort">Server port number.</param>
-            <param name="consoleEnable">Enable or disable console logging.</param>
-            <param name="minimumSeverity">Minimum severity required to send a message.</param>
-            <param name="asyncLogging">Enable or disable async logging.</param>
-            <param name="includeUtcTimestamp">Include the UTC timestamp in the message.</param>
-            <param name="includeSeverity">Include the severity in the message.</param>
-            <param name="includeHostname">Include the local hostname in the message.</param>
-            <param name="includeThreadId">Include the local thread ID in the message.</param>
-            <param name="indentByStackSize">Indent outgoing messages based on stack depth.</param>
         </member>
         <member name="M:SyslogLogging.LoggingModule.Dispose">
             <summary>
@@ -266,7 +179,7 @@
             </summary>
             <param name="msg">Message to send.</param>
         </member>
-        <member name="M:SyslogLogging.LoggingModule.Exception(System.String,System.String,System.Exception)">
+        <member name="M:SyslogLogging.LoggingModule.Exception(System.Exception,System.String,System.String)">
             <summary>
             Send log messages containing Exception details using 'Alert' severity.
             </summary>
@@ -286,6 +199,77 @@
             Dispose of the resource.
             </summary>
             <param name="disposing">Disposing.</param>
+        </member>
+        <member name="T:SyslogLogging.LoggingSettings">
+            <summary>
+            Logging settings.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LoggingSettings.HeaderFormat">
+            <summary>
+            Header format.  Provide a string that specifies how the preamble of each message should be structured.  You can use variables including:
+            {ts}: UTC timestamp
+            {host}: Hostname
+            {thread}: Thread ID
+            {sev}: Severity
+            Default: {ts} {host} {thread} {sev}
+            A space will be inserted between the header and the message.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LoggingSettings.TimestampFormat">
+            <summary>
+            Timestamp format.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LoggingSettings.EnableConsole">
+            <summary>
+            Enable or disable console logging.  
+            Settings this to true will first validate if a console exists. 
+            If a console is not available, it will be set to false.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LoggingSettings.MinimumSeverity">
+            <summary>
+            Minimum severity required to send a message.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LoggingSettings.EnableColors">
+            <summary>
+            Enable or disable use of color for console messages.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LoggingSettings.Colors">
+            <summary>
+            Colors to use for console messages based on message severity.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.LoggingSettings.FileLogging">
+            <summary>
+            Enable or disable logging to a file.
+            Disabled: file logging will not be used.
+            SingleLogFile: all messages will be appended to a single file.
+            FileWithDate: all messages will be appended to a file, where the name of the file is the supplied filename followed by '.yyyyMMdd'.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LoggingSettings.LogFilename">
+            <summary>
+            The file to which log messages should be appended.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LoggingSettings.ExceptionSeverity">
+            <summary>
+            The severity level to use when logging exceptions through the .Exception() method.  
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LoggingSettings.MaxMessageLength">
+            <summary>
+            Maximum message length.  Must be greater than or equal to 32.  Default is 1024.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.LoggingSettings.#ctor">
+            <summary>
+            Instantiate the object.
+            </summary>
         </member>
         <member name="T:SyslogLogging.Severity">
             <summary>
@@ -326,6 +310,33 @@
             <summary>
             Emergency messages.
             </summary>
+        </member>
+        <member name="T:SyslogLogging.SyslogServer">
+            <summary>
+            Syslog server.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.SyslogServer.Hostname">
+            <summary>
+            Hostname.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.SyslogServer.Port">
+            <summary>
+            UDP port.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.SyslogServer.#ctor">
+            <summary>
+            Instantiate the object.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.SyslogServer.#ctor(System.String,System.Int32)">
+            <summary>
+            Instantiate the object.
+            </summary>
+            <param name="hostname">Hostname.</param>
+            <param name="port">Port.</param>
         </member>
     </members>
 </doc>

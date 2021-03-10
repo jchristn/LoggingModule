@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v5.0": {
-      "LoggingModule/1.3.2.7": {
+      "LoggingModule/2.0.1": {
         "runtime": {
           "LoggingModule.dll": {}
         }
@@ -14,7 +14,7 @@
     }
   },
   "libraries": {
-    "LoggingModule/1.3.2.7": {
+    "LoggingModule/2.0.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
