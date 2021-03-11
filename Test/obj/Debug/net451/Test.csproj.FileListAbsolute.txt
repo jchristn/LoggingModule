@@ -26,3 +26,4 @@ C:\code\misc\SyslogLogging-2.0\Test\obj\Debug\net451\Test.csproj.CoreCompileInpu
 C:\code\misc\SyslogLogging-2.0\Test\obj\Debug\net451\Test.csproj.CopyComplete
 C:\code\misc\SyslogLogging-2.0\Test\obj\Debug\net451\Test.exe
 C:\code\misc\SyslogLogging-2.0\Test\obj\Debug\net451\Test.pdb
+C:\Code\Misc\SyslogLogging-2.0\Test\bin\Debug\net451\Newtonsoft.Json.dll

@@ -26,6 +26,8 @@ namespace SyslogLogging
             {
                 if (String.IsNullOrEmpty(value)) throw new ArgumentNullException(nameof(Hostname));
                 _Hostname = value;
+
+                SetUdp();
             }
         }
 
@@ -42,6 +44,8 @@ namespace SyslogLogging
             {
                 if (value < 0) throw new ArgumentException("Port must be zero or greater.");
                 _Port = value;
+
+                SetUdp();
             }
         }
 
@@ -83,6 +87,12 @@ namespace SyslogLogging
         #endregion
 
         #region Private-Methods
+
+        private void SetUdp()
+        {
+            Udp = null;
+            Udp = new UdpClient(_Hostname, _Port);
+        }
 
         #endregion
     }
