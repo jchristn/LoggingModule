@@ -79,3 +79,30 @@
    at Test.Program.Main(String[] args) in C:\Code\Misc\SyslogLogging-2.0\Test\Program.cs:line 43
 ---
 2021-03-10 23:46:53 THINKPAD 1 Alert Press ENTER to exit
+2021-03-11 00:09:31 THINKPAD 1 Debug This is a Debug message.
+2021-03-11 00:09:31 THINKPAD 1 Info This is an Info message.
+2021-03-11 00:09:31 THINKPAD 1 Warn This is a Warn message.
+2021-03-11 00:09:31 THINKPAD 1 Error This is an Error message.
+2021-03-11 00:09:31 THINKPAD 1 Alert This is an Alert message.
+2021-03-11 00:09:31 THINKPAD 1 Critical This is a Critical message.
+2021-03-11 00:09:31 THINKPAD 1 Emergency This is an Emergency message.
+2021-03-11 00:09:31 THINKPAD 1 Info Let's test logging an exception.
+2021-03-11 00:09:31 THINKPAD 1 Info Just another way to create log messages!
+2021-03-11 00:09:31 THINKPAD 1 Critical Shall we divide by zero?
+2021-03-11 00:09:31 THINKPAD 1 Alert 
+--- Exception details ---
+  Module     : Program
+  Method     : Main
+  Type       : System.DivideByZeroException
+  Data       : 
+  | foo: bar
+  Inner      : (null)
+  Message    : Attempted to divide by zero.
+  Source     : Test
+  StackTrace :    at Test.Program.Main(String[] args) in C:\Code\Misc\SyslogLogging-2.0\Test\Program.cs:line 43
+  Line       : 43
+  File       : C:\Code\Misc\SyslogLogging-2.0\Test\Program.cs
+  ToString   : System.DivideByZeroException: Attempted to divide by zero.
+   at Test.Program.Main(String[] args) in C:\Code\Misc\SyslogLogging-2.0\Test\Program.cs:line 43
+---
+2021-03-11 00:09:31 THINKPAD 1 Alert Press ENTER to exit

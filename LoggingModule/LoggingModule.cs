@@ -455,7 +455,8 @@ namespace SyslogLogging
                 {
                     try
                     {
-                        server.Udp.Send(data, data.Length);
+                        UdpClient udp = new UdpClient(server.Hostname, server.Port);
+                        udp.Send(data, data.Length);
                     }
                     catch (Exception)
                     {

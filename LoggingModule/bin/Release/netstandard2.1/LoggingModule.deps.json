@@ -7,7 +7,7 @@
   "targets": {
     ".NETStandard,Version=v2.1": {},
     ".NETStandard,Version=v2.1/": {
-      "LoggingModule/2.0.1.1": {
+      "LoggingModule/2.0.1.2": {
         "runtime": {
           "LoggingModule.dll": {}
         }
@@ -15,7 +15,7 @@
     }
   },
   "libraries": {
-    "LoggingModule/2.0.1.1": {
+    "LoggingModule/2.0.1.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

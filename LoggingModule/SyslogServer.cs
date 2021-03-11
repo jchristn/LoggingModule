@@ -63,7 +63,6 @@ namespace SyslogLogging
         /// </summary>
         public SyslogServer()
         {
-            Udp = new UdpClient(Hostname, Port);
         }
 
         /// <summary>
@@ -75,7 +74,6 @@ namespace SyslogLogging
         {
             Hostname = hostname;
             Port = port;
-            Udp = new UdpClient(Hostname, Port);
         }
 
         #endregion

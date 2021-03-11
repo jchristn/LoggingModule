@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v3.1": {
-      "SyslogLogging/2.0.1.1": {
+      "SyslogLogging/2.0.1.2": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.1",
         "compile": {
@@ -14,7 +14,7 @@
       }
     },
     ".NETCoreApp,Version=v3.1/win7-x86": {
-      "SyslogLogging/2.0.1.1": {
+      "SyslogLogging/2.0.1.2": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.1",
         "compile": {
@@ -26,7 +26,7 @@
       }
     },
     ".NETFramework,Version=v4.5.1": {
-      "SyslogLogging/2.0.1.1": {
+      "SyslogLogging/2.0.1.2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "compile": {
@@ -38,7 +38,7 @@
       }
     },
     ".NETFramework,Version=v4.5.1/win7-x86": {
-      "SyslogLogging/2.0.1.1": {
+      "SyslogLogging/2.0.1.2": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "compile": {
@@ -50,7 +50,7 @@
       }
     },
     "net5.0": {
-      "SyslogLogging/2.0.1.1": {
+      "SyslogLogging/2.0.1.2": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "compile": {
@@ -62,7 +62,7 @@
       }
     },
     "net5.0/win7-x86": {
-      "SyslogLogging/2.0.1.1": {
+      "SyslogLogging/2.0.1.2": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "compile": {
@@ -75,7 +75,7 @@
     }
   },
   "libraries": {
-    "SyslogLogging/2.0.1.1": {
+    "SyslogLogging/2.0.1.2": {
       "type": "project",
       "path": "../LoggingModule/LoggingModule.csproj",
       "msbuildProject": "../LoggingModule/LoggingModule.csproj"
@@ -83,13 +83,13 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
-      "SyslogLogging >= 2.0.1.1"
+      "SyslogLogging >= 2.0.1.2"
     ],
     ".NETFramework,Version=v4.5.1": [
-      "SyslogLogging >= 2.0.1.1"
+      "SyslogLogging >= 2.0.1.2"
     ],
     "net5.0": [
-      "SyslogLogging >= 2.0.1.1"
+      "SyslogLogging >= 2.0.1.2"
     ]
   },
   "packageFolders": {
