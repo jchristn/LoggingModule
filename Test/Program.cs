@@ -15,16 +15,20 @@ namespace Test
         static void Main(string[] args)
         {
             /*
+             * 
+             * Testing deserialization
+             * 
+            string json = "[{'Hostname':'127.0.0.1','Port':514},{'Hostname':'myhost.com','Port':21657}]";
+            List<SyslogServer> servers = JsonConvert.DeserializeObject<List<SyslogServer>>(json);
+             *
+             */
+
             List<SyslogServer> servers = new List<SyslogServer>
             {
                 new SyslogServer("myhost.com", 514),
                 new SyslogServer("127.0.0.1", 514)
             };
-            */
-
-            string json = "[{'Hostname':'127.0.0.1','Port':514},{'Hostname':'logs5.papertrailapp.com','Port':21657}]";
-            List<SyslogServer> servers = JsonConvert.DeserializeObject<List<SyslogServer>>(json);
-
+         
             log = new LoggingModule(servers, true);
             log.Settings.MinimumSeverity = Severity.Debug;
             log.Settings.FileLogging = FileLoggingMode.SingleLogFile;
