@@ -26,6 +26,8 @@ namespace Test
             List<SyslogServer> servers = new List<SyslogServer>
             {
                 new SyslogServer("myhost.com", 514),
+                new SyslogServer("127.0.0.1", 514),
+                new SyslogServer("127.0.0.1", 514),
                 new SyslogServer("127.0.0.1", 514)
             };
          

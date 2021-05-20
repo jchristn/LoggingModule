@@ -18,11 +18,13 @@ First things first - do you need help or have feedback?  File an issue here!  We
 
 ## It's Really Easy...  I Mean, REALLY Easy
 
+By default, ```127.0.0.1:514``` is automatically included in the list of servers.
+
 ### Single Syslog Server
 ```csharp
 using SyslogLogging;
 
-LoggingModule log = new LoggingModule("127.0.0.1", 514);
+LoggingModule log = new LoggingModule(); // 127.0.0.1:514 is automatically included
 log.Debug("This is a debug message!");
 ```
 
@@ -32,7 +34,7 @@ using SyslogLogging;
 
 List<SyslogServer> servers = new List<SyslogServer>
 {
-  new SyslogServer("127.0.0.1", 514),
+  new SyslogServer("logginghost.com", 2000),
   new SyslogServer("myhost.com", 514)
 };
 

@@ -49,6 +49,17 @@ namespace SyslogLogging
             }
         }
 
+        /// <summary>
+        /// IP:port of the server.
+        /// </summary>
+        public string IpPort
+        {
+            get
+            {
+                return _Hostname + ":" + _Port;
+            }
+        }
+
         #endregion
 
         #region Private-Members

@@ -23,12 +23,12 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="C:\Code\Misc\SyslogLogging-2.0\LoggingModule\bin\Debug\net451\LoggingModule.dll" target="lib\net451\LoggingModule.dll" />
-    <file src="C:\Code\Misc\SyslogLogging-2.0\LoggingModule\bin\Debug\net5.0\LoggingModule.dll" target="lib\net5.0\LoggingModule.dll" />
-    <file src="C:\Code\Misc\SyslogLogging-2.0\LoggingModule\bin\Debug\netcoreapp3.1\LoggingModule.dll" target="lib\netcoreapp3.1\LoggingModule.dll" />
-    <file src="C:\Code\Misc\SyslogLogging-2.0\LoggingModule\bin\Debug\netcoreapp3.1\LoggingModule.xml" target="lib\netcoreapp3.1\LoggingModule.xml" />
-    <file src="C:\Code\Misc\SyslogLogging-2.0\LoggingModule\bin\Debug\netstandard2.0\LoggingModule.dll" target="lib\netstandard2.0\LoggingModule.dll" />
-    <file src="C:\Code\Misc\SyslogLogging-2.0\LoggingModule\bin\Debug\netstandard2.1\LoggingModule.dll" target="lib\netstandard2.1\LoggingModule.dll" />
-    <file src="C:\Code\Misc\SyslogLogging-2.0\LICENSE.md" target="LICENSE.md" />
+    <file src="C:\code\Misc\SyslogLogging-2.0\LoggingModule\bin\Debug\net451\LoggingModule.dll" target="lib\net451\LoggingModule.dll" />
+    <file src="C:\code\Misc\SyslogLogging-2.0\LoggingModule\bin\Debug\net5.0\LoggingModule.dll" target="lib\net5.0\LoggingModule.dll" />
+    <file src="C:\code\Misc\SyslogLogging-2.0\LoggingModule\bin\Debug\netcoreapp3.1\LoggingModule.dll" target="lib\netcoreapp3.1\LoggingModule.dll" />
+    <file src="C:\code\Misc\SyslogLogging-2.0\LoggingModule\bin\Debug\netcoreapp3.1\LoggingModule.xml" target="lib\netcoreapp3.1\LoggingModule.xml" />
+    <file src="C:\code\Misc\SyslogLogging-2.0\LoggingModule\bin\Debug\netstandard2.0\LoggingModule.dll" target="lib\netstandard2.0\LoggingModule.dll" />
+    <file src="C:\code\Misc\SyslogLogging-2.0\LoggingModule\bin\Debug\netstandard2.1\LoggingModule.dll" target="lib\netstandard2.1\LoggingModule.dll" />
+    <file src="C:\code\Misc\SyslogLogging-2.0\LICENSE.md" target="LICENSE.md" />
   </files>
 </package>

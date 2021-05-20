@@ -326,6 +326,11 @@
             UDP port.
             </summary>
         </member>
+        <member name="P:SyslogLogging.SyslogServer.IpPort">
+            <summary>
+            IP:port of the server.
+            </summary>
+        </member>
         <member name="M:SyslogLogging.SyslogServer.#ctor">
             <summary>
             Instantiate the object.

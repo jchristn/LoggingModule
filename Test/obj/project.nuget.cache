@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "rY3/I5HaYx5BznROgOC+BSoRnvQXH4KUM6HLcIF0M7OVMvxpnXP9G2tF4twAFivQqx21jbTw3gDRIli9m+u2/w==",
+  "dgSpecHash": "JLIJdAh4cykFN2dVy3LtXb6wBLTGZa4klpeMc8ianY6bnfdzi6qts8bq7/bS1GXoyivAbOEnUKQ+DeWIMNMdcA==",
   "success": true,
-  "projectFilePath": "C:\\Code\\Misc\\SyslogLogging-2.0\\Test\\Test.csproj",
+  "projectFilePath": "C:\\code\\Misc\\SyslogLogging-2.0\\Test\\Test.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\joelc\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512"
+    "C:\\Users\\joelc\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
+    "C:\\Users\\joelc\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.13\\microsoft.netcore.app.host.win-x64.3.1.13.nupkg.sha512"
   ],
   "logs": []
 }

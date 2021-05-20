@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO; 
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -45,8 +46,14 @@ namespace SyslogLogging
             }
             set
             {
-                if (value == null) _Servers = new List<SyslogServer>();
-                else _Servers = value;
+                if (value == null)
+                {
+                    _Servers = new List<SyslogServer>();
+                }
+                else
+                {
+                    _Servers = DistinctBy(value, s => s.IpPort).ToList();
+                }
             }
         }
          
@@ -85,8 +92,12 @@ namespace SyslogLogging
             int serverPort,
             bool enableConsole = true)
         {
-            SyslogServer server = new SyslogServer(serverIp, serverPort);
-            _Servers.Add(server);
+            if (String.IsNullOrEmpty(serverIp)) throw new ArgumentNullException(nameof(serverIp));
+            if (serverPort < 0) throw new ArgumentException("Server port must be zero or greater.");
+
+            _Servers = new List<SyslogServer>();
+            _Servers.Add(new SyslogServer(serverIp, serverPort));
+
             _Settings.EnableConsole = enableConsole;
             _Token = _TokenSource.Token;
         }
@@ -102,6 +113,8 @@ namespace SyslogLogging
         {
             if (servers == null) throw new ArgumentNullException(nameof(servers));
             if (servers.Count < 1) throw new ArgumentException("At least one server must be specified.");
+
+            servers = DistinctBy(servers, s => s.IpPort).ToList();
 
             _Servers = servers;
             _Settings.EnableConsole = enableConsole;
@@ -464,7 +477,19 @@ namespace SyslogLogging
                 }
             } 
         }
-         
+
+        private static IEnumerable<TSource> DistinctBy<TSource, TKey>(IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        {
+            HashSet<TKey> seenKeys = new HashSet<TKey>();
+            foreach (TSource element in source)
+            {
+                if (seenKeys.Add(keySelector(element)))
+                {
+                    yield return element;
+                }
+            }
+        }
+
         #endregion
     }
 }
