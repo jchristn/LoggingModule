@@ -33,9 +33,9 @@ C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Debug\netstandard2.0\LICENSE.md
 C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Debug\netstandard2.0\LoggingModule.deps.json
 C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Debug\netstandard2.0\LoggingModule.dll
 C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Debug\netstandard2.0\LoggingModule.pdb
-C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.csprojAssemblyReference.cache
 C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.AssemblyInfoInputs.cache
 C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.AssemblyInfo.cs
 C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.csproj.CoreCompileInputs.cache
 C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.dll
 C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.pdb
+C:\Code\Misc\SyslogLogging-2.0\LoggingModule\obj\Debug\netstandard2.0\LoggingModule.csproj.AssemblyReference.cache

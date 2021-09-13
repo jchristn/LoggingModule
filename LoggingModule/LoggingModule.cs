@@ -434,6 +434,7 @@ namespace SyslogLogging
         private void SendFile(Severity sev, string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;
+            if (String.IsNullOrEmpty(_Settings.LogFilename)) return;
 
             switch (_Settings.FileLogging)
             {

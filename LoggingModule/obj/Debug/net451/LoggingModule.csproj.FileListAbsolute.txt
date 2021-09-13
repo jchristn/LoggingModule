@@ -12,9 +12,9 @@ C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Debug\net451\LoggingModule.xml
 C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Debug\net451\LICENSE.md
 C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Debug\net451\LoggingModule.dll
 C:\code\misc\SyslogLogging-2.0\LoggingModule\bin\Debug\net451\LoggingModule.pdb
-C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\net451\LoggingModule.csprojAssemblyReference.cache
 C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\net451\LoggingModule.AssemblyInfoInputs.cache
 C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\net451\LoggingModule.AssemblyInfo.cs
 C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\net451\LoggingModule.csproj.CoreCompileInputs.cache
 C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\net451\LoggingModule.dll
 C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\net451\LoggingModule.pdb
+C:\Code\Misc\SyslogLogging-2.0\LoggingModule\obj\Debug\net451\LoggingModule.csproj.AssemblyReference.cache

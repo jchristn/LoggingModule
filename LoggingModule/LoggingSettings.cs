@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace SyslogLogging
@@ -104,7 +105,23 @@ namespace SyslogLogging
         /// <summary>
         /// The file to which log messages should be appended.
         /// </summary>
-        public string LogFilename { get; set; } = null;
+        public string LogFilename
+        {
+            get
+            {
+                return _LogFilename;
+            }
+            set
+            {
+                _LogFilename = value;
+
+                if (!String.IsNullOrEmpty(_LogFilename))
+                {
+                    string dir = Path.GetDirectoryName(LogFilename);
+                    if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                }
+            }
+        }
 
         /// <summary>
         /// The severity level to use when logging exceptions through the .Exception() method.  
@@ -136,6 +153,7 @@ namespace SyslogLogging
         private bool _EnableConsole = true;
         private int _MaxMessageLength = 1024;
         private ColorSchema _Colors = new ColorSchema();
+        private string _LogFilename = null;
 
         #endregion
 

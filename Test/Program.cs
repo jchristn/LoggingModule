@@ -34,7 +34,7 @@ namespace Test
             log = new LoggingModule(servers, true);
             log.Settings.MinimumSeverity = Severity.Debug;
             log.Settings.FileLogging = FileLoggingMode.SingleLogFile;
-            log.Settings.LogFilename = "test.log";
+            log.Settings.LogFilename = "logs/test.log";
              
             log.Debug("This is a Debug message.");
             log.Info("This is an Info message.");

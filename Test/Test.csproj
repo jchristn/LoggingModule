@@ -13,4 +13,10 @@
     <ProjectReference Include="..\LoggingModule\LoggingModule.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="LICENSE.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

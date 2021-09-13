@@ -19,7 +19,6 @@ C:\code\misc\SyslogLogging-2.0\Test\bin\Release\net451\Test.exe
 C:\code\misc\SyslogLogging-2.0\Test\bin\Release\net451\Test.pdb
 C:\code\misc\SyslogLogging-2.0\Test\bin\Release\net451\LoggingModule.dll
 C:\code\misc\SyslogLogging-2.0\Test\bin\Release\net451\LoggingModule.pdb
-C:\code\misc\SyslogLogging-2.0\Test\obj\Release\net451\Test.csprojAssemblyReference.cache
 C:\code\misc\SyslogLogging-2.0\Test\obj\Release\net451\Test.AssemblyInfoInputs.cache
 C:\code\misc\SyslogLogging-2.0\Test\obj\Release\net451\Test.AssemblyInfo.cs
 C:\code\misc\SyslogLogging-2.0\Test\obj\Release\net451\Test.csproj.CoreCompileInputs.cache
@@ -27,3 +26,4 @@ C:\code\misc\SyslogLogging-2.0\Test\obj\Release\net451\Test.csproj.CopyComplete
 C:\code\misc\SyslogLogging-2.0\Test\obj\Release\net451\Test.exe
 C:\code\misc\SyslogLogging-2.0\Test\obj\Release\net451\Test.pdb
 C:\Code\Misc\SyslogLogging-2.0\Test\bin\Release\net451\Newtonsoft.Json.dll
+C:\Code\Misc\SyslogLogging-2.0\Test\obj\Release\net451\Test.csproj.AssemblyReference.cache

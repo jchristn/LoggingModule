@@ -30,7 +30,6 @@ C:\code\misc\SyslogLogging-2.0\Test\bin\Debug\net5.0\ref\Test.dll
 C:\code\misc\SyslogLogging-2.0\Test\bin\Debug\net5.0\Test.pdb
 C:\code\misc\SyslogLogging-2.0\Test\bin\Debug\net5.0\LoggingModule.dll
 C:\code\misc\SyslogLogging-2.0\Test\bin\Debug\net5.0\LoggingModule.pdb
-C:\code\misc\SyslogLogging-2.0\Test\obj\Debug\net5.0\Test.csprojAssemblyReference.cache
 C:\code\misc\SyslogLogging-2.0\Test\obj\Debug\net5.0\Test.GeneratedMSBuildEditorConfig.editorconfig
 C:\code\misc\SyslogLogging-2.0\Test\obj\Debug\net5.0\Test.AssemblyInfoInputs.cache
 C:\code\misc\SyslogLogging-2.0\Test\obj\Debug\net5.0\Test.AssemblyInfo.cs
@@ -41,3 +40,4 @@ C:\code\misc\SyslogLogging-2.0\Test\obj\Debug\net5.0\ref\Test.dll
 C:\code\misc\SyslogLogging-2.0\Test\obj\Debug\net5.0\Test.pdb
 C:\code\misc\SyslogLogging-2.0\Test\obj\Debug\net5.0\Test.genruntimeconfig.cache
 C:\Code\Misc\SyslogLogging-2.0\Test\bin\Debug\net5.0\Newtonsoft.Json.dll
+C:\Code\Misc\SyslogLogging-2.0\Test\obj\Debug\net5.0\Test.csproj.AssemblyReference.cache

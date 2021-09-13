@@ -3,21 +3,22 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;netstandard2.0;netstandard2.1;net451;net5.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.1.4</Version>
+    <Version>2.0.1.5</Version>
     <Authors>Joel Christner</Authors>
     <PackageId>SyslogLogging</PackageId>
     <Product>SyslogLogging</Product>
     <Description>The easiest logging library to use to send log messages to syslog, the console, or the file system.  It's.  REALLY.  Easy.</Description>
-    <Copyright>(c)2020 Joel Christner</Copyright>
+    <Copyright>(c)2021 Joel Christner</Copyright>
     <PackageTags>syslog logging console log logger udp event</PackageTags>
     <PackageProjectUrl>https://github.com/jchristn/LoggingModule</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageLicenseUrl></PackageLicenseUrl>
-    <PackageReleaseNotes>Expose Log method (thank you @dev-jan!)</PackageReleaseNotes>
-    <PackageIconUrl>https://raw.githubusercontent.com/jchristn/loggingmodule/master/assets/logo.ico</PackageIconUrl>
+    <PackageReleaseNotes>Create logfile directory if it does not exist</PackageReleaseNotes>
+    <PackageIconUrl></PackageIconUrl>
     <RootNamespace>SyslogLogging</RootNamespace>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageIcon>logo.png</PackageIcon>
   </PropertyGroup>
  
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
@@ -29,7 +30,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\LICENSE.md">
+    <None Include="assets\logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="LICENSE.md">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
