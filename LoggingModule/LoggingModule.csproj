@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;netstandard2.0;netstandard2.1;net451;net5.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netstandard2.0;netstandard2.1;net451;net5.0;net6.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.1.5</Version>
+    <Version>2.0.1.6</Version>
     <Authors>Joel Christner</Authors>
     <PackageId>SyslogLogging</PackageId>
     <Product>SyslogLogging</Product>
@@ -14,7 +14,7 @@
     <RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageLicenseUrl></PackageLicenseUrl>
-    <PackageReleaseNotes>Create logfile directory if it does not exist</PackageReleaseNotes>
+    <PackageReleaseNotes>.NET 6 support.</PackageReleaseNotes>
     <PackageIconUrl></PackageIconUrl>
     <RootNamespace>SyslogLogging</RootNamespace>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>

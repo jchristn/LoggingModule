@@ -11,7 +11,7 @@
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
         }
       },
-      "SyslogLogging/2.0.1.5": {
+      "SyslogLogging/2.0.1.6": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.1",
         "compile": {
@@ -32,7 +32,7 @@
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
         }
       },
-      "SyslogLogging/2.0.1.5": {
+      "SyslogLogging/2.0.1.6": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.1",
         "compile": {
@@ -53,7 +53,7 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "SyslogLogging/2.0.1.5": {
+      "SyslogLogging/2.0.1.6": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "compile": {
@@ -74,7 +74,7 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "SyslogLogging/2.0.1.5": {
+      "SyslogLogging/2.0.1.6": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "compile": {
@@ -95,7 +95,7 @@
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
         }
       },
-      "SyslogLogging/2.0.1.5": {
+      "SyslogLogging/2.0.1.6": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "compile": {
@@ -116,9 +116,51 @@
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
         }
       },
-      "SyslogLogging/2.0.1.5": {
+      "SyslogLogging/2.0.1.6": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
+        "compile": {
+          "bin/placeholder/SyslogLogging.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SyslogLogging.dll": {}
+        }
+      }
+    },
+    "net6.0": {
+      "Newtonsoft.Json/12.0.3": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Newtonsoft.Json.dll": {}
+        }
+      },
+      "SyslogLogging/2.0.1.6": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/SyslogLogging.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SyslogLogging.dll": {}
+        }
+      }
+    },
+    "net6.0/win7-x86": {
+      "Newtonsoft.Json/12.0.3": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Newtonsoft.Json.dll": {}
+        }
+      },
+      "SyslogLogging/2.0.1.6": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
         "compile": {
           "bin/placeholder/SyslogLogging.dll": {}
         },
@@ -160,7 +202,7 @@
         "packageIcon.png"
       ]
     },
-    "SyslogLogging/2.0.1.5": {
+    "SyslogLogging/2.0.1.6": {
       "type": "project",
       "path": "../LoggingModule/LoggingModule.csproj",
       "msbuildProject": "../LoggingModule/LoggingModule.csproj"
@@ -169,15 +211,19 @@
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
       "Newtonsoft.Json >= 12.0.3",
-      "SyslogLogging >= 2.0.1.5"
+      "SyslogLogging >= 2.0.1.6"
     ],
     ".NETFramework,Version=v4.5.1": [
       "Newtonsoft.Json >= 12.0.3",
-      "SyslogLogging >= 2.0.1.5"
+      "SyslogLogging >= 2.0.1.6"
     ],
     "net5.0": [
       "Newtonsoft.Json >= 12.0.3",
-      "SyslogLogging >= 2.0.1.5"
+      "SyslogLogging >= 2.0.1.6"
+    ],
+    "net6.0": [
+      "Newtonsoft.Json >= 12.0.3",
+      "SyslogLogging >= 2.0.1.6"
     ]
   },
   "packageFolders": {
@@ -210,6 +256,7 @@
       "originalTargetFrameworks": [
         "net451",
         "net5.0",
+        "net6.0",
         "netcoreapp3.1"
       ],
       "sources": {
@@ -227,6 +274,14 @@
         },
         "net5.0": {
           "targetAlias": "net5.0",
+          "projectReferences": {
+            "C:\\Code\\Misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj": {
+              "projectPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj"
+            }
+          }
+        },
+        "net6.0": {
+          "targetAlias": "net6.0",
           "projectReferences": {
             "C:\\Code\\Misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj": {
               "projectPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj"
@@ -272,7 +327,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.303\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
       },
       "net5.0": {
         "targetAlias": "net5.0",
@@ -297,7 +352,32 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.303\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+      },
+      "net6.0": {
+        "targetAlias": "net6.0",
+        "dependencies": {
+          "Newtonsoft.Json": {
+            "target": "Package",
+            "version": "[12.0.3, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
       },
       "net451": {
         "targetAlias": "net451",
@@ -307,7 +387,7 @@
             "version": "[12.0.3, )"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.303\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
       }
     },
     "runtimes": {

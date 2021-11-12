@@ -18,3 +18,4 @@ C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Release\net451\LoggingModule.cs
 C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Release\net451\LoggingModule.dll
 C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Release\net451\LoggingModule.pdb
 C:\Code\Misc\SyslogLogging-2.0\LoggingModule\obj\Release\net451\LoggingModule.csproj.AssemblyReference.cache
+C:\Code\Misc\SyslogLogging-2.0\LoggingModule\obj\Release\net451\LoggingModule.GeneratedMSBuildEditorConfig.editorconfig

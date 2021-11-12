@@ -27,3 +27,5 @@ C:\code\misc\SyslogLogging-2.0\Test\obj\Release\net451\Test.exe
 C:\code\misc\SyslogLogging-2.0\Test\obj\Release\net451\Test.pdb
 C:\Code\Misc\SyslogLogging-2.0\Test\bin\Release\net451\Newtonsoft.Json.dll
 C:\Code\Misc\SyslogLogging-2.0\Test\obj\Release\net451\Test.csproj.AssemblyReference.cache
+C:\Code\Misc\SyslogLogging-2.0\Test\obj\Release\net451\Test.csproj.SuggestedBindingRedirects.cache
+C:\Code\Misc\SyslogLogging-2.0\Test\obj\Release\net451\Test.GeneratedMSBuildEditorConfig.editorconfig

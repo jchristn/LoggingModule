@@ -20,3 +20,4 @@ C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\netcoreapp3.1\LoggingModu
 C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\netcoreapp3.1\LoggingModule.dll
 C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Debug\netcoreapp3.1\LoggingModule.pdb
 C:\Code\Misc\SyslogLogging-2.0\LoggingModule\obj\Debug\netcoreapp3.1\LoggingModule.csproj.AssemblyReference.cache
+C:\Code\Misc\SyslogLogging-2.0\LoggingModule\obj\Debug\netcoreapp3.1\LoggingModule.GeneratedMSBuildEditorConfig.editorconfig

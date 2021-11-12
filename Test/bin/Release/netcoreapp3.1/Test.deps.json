@@ -9,7 +9,7 @@
       "Test/1.0.0": {
         "dependencies": {
           "Newtonsoft.Json": "12.0.3",
-          "SyslogLogging": "2.0.1.5"
+          "SyslogLogging": "2.0.1.6"
         },
         "runtime": {
           "Test.dll": {}
@@ -23,7 +23,7 @@
           }
         }
       },
-      "SyslogLogging/2.0.1.5": {
+      "SyslogLogging/2.0.1.6": {
         "runtime": {
           "LoggingModule.dll": {}
         }
@@ -43,7 +43,7 @@
       "path": "newtonsoft.json/12.0.3",
       "hashPath": "newtonsoft.json.12.0.3.nupkg.sha512"
     },
-    "SyslogLogging/2.0.1.5": {
+    "SyslogLogging/2.0.1.6": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
