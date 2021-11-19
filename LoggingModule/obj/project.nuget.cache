@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "9VQaCzRG3r5UfplDvGK6d+R3n5ieD5RNUrco9Lhm+SvAQtNrdGn5BNMYNUdLjTGZpCvCRUO3oUoCaUH2k5isjA==",
+  "dgSpecHash": "xnUpeSAW41CqrgOQwB9c7cYhL2/cyoDFaOqN1wUsqxrb3AnVti7OVwUlmhfFPT6F+wxDQ3Bapeq6FFtuLpPAZA==",
   "success": true,
-  "projectFilePath": "C:\\Code\\Misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj",
+  "projectFilePath": "C:\\code\\misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj",
   "expectedPackageFiles": [
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"

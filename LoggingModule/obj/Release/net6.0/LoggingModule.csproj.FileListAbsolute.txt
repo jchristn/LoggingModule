@@ -13,3 +13,4 @@ C:\Code\Misc\SyslogLogging-2.0\LoggingModule\obj\Release\net6.0\LoggingModule.cs
 C:\Code\Misc\SyslogLogging-2.0\LoggingModule\obj\Release\net6.0\LoggingModule.dll
 C:\Code\Misc\SyslogLogging-2.0\LoggingModule\obj\Release\net6.0\ref\LoggingModule.dll
 C:\Code\Misc\SyslogLogging-2.0\LoggingModule\obj\Release\net6.0\LoggingModule.pdb
+C:\code\misc\SyslogLogging-2.0\LoggingModule\obj\Release\net6.0\LoggingModule.csproj.AssemblyReference.cache

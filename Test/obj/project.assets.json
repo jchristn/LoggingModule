@@ -11,7 +11,7 @@
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
         }
       },
-      "SyslogLogging/2.0.1.6": {
+      "SyslogLogging/2.0.1.7": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.1",
         "compile": {
@@ -32,7 +32,7 @@
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
         }
       },
-      "SyslogLogging/2.0.1.6": {
+      "SyslogLogging/2.0.1.7": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v3.1",
         "compile": {
@@ -53,7 +53,7 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "SyslogLogging/2.0.1.6": {
+      "SyslogLogging/2.0.1.7": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "compile": {
@@ -74,7 +74,7 @@
           "lib/net45/Newtonsoft.Json.dll": {}
         }
       },
-      "SyslogLogging/2.0.1.6": {
+      "SyslogLogging/2.0.1.7": {
         "type": "project",
         "framework": ".NETFramework,Version=v4.5.1",
         "compile": {
@@ -95,7 +95,7 @@
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
         }
       },
-      "SyslogLogging/2.0.1.6": {
+      "SyslogLogging/2.0.1.7": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "compile": {
@@ -116,7 +116,7 @@
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
         }
       },
-      "SyslogLogging/2.0.1.6": {
+      "SyslogLogging/2.0.1.7": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "compile": {
@@ -137,7 +137,7 @@
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
         }
       },
-      "SyslogLogging/2.0.1.6": {
+      "SyslogLogging/2.0.1.7": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "compile": {
@@ -158,7 +158,7 @@
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
         }
       },
-      "SyslogLogging/2.0.1.6": {
+      "SyslogLogging/2.0.1.7": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "compile": {
@@ -202,7 +202,7 @@
         "packageIcon.png"
       ]
     },
-    "SyslogLogging/2.0.1.6": {
+    "SyslogLogging/2.0.1.7": {
       "type": "project",
       "path": "../LoggingModule/LoggingModule.csproj",
       "msbuildProject": "../LoggingModule/LoggingModule.csproj"
@@ -211,19 +211,19 @@
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
       "Newtonsoft.Json >= 12.0.3",
-      "SyslogLogging >= 2.0.1.6"
+      "SyslogLogging >= 2.0.1.7"
     ],
     ".NETFramework,Version=v4.5.1": [
       "Newtonsoft.Json >= 12.0.3",
-      "SyslogLogging >= 2.0.1.6"
+      "SyslogLogging >= 2.0.1.7"
     ],
     "net5.0": [
       "Newtonsoft.Json >= 12.0.3",
-      "SyslogLogging >= 2.0.1.6"
+      "SyslogLogging >= 2.0.1.7"
     ],
     "net6.0": [
       "Newtonsoft.Json >= 12.0.3",
-      "SyslogLogging >= 2.0.1.6"
+      "SyslogLogging >= 2.0.1.7"
     ]
   },
   "packageFolders": {
@@ -235,11 +235,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Code\\Misc\\SyslogLogging-2.0\\Test\\Test.csproj",
+      "projectUniqueName": "C:\\code\\misc\\SyslogLogging-2.0\\Test\\Test.csproj",
       "projectName": "Test",
-      "projectPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\Test\\Test.csproj",
+      "projectPath": "C:\\code\\misc\\SyslogLogging-2.0\\Test\\Test.csproj",
       "packagesPath": "C:\\Users\\joelc\\.nuget\\packages\\",
-      "outputPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\Test\\obj\\",
+      "outputPath": "C:\\code\\misc\\SyslogLogging-2.0\\Test\\obj\\",
       "projectStyle": "PackageReference",
       "crossTargeting": true,
       "fallbackFolders": [
@@ -267,32 +267,32 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "projectReferences": {
-            "C:\\Code\\Misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj": {
-              "projectPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj"
+            "C:\\code\\misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj": {
+              "projectPath": "C:\\code\\misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj"
             }
           }
         },
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "C:\\Code\\Misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj": {
-              "projectPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj"
+            "C:\\code\\misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj": {
+              "projectPath": "C:\\code\\misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj"
             }
           }
         },
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Code\\Misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj": {
-              "projectPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj"
+            "C:\\code\\misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj": {
+              "projectPath": "C:\\code\\misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj"
             }
           }
         },
         "net451": {
           "targetAlias": "net451",
           "projectReferences": {
-            "C:\\Code\\Misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj": {
-              "projectPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj"
+            "C:\\code\\misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj": {
+              "projectPath": "C:\\code\\misc\\SyslogLogging-2.0\\LoggingModule\\LoggingModule.csproj"
             }
           }
         }
