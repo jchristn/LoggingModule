@@ -1,9 +1,0 @@
-C:\code\misc\SyslogLogging-1.3\LoggingModule\bin\Release\netcoreapp2.0\LoggingModule.deps.json
-C:\code\misc\SyslogLogging-1.3\LoggingModule\bin\Release\netcoreapp2.0\LoggingModule.dll
-C:\code\misc\SyslogLogging-1.3\LoggingModule\bin\Release\netcoreapp2.0\LoggingModule.pdb
-C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\netcoreapp2.0\LoggingModule.csprojAssemblyReference.cache
-C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\netcoreapp2.0\LoggingModule.AssemblyInfoInputs.cache
-C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\netcoreapp2.0\LoggingModule.AssemblyInfo.cs
-C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\netcoreapp2.0\LoggingModule.dll
-C:\code\misc\SyslogLogging-1.3\LoggingModule\obj\Release\netcoreapp2.0\LoggingModule.pdb
-C:\Code\Misc\SyslogLogging-1.3\LoggingModule\obj\Release\netcoreapp2.0\LoggingModule.csproj.CoreCompileInputs.cache

@@ -1,0 +1,16 @@
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\bin\Debug\net6.0\assets\logo.ico
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\bin\Debug\net6.0\assets\logo.png
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\bin\Debug\net6.0\LoggingModule.xml
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\bin\Debug\net6.0\LICENSE.md
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\bin\Debug\net6.0\LoggingModule.deps.json
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\bin\Debug\net6.0\LoggingModule.dll
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\bin\Debug\net6.0\LoggingModule.pdb
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net6.0\LoggingModule.csproj.AssemblyReference.cache
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net6.0\LoggingModule.GeneratedMSBuildEditorConfig.editorconfig
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net6.0\LoggingModule.AssemblyInfoInputs.cache
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net6.0\LoggingModule.AssemblyInfo.cs
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net6.0\LoggingModule.csproj.CoreCompileInputs.cache
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net6.0\LoggingModule.dll
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net6.0\refint\LoggingModule.dll
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net6.0\LoggingModule.pdb
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net6.0\ref\LoggingModule.dll

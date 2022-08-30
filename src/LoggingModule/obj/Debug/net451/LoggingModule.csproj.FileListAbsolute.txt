@@ -1,0 +1,13 @@
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\bin\Debug\net451\assets\logo.ico
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\bin\Debug\net451\assets\logo.png
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\bin\Debug\net451\LoggingModule.xml
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\bin\Debug\net451\LICENSE.md
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\bin\Debug\net451\LoggingModule.dll
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\bin\Debug\net451\LoggingModule.pdb
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net451\LoggingModule.csproj.AssemblyReference.cache
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net451\LoggingModule.GeneratedMSBuildEditorConfig.editorconfig
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net451\LoggingModule.AssemblyInfoInputs.cache
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net451\LoggingModule.AssemblyInfo.cs
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net451\LoggingModule.csproj.CoreCompileInputs.cache
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net451\LoggingModule.dll
+C:\Code\Misc\SyslogLogging-2.0\src\LoggingModule\obj\Debug\net451\LoggingModule.pdb

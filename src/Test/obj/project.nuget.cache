@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "BhHwub5qJnhrBzKVUreq+vCDYVCc/hZlHx4xoLwsa1YQuvCCzr9wyh1tnU7wvjnuERoR42Ufie6tUo9wBOnL2g==",
+  "success": true,
+  "projectFilePath": "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\Test\\Test.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\joelc\\.nuget\\packages\\sysloglogging\\2.0.1.7\\sysloglogging.2.0.1.7.nupkg.sha512",
+    "C:\\Users\\joelc\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\3.1.25\\microsoft.netcore.app.host.win-x64.3.1.25.nupkg.sha512"
+  ],
+  "logs": []
+}
