@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj": {}
+    "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj": {}
   },
   "projects": {
-    "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj": {
-      "version": "2.0.1.7",
+    "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj": {
+      "version": "2.0.1.8",
       "restore": {
-        "projectUniqueName": "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj",
+        "projectUniqueName": "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj",
         "projectName": "SyslogLogging",
-        "projectPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj",
+        "projectPath": "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj",
         "packagesPath": "C:\\Users\\joelc\\.nuget\\packages\\",
-        "outputPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\obj\\",
+        "outputPath": "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\obj\\",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "fallbackFolders": [

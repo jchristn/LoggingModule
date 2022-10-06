@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\Test\\Test.csproj": {}
+    "C:\\code\\misc\\SyslogLogging-2.0\\src\\Test\\Test.csproj": {}
   },
   "projects": {
-    "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj": {
-      "version": "2.0.1.7",
+    "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj": {
+      "version": "2.0.1.8",
       "restore": {
-        "projectUniqueName": "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj",
+        "projectUniqueName": "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj",
         "projectName": "SyslogLogging",
-        "projectPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj",
+        "projectPath": "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj",
         "packagesPath": "C:\\Users\\joelc\\.nuget\\packages\\",
-        "outputPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\obj\\",
+        "outputPath": "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\obj\\",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "fallbackFolders": [
@@ -171,14 +171,14 @@
         }
       }
     },
-    "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\Test\\Test.csproj": {
+    "C:\\code\\misc\\SyslogLogging-2.0\\src\\Test\\Test.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\Test\\Test.csproj",
+        "projectUniqueName": "C:\\code\\misc\\SyslogLogging-2.0\\src\\Test\\Test.csproj",
         "projectName": "Test",
-        "projectPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\Test\\Test.csproj",
+        "projectPath": "C:\\code\\misc\\SyslogLogging-2.0\\src\\Test\\Test.csproj",
         "packagesPath": "C:\\Users\\joelc\\.nuget\\packages\\",
-        "outputPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\Test\\obj\\",
+        "outputPath": "C:\\code\\misc\\SyslogLogging-2.0\\src\\Test\\obj\\",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "fallbackFolders": [
@@ -203,32 +203,32 @@
           "netcoreapp3.1": {
             "targetAlias": "netcoreapp3.1",
             "projectReferences": {
-              "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj": {
-                "projectPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj"
+              "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj": {
+                "projectPath": "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj"
               }
             }
           },
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj": {
-                "projectPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj"
+              "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj": {
+                "projectPath": "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj"
               }
             }
           },
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj": {
-                "projectPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj"
+              "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj": {
+                "projectPath": "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj"
               }
             }
           },
           "net451": {
             "targetAlias": "net451",
             "projectReferences": {
-              "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj": {
-                "projectPath": "C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj"
+              "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj": {
+                "projectPath": "C:\\code\\misc\\SyslogLogging-2.0\\src\\LoggingModule\\LoggingModule.csproj"
               }
             }
           }

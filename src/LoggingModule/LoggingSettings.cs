@@ -117,8 +117,14 @@ namespace SyslogLogging
 
                 if (!String.IsNullOrEmpty(_LogFilename))
                 {
-                    string dir = Path.GetDirectoryName(LogFilename);
-                    if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                    string dir = Path.GetDirectoryName(_LogFilename);
+                    if (!String.IsNullOrEmpty(dir))
+                    {
+                        if (!Directory.Exists(dir))
+                        {
+                            Directory.CreateDirectory(dir);
+                        }
+                    }
                 }
             }
         }

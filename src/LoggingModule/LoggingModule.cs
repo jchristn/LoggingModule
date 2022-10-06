@@ -71,7 +71,7 @@ namespace SyslogLogging
 
         #endregion
 
-        #region Constructor
+        #region Constructors-and-Factories
 
         /// <summary>
         /// Instantiate the object using localhost syslog (UDP port 514).
