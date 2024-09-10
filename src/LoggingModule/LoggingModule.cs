@@ -42,18 +42,12 @@ namespace SyslogLogging
         {
             get
             {
-                return DistinctBy(_Servers, s => s.IpPort).ToList();
+                return _Servers.DistinctBy(s => s.IpPort).ToList();
             }
             set
             {
-                if (value == null)
-                {
-                    _Servers = new List<SyslogServer>();
-                }
-                else
-                {
-                    _Servers = DistinctBy(value, s => s.IpPort).ToList();
-                }
+                if (value == null) _Servers = new List<SyslogServer>();
+                _Servers = value.DistinctBy(s => s.IpPort).ToList();
             }
         }
          
@@ -95,8 +89,14 @@ namespace SyslogLogging
             if (String.IsNullOrEmpty(serverIp)) throw new ArgumentNullException(nameof(serverIp));
             if (serverPort < 0) throw new ArgumentException("Server port must be zero or greater.");
 
-            _Servers = new List<SyslogServer>();
-            _Servers.Add(new SyslogServer(serverIp, serverPort));
+            Servers = new List<SyslogServer>()
+            {
+                new SyslogServer
+                {
+                    Hostname = serverIp,
+                    Port = serverPort
+                }
+            };
 
             _Settings.EnableConsole = enableConsole;
             _Token = _TokenSource.Token;
@@ -114,9 +114,8 @@ namespace SyslogLogging
             if (servers == null) throw new ArgumentNullException(nameof(servers));
             if (servers.Count < 1) throw new ArgumentException("At least one server must be specified.");
 
-            servers = DistinctBy(servers, s => s.IpPort).ToList();
+            Servers = servers;
 
-            _Servers = servers;
             _Settings.EnableConsole = enableConsole;
             _Token = _TokenSource.Token;
         }
@@ -342,9 +341,9 @@ namespace SyslogLogging
                 SendFile(sev, message);
             }
 
-            if (_Servers != null && _Servers.Count > 0)
+            if (Servers != null && Servers.Count > 0)
             {
-                List<SyslogServer> servers = new List<SyslogServer>(_Servers);
+                List<SyslogServer> servers = new List<SyslogServer>(Servers);
                 SendServers(servers, message);
             }
              
@@ -477,18 +476,6 @@ namespace SyslogLogging
                     }
                 }
             } 
-        }
-
-        private static IEnumerable<TSource> DistinctBy<TSource, TKey>(IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
-        {
-            HashSet<TKey> seenKeys = new HashSet<TKey>();
-            foreach (TSource element in source)
-            {
-                if (seenKeys.Add(keySelector(element)))
-                {
-                    yield return element;
-                }
-            }
         }
 
         #endregion
