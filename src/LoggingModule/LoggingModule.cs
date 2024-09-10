@@ -35,30 +35,17 @@ namespace SyslogLogging
             }
         }
 
-        /// <summary>
-        /// List of syslog servers.
-        /// </summary>
-        public List<SyslogServer> Servers
-        {
-            get
-            {
-                return _Servers.DistinctBy(s => s.IpPort).ToList();
-            }
-            set
-            {
-                if (value == null) _Servers = new List<SyslogServer>();
-                _Servers = value.DistinctBy(s => s.IpPort).ToList();
-            }
-        }
-         
         #endregion
 
         #region Private-Members
 
         private bool _Disposed = false;
         private LoggingSettings _Settings = new LoggingSettings();
-        private List<SyslogServer> _Servers = new List<SyslogServer> { new SyslogServer("127.0.0.1", 514) };
+        
+        private List<SyslogServer> _Servers = new List<SyslogServer>();
+        private readonly object _ServersLock = new object();
         private readonly object _FileLock = new object();
+
         private string _Hostname = Dns.GetHostName();
         private CancellationTokenSource _TokenSource = new CancellationTokenSource();
         private CancellationToken _Token;
@@ -72,6 +59,8 @@ namespace SyslogLogging
         /// </summary>
         public LoggingModule()
         {
+            _Servers.Add(new SyslogServer("127.0.0.1", 514));
+
             _Token = _TokenSource.Token;
         }
 
@@ -89,14 +78,7 @@ namespace SyslogLogging
             if (String.IsNullOrEmpty(serverIp)) throw new ArgumentNullException(nameof(serverIp));
             if (serverPort < 0) throw new ArgumentException("Server port must be zero or greater.");
 
-            Servers = new List<SyslogServer>()
-            {
-                new SyslogServer
-                {
-                    Hostname = serverIp,
-                    Port = serverPort
-                }
-            };
+            _Servers.Add(new SyslogServer(serverIp, serverPort));
 
             _Settings.EnableConsole = enableConsole;
             _Token = _TokenSource.Token;
@@ -114,7 +96,11 @@ namespace SyslogLogging
             if (servers == null) throw new ArgumentNullException(nameof(servers));
             if (servers.Count < 1) throw new ArgumentException("At least one server must be specified.");
 
-            Servers = servers;
+            foreach (SyslogServer server in servers)
+            {
+                if (!_Servers.Any(s => s.IpPort.Equals(server.IpPort)))
+                    _Servers.Add(server);
+            }
 
             _Settings.EnableConsole = enableConsole;
             _Token = _TokenSource.Token;
@@ -341,10 +327,9 @@ namespace SyslogLogging
                 SendFile(sev, message);
             }
 
-            if (Servers != null && Servers.Count > 0)
+            if (_Servers != null && _Servers.Count > 0)
             {
-                List<SyslogServer> servers = new List<SyslogServer>(Servers);
-                SendServers(servers, message);
+                SendServers(message);
             }
              
             if (!String.IsNullOrEmpty(remainder))
@@ -457,12 +442,12 @@ namespace SyslogLogging
             }
         }
 
-        private void SendServers(List<SyslogServer> servers, string msg)
+        private void SendServers(string msg)
         {
             if (String.IsNullOrEmpty(msg)) return;
             byte[] data = Encoding.UTF8.GetBytes(msg);
 
-            foreach (SyslogServer server in servers)
+            foreach (SyslogServer server in _Servers)
             {
                 lock (server.SendLock)
                 {

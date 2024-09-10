@@ -76,7 +76,7 @@ namespace SyslogLogging
         /// <summary>
         /// Enable or disable use of color for console messages.
         /// </summary>
-        public bool EnableColors { get; set; } = true;
+        public bool EnableColors { get; set; } = false;
 
         /// <summary>
         /// Colors to use for console messages based on message severity.
@@ -154,7 +154,7 @@ namespace SyslogLogging
 
         #region Private-Members
 
-        private string _HeaderFormat = "{ts} {host} {thread} {sev}";
+        private string _HeaderFormat = "{ts} {host} {sev}";
         private string _TimestampFormat = "yyyy-MM-dd HH:mm:ss";
         private bool _EnableConsole = true;
         private int _MaxMessageLength = 1024;

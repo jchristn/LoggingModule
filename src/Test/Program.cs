@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SyslogLogging;
-
-namespace Test
+﻿namespace Test
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using SyslogLogging;
+
     class Program
     {
         public static LoggingModule _Log;
@@ -22,19 +22,41 @@ namespace Test
              *
              */
 
-            List<SyslogServer> servers = new List<SyslogServer>
-            {
-                new SyslogServer("myhost.com", 514),
-                new SyslogServer("127.0.0.1", 514),
-                new SyslogServer("127.0.0.1", 514),
-                new SyslogServer("127.0.0.1", 514)
-            };
-         
-            _Log = new LoggingModule(servers, true);
+            Console.WriteLine("");
+            Console.WriteLine("Using default constructor");
+            _Log = new LoggingModule();
             _Log.Settings.MinimumSeverity = Severity.Debug;
             _Log.Settings.FileLogging = FileLoggingMode.SingleLogFile;
             _Log.Settings.LogFilename = "logs/test.log";
-             
+            EmitMessages();
+
+            Console.WriteLine("");
+            Console.WriteLine("Using constructor with specific syslog server");
+            _Log = new LoggingModule("127.0.0.1", 514);
+            _Log.Settings.MinimumSeverity = Severity.Debug;
+            _Log.Settings.FileLogging = FileLoggingMode.SingleLogFile;
+            _Log.Settings.LogFilename = "logs/test.log";
+            EmitMessages();
+
+            Console.WriteLine("");
+            Console.WriteLine("Using constructor with list of syslog servers");
+            List<SyslogServer> servers = new List<SyslogServer>()
+            {
+                new SyslogServer("127.0.0.1", 514),
+                new SyslogServer("127.0.0.1", 514),
+                new SyslogServer("127.0.0.1", 514),
+            };
+            _Log = new LoggingModule(servers);
+            _Log.Settings.MinimumSeverity = Severity.Debug;
+            _Log.Settings.FileLogging = FileLoggingMode.SingleLogFile;
+            _Log.Settings.LogFilename = "logs/test.log";
+            EmitMessages();
+
+            Console.WriteLine("");
+        }
+
+        static void EmitMessages()
+        {
             _Log.Debug("This is a Debug message.");
             _Log.Info("This is an Info message.");
             _Log.Warn("This is a Warn message.");
@@ -55,13 +77,10 @@ namespace Test
                 _Log.Warn("If you see this, there's a problem.");
             }
             catch (Exception e)
-            { 
+            {
                 e.Data.Add("foo", "bar");
                 _Log.Exception(e, "Program", "Main");
             }
-
-            _Log.Alert("Press ENTER to exit");
-            Console.ReadLine();
         }
     }
 }

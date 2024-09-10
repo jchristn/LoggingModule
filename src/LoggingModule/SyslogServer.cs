@@ -95,6 +95,11 @@ namespace SyslogLogging
 
         #region Public-Methods
 
+        public override string ToString()
+        {
+            return "Syslog server: " + Hostname + ":" + Port + " (ip:port " + IpPort + ")";
+        }
+
         #endregion
 
         #region Private-Methods

@@ -18,17 +18,27 @@ First things first - do you need help or have feedback?  File an issue here!  We
 
 ## It's Really Easy...  I Mean, REALLY Easy
 
-By default, ```127.0.0.1:514``` is automatically included in the list of servers.
+### Easiest Way Possible
+
+Using the constructor with no parameters will cause the library to log to `127.0.0.1:514`.
+
+```csharp
+using SyslogLogging;
+LoggingModule log = new LoggingModule();
+log.Debug("Hello, world!");
+```
 
 ### Single Syslog Server
+
 ```csharp
 using SyslogLogging;
 
-LoggingModule log = new LoggingModule(); // 127.0.0.1:514 is automatically included
-log.Debug("This is a debug message!");
+LoggingModule log = new LoggingModule("mysyslogserver", 514);
+log.Debug("Hello, world!");
 ```
 
 ### Multiple Syslog Servers and Console
+
 ```csharp
 using SyslogLogging;
 
@@ -43,6 +53,7 @@ log.Warn("Look out!");
 ```
 
 ### Logging to File
+
 ```csharp
 using SyslogLogging;
 
@@ -51,6 +62,7 @@ log.Info("Here's some new information!");
 ```
 
 ### Logging EVERYWHERE
+
 ```csharp
 using SyslogLogging;
 
@@ -65,17 +77,13 @@ log.Settings.LogFilename = "mylogfile.txt";
 log.Alert("We're going everywhere!");
 ```
 
-When using ```FileLoggingMode.FileWithDate```, LoggingModule with append ```.yyyyMMdd``` to the supplied filename in ```LogFilename```.  When using ```FileLoggingMode.SingleLogFile```, the filename is left untouched.
-
-## Supported Environments
-
-Tested and works well in Windows in .NET Framework 4.5.2 or later or .NET Core.  Tested and works well in Linux and OSX environments, too.  Should work well in Mono environments.  You may want to use the Mono Ahead-of-time compiler (AOT).
-
-This package has also been tested with PaperTrail.  Realistically, any cloud syslog server should work.
+When using `FileLoggingMode.FileWithDate`, LoggingModule with append `.yyyyMMdd to the supplied filename in `LogFilename.  When using `FileLoggingMode.SingleLogFile`, the filename is left untouched.
 
 ## Changing Console Message Color
 
-If you wish to change the colors used by the library, modify the ```Settings.Colors``` property.  A variable of type ```ColorScheme``` exists for each severity level.  To disable colors, set ```Settings.EnableColors``` to false.
+Colors are disabled by default to ensure compatibility across different operating systems and environments.
+
+If you wish to enable colors and change the colors used by the library, set `Settings.EnableColors` to `true` and modify the `Settings.Colors` property.  A variable of type `ColorScheme` exists for each severity level.  To disable colors, set `Settings.EnableColors` to false.
 
 ```csharp
 log.Settings.EnableColors = true;
