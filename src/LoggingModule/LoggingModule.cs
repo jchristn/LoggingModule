@@ -42,7 +42,7 @@ namespace SyslogLogging
         {
             get
             {
-                return _Servers;
+                return DistinctBy(_Servers, s => s.IpPort).ToList();
             }
             set
             {
