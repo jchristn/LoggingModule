@@ -10,7 +10,7 @@ SyslogLogging is targeted to .NET Core, .NET Standard, and .NET Framework.
 
 First things first - do you need help or have feedback?  File an issue here!  We'd love to hear from you.
 
-## New in v2.0.1
+## New in v2.0.x
 
 - Breaking changes including new constructors and minor API changes
 - Support for multiple syslog servers
