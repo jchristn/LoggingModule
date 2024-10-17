@@ -35,6 +35,30 @@ namespace SyslogLogging
             }
         }
 
+        public List<SyslogServer> Servers
+        {
+            get
+            {
+                lock (_ServersLock)
+                    return _Servers;
+            }
+            set
+            {
+                if (value == null) value = new List<SyslogServer>();
+
+                lock (_ServersLock)
+                {
+                    _Servers = new List<SyslogServer>();
+
+                    foreach (SyslogServer server in value)
+                    {
+                        if (!_Servers.Any(s => s.IpPort.Equals(server.IpPort)))
+                            _Servers.Add(server);
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Private-Members

@@ -44,7 +44,7 @@
             {
                 new SyslogServer("127.0.0.1", 514),
                 new SyslogServer("127.0.0.1", 514),
-                new SyslogServer("127.0.0.1", 514),
+                new SyslogServer("127.0.0.1", 65426),
             };
             _Log = new LoggingModule(servers);
             _Log.Settings.MinimumSeverity = Severity.Debug;
