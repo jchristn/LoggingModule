@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SyslogLogging
+﻿namespace SyslogLogging
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+
     /// <summary>
     /// Specify whether or not log messages should be appended to a file.
     /// Disabled: file logging will not be used.

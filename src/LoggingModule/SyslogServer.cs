@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-
-namespace SyslogLogging
+﻿namespace SyslogLogging
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Text;
+
     /// <summary>
     /// Syslog server.
     /// </summary>
@@ -95,6 +95,10 @@ namespace SyslogLogging
 
         #region Public-Methods
 
+        /// <summary>
+        /// Display a human-readable string of the object.
+        /// </summary>
+        /// <returns>String.</returns>
         public override string ToString()
         {
             return "Syslog server: " + Hostname + ":" + Port + " (ip:port " + IpPort + ")";

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-namespace SyslogLogging
+﻿namespace SyslogLogging
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+
     /// <summary>
     /// Logging settings.
     /// </summary>
@@ -49,6 +49,11 @@ namespace SyslogLogging
                 _TimestampFormat = value;
             }
         }
+
+        /// <summary>
+        /// Boolean to enable or disable use of UTC timestamps.
+        /// </summary>
+        public bool UseUtcTime { get; set; } = true;
 
         /// <summary>
         /// Enable or disable console logging.  

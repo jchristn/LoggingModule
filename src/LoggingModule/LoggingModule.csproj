@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.6</Version>
+    <Version>2.0.7</Version>
     <Authors>Joel Christner</Authors>
     <PackageId>SyslogLogging</PackageId>
     <Product>SyslogLogging</Product>
@@ -19,19 +19,10 @@
     <RootNamespace>SyslogLogging</RootNamespace>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageIcon>logo.png</PackageIcon>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\SyslogLogging.snk</AssemblyOriginatorKeyFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <DocumentationFile>LoggingModule.xml</DocumentationFile>
   </PropertyGroup>
  
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
-    <DocumentationFile>LoggingModule.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp3.1|AnyCPU'">
-    <DocumentationFile>LoggingModule.xml</DocumentationFile>
-  </PropertyGroup>
-
   <ItemGroup>
     <None Include="..\..\README.md">
       <Pack>True</Pack>

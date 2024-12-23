@@ -221,6 +221,11 @@
             Timestamp format.
             </summary>
         </member>
+        <member name="P:SyslogLogging.LoggingSettings.UseUtcTime">
+            <summary>
+            Boolean to enable or disable use of UTC timestamps.
+            </summary>
+        </member>
         <member name="P:SyslogLogging.LoggingSettings.EnableConsole">
             <summary>
             Enable or disable console logging.  
@@ -342,6 +347,12 @@
             </summary>
             <param name="hostname">Hostname.</param>
             <param name="port">Port.</param>
+        </member>
+        <member name="M:SyslogLogging.SyslogServer.ToString">
+            <summary>
+            Display a human-readable string of the object.
+            </summary>
+            <returns>String.</returns>
         </member>
     </members>
 </doc>

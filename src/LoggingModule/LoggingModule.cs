@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace SyslogLogging
+﻿namespace SyslogLogging
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     /// <summary>
     /// Syslog, console, and file logging module.
     /// </summary>
@@ -35,6 +35,9 @@ namespace SyslogLogging
             }
         }
 
+        /// <summary>
+        /// List of syslog servers.
+        /// </summary>
         public List<SyslogServer> Servers
         {
             get
@@ -330,8 +333,13 @@ namespace SyslogLogging
             }
             
             header = _Settings.HeaderFormat;
-            if (header.Contains("{ts}")) 
-                header = header.Replace("{ts}", DateTime.Now.ToUniversalTime().ToString(_Settings.TimestampFormat));
+            if (header.Contains("{ts}"))
+            {
+                if (_Settings.UseUtcTime)
+                    header = header.Replace("{ts}", DateTime.Now.ToUniversalTime().ToString(_Settings.TimestampFormat));
+                else
+                    header = header.Replace("{ts}", DateTime.Now.ToString(_Settings.TimestampFormat));
+            }
             if (header.Contains("{host}")) 
                 header = header.Replace("{host}", _Hostname);
             if (header.Contains("{thread}")) 
