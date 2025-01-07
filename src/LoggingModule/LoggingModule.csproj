@@ -1,27 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net462;net48;net6.0;net8.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.7</Version>
+    <Version>2.0.8</Version>
     <Authors>Joel Christner</Authors>
     <PackageId>SyslogLogging</PackageId>
     <Product>SyslogLogging</Product>
     <Description>The easiest logging library to use to send log messages to syslog, the console, or the file system.  It's.  REALLY.  Easy.</Description>
-    <Copyright>(c)2024 Joel Christner</Copyright>
+    <Copyright>(c)2025 Joel Christner</Copyright>
     <PackageTags>syslog logging console log logger udp event</PackageTags>
     <PackageProjectUrl>https://github.com/jchristn/LoggingModule</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageLicenseUrl></PackageLicenseUrl>
-    <PackageReleaseNotes>Strong naming</PackageReleaseNotes>
+    <PackageReleaseNotes>Retarget</PackageReleaseNotes>
     <PackageIconUrl></PackageIconUrl>
     <RootNamespace>SyslogLogging</RootNamespace>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageIcon>logo.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <DocumentationFile>LoggingModule.xml</DocumentationFile>
+    <ApplicationIcon>logo.ico</ApplicationIcon>
+    <Title>SyslogLogging</Title>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="logo.ico" />
+  </ItemGroup>
  
   <ItemGroup>
     <None Include="..\..\README.md">
