@@ -11,7 +11,8 @@
       "Bash(dotnet --version)",
       "Read(//c/Code/Misc/SyslogLogging-2.0/**)",
       "Bash(tee:*)",
-      "Bash(dotnet:*)"
+      "Bash(dotnet:*)",
+      "Bash(dir \"C:\\Code\\Misc\\SyslogLogging-2.0\\src\\LoggingModule\")"
     ],
     "deny": [],
     "ask": []

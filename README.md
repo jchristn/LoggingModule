@@ -1,8 +1,10 @@
+<img src="assets/logo.png" alt="SyslogLogging Logo" width="128" height="128" />
+
 # SyslogLogging
 
 [![NuGet Version](https://img.shields.io/nuget/v/SyslogLogging.svg?style=flat)](https://www.nuget.org/packages/SyslogLogging/) [![NuGet](https://img.shields.io/nuget/dt/SyslogLogging.svg)](https://www.nuget.org/packages/SyslogLogging)
 
-🚀 **Modern, high-performance C# logging library** for syslog, console, and file destinations with **async support**, **structured logging**, **background queuing**, and **Microsoft.Extensions.Logging integration**.
+🚀 **Modern, high-performance C# logging library** for syslog, console, and file destinations with **async support**, **structured logging**, and **Microsoft.Extensions.Logging integration**.
 
 Targeted to .NET Standard 2.0+, .NET Framework 4.6.2+, .NET 6.0+, and .NET 8.0.
 
@@ -12,19 +14,16 @@ Targeted to .NET Standard 2.0+, .NET Framework 4.6.2+, .NET 6.0+, and .NET 8.0.
 - 🌪️ **Full async support** with `CancellationToken` throughout
 - 📊 **Structured logging** with properties, correlation IDs, and JSON serialization
 - 🔌 **Microsoft.Extensions.Logging integration** (ILogger, DI support)
-- ⚡ **Background message queuing** with batching for I/O optimization
-- 💾 **Persistent queues** that survive application restarts
 - 🏗️ **Enterprise-grade thread safety** with comprehensive race condition prevention
 - 🎯 **Integrated SyslogServer** for end-to-end testing
 - 🛡️ **Comprehensive input validation** on all public properties
 - 🧪 **Extensive thread safety testing** (20+ specialized concurrent scenarios)
 
 ### 🔧 **Performance & Reliability**
-- **>100K messages/second** throughput in background mode
-- **<1ms latency** for queue operations
-- **Memory pressure handling** with configurable limits
-- **Automatic batch processing** for optimal I/O
-- **Zero message loss** with persistent file-backed queues
+- **Thread-safe operations** with proper locking mechanisms
+- **Immediate log delivery** with direct processing
+- **Memory efficient** with minimal overhead
+- **Standards compliant** RFC 3164 syslog format support
 
 ## 🚀 Quick Start
 
@@ -64,19 +63,6 @@ log.BeginStructuredLog(Severity.Info, "User login")
     .WriteAsync();
 ```
 
-### High-Performance Background Processing
-```csharp
-LoggingModule log = new LoggingModule("logserver", 514);
-log.Settings.EnableBackgroundQueue = true;
-log.Settings.BatchSize = 100;        // Process 100 messages at once
-log.Settings.FlushInterval = 5000;   // Flush every 5 seconds
-
-// Fire-and-forget logging - messages are queued and processed in background
-log.Info("High-throughput message 1");
-log.Info("High-throughput message 2");
-// ... thousands more messages
-```
-
 ## 🔌 Microsoft.Extensions.Logging Integration
 
 ### ASP.NET Core / Generic Host
@@ -84,11 +70,7 @@ log.Info("High-throughput message 2");
 // Program.cs or Startup.cs
 services.AddLogging(builder =>
 {
-    builder.AddSyslog("syslogserver", 514, configure: module =>
-    {
-        module.Settings.EnableBackgroundQueue = true;
-        module.Settings.BatchSize = 50;
-    });
+    builder.AddSyslog("syslogserver", 514);
 });
 
 // In your controllers/services
@@ -147,35 +129,6 @@ LogEntry entry = new LogEntry(Severity.Info, "User session")
 
 string json = entry.ToJson();
 // Output: {"timestamp":"2023-12-01T10:30:00.000Z","severity":"Info","message":"User session","threadId":1,"properties":{"SessionDuration":"00:45:00","PagesVisited":["/home","/products","/checkout"]}}
-```
-
-## ⚡ Background Processing & Batching
-
-### Enable Background Queue
-```csharp
-LoggingModule log = new LoggingModule("logserver", 514);
-log.Settings.EnableBackgroundQueue = true;
-log.Settings.BatchSize = 100;           // Batch up to 100 messages
-log.Settings.FlushInterval = 5000;      // Force flush every 5 seconds
-log.Settings.MaxMemoryEntries = 10000;  // Queue up to 10K messages in memory
-
-// Messages are now processed asynchronously in background
-for (int i = 0; i < 100000; i++)
-{
-    log.Info($"High-volume message {i}");  // Returns immediately
-}
-
-// Ensure all messages are processed before shutdown
-await log.FlushAsync();
-```
-
-### Persistent Queues
-```csharp
-// Messages survive application restarts
-log.Settings.EnablePersistentQueue = true;
-log.Settings.QueueFilePath = "./logs/message-queue.dat";
-
-log.Critical("This message will be delivered even if app crashes!");
 ```
 
 ## 🎯 Multiple Destinations
@@ -247,86 +200,11 @@ log.Settings.UseUtcTime = true;
 | `{correlation}` | Correlation ID | `abc-123-def` |
 | `{source}` | Log source | `UserService` |
 
-## 🛡️ Input Validation & Safety
-
-All public properties now have comprehensive validation:
-
-```csharp
-// Validates port range (0-65535)
-server.Port = 65536; // ❌ Throws ArgumentOutOfRangeException
-
-// Validates hostname not null/empty
-server.Hostname = null; // ❌ Throws ArgumentException
-
-// Validates minimum values
-log.Settings.MaxMessageLength = 16; // ❌ Throws ArgumentOutOfRangeException (min: 32)
-
-// Validates color schemes
-log.Settings.Colors.Debug = null; // ❌ Throws ArgumentNullException
-```
-
-## 🧪 Testing with Integrated SyslogServer
-
-The library now includes a complete SyslogServer for testing:
-
-```csharp
-// Start a test syslog server
-var serverSettings = new Syslog.Settings
-{
-    UdpPort = 5140,
-    LogFileDirectory = "./test-logs/"
-};
-
-// Use with your logging client
-LoggingModule log = new LoggingModule("127.0.0.1", 5140);
-await log.InfoAsync("Test message");
-
-// Server automatically logs to file for verification
-```
-
-## 📈 Performance Metrics
-
-### Sync vs Async Performance
-```csharp
-// Measure sync performance
-DateTime start = DateTime.UtcNow;
-for (int i = 0; i < 1000; i++)
-{
-    log.Info($"Sync message {i}");
-}
-await log.FlushAsync();
-DateTime end = DateTime.UtcNow;
-double syncMps = 1000.0 / (end - start).TotalSeconds;
-
-// Measure async performance
-start = DateTime.UtcNow;
-List<Task> tasks = new List<Task>();
-for (int i = 0; i < 1000; i++)
-{
-    tasks.Add(log.InfoAsync($"Async message {i}"));
-}
-await Task.WhenAll(tasks);
-await log.FlushAsync();
-end = DateTime.UtcNow;
-double asyncMps = 1000.0 / (end - start).TotalSeconds;
-
-Console.WriteLine($"Sync: {syncMps:F0} msg/sec, Async: {asyncMps:F0} msg/sec");
-```
-
 ## 🔧 Configuration Examples
 
 ### Production Configuration
 ```csharp
 LoggingModule log = new LoggingModule("prod-syslog", 514, enableConsole: false);
-
-// Enable background processing for high throughput
-log.Settings.EnableBackgroundQueue = true;
-log.Settings.BatchSize = 200;
-log.Settings.FlushInterval = 10000;
-
-// Enable persistence for reliability
-log.Settings.EnablePersistentQueue = true;
-log.Settings.QueueFilePath = "/var/log/app/message-queue.dat";
 
 // Set appropriate filters
 log.Settings.MinimumSeverity = Severity.Warning;
@@ -345,7 +223,6 @@ await log.BeginStructuredLog(Severity.Info, "Application started")
 LoggingModule log = new LoggingModule("localhost", 514, enableConsole: true);
 
 // Immediate feedback for development
-log.Settings.EnableBackgroundQueue = false;
 log.Settings.EnableColors = true;
 log.Settings.MinimumSeverity = Severity.Debug;
 
@@ -358,14 +235,9 @@ log.Settings.LogFilename = "./logs/debug.log";
 ```csharp
 LoggingModule log = new LoggingModule("logserver", 514, enableConsole: true);
 
-// Optimized for multi-threaded applications
-log.Settings.EnableBackgroundQueue = true;     // Essential for high concurrency
-log.Settings.BatchSize = 500;                  // Larger batches for efficiency
-log.Settings.FlushInterval = 2000;             // Frequent flushing under load
-log.Settings.MaxMemoryEntries = 50000;         // Higher memory limit
-log.Settings.EnableColors = true;              // Safe - race conditions prevented
+// Thread-safe operations
+log.Settings.EnableColors = true;
 
-// Thread-safe server switching (safe during active logging)
 Task.Run(async () =>
 {
     while (true)
@@ -383,51 +255,6 @@ Parallel.For(0, 1000, i =>
 });
 ```
 
-## 🔄 Migration from v1.x
-
-### Breaking Changes
-- Constructors have changed - update your initialization code
-- Some method signatures now include `CancellationToken` parameters
-- Settings properties now have validation (may throw exceptions on invalid values)
-
-### New Recommended Patterns
-```csharp
-// Old v1.x style
-LoggingModule log = new LoggingModule("server", 514);
-log.Log(Severity.Info, "Message");
-
-// New v2.x style (both work, async preferred)
-LoggingModule log = new LoggingModule("server", 514);
-await log.InfoAsync("Message");                    // ✅ Preferred
-log.Info("Message");                                // ✅ Still works
-
-// New structured logging
-await log.BeginStructuredLog(Severity.Info, "User action")
-    .WithProperty("Action", "Login")
-    .WithProperty("UserId", userId)
-    .WriteAsync();
-```
-
-## 🏗️ Architecture
-
-- **Thread-Safe**: All operations are thread-safe with comprehensive locking and race condition prevention
-  - Console color operations properly isolated to prevent bleeding between threads
-  - UDP client management handles concurrent server configuration changes
-  - Background queue operations optimized for high-concurrency scenarios
-  - Settings modifications safe during concurrent logging operations
-- **Memory Efficient**: Configurable memory limits with pressure handling and leak prevention
-- **I/O Optimized**: Background batching reduces I/O operations with intelligent queue management
-- **Fault Tolerant**: Persistent queues survive crashes and restarts with corruption recovery
-- **Standards Compliant**: RFC 3164 syslog format support with proper message formatting
-- **Cross-Platform**: Works on Windows, Linux, and macOS with platform-specific optimizations
-
-## 📚 Documentation
-
-- [Developer Guide (CLAUDE.md)](./CLAUDE.md) - Comprehensive development documentation
-- [API Reference](./src/LoggingModule/LoggingModule.xml) - Generated XML documentation
-- [Performance Benchmarks](./docs/performance.md) - Detailed performance analysis
-- [Integration Examples](./src/Test/Program.cs) - Comprehensive test suite with examples
-
 ## 🧪 Testing
 
 Run the comprehensive test suite:
@@ -437,31 +264,15 @@ cd src/Test
 dotnet run
 ```
 
-The test program validates **every** library capability including:
+The test program validates each library capability including:
 - ✅ All constructor patterns and validation
 - ✅ Sync and async logging methods
 - ✅ Structured logging with properties and correlation IDs
-- ✅ Background processing and persistent queuing
-- ✅ **Comprehensive thread safety** under extreme concurrent load
+- ✅ Comprehensive thread safety under concurrent load
 - ✅ Multiple destination delivery (syslog + console + file)
-- ✅ Persistent queue recovery across restarts
 - ✅ Error handling and edge cases
-- ✅ Performance benchmarks (>100K msg/sec)
+- ✅ Performance benchmarks
 - ✅ SyslogServer integration and end-to-end testing
-
-### Advanced Thread Safety Testing
-
-The test suite includes **20+ specialized thread safety tests** covering:
-- **Console color race condition prevention** (50 concurrent threads)
-- **UDP client management** during server configuration changes
-- **Background queue operations** under extreme load (20 threads × 100 messages)
-- **Settings modification race conditions** (concurrent property changes)
-- **Disposal safety** with active operations across multiple threads
-- **Exception handling** thread safety (15 threads × 20 exceptions)
-- **File handle management** with concurrent file access
-- **Memory pressure testing** under concurrent load
-- **Mixed sync/async operations** validation
-- **Resource contention simulation** with large message payloads
 
 ## 🤝 Help or Feedback
 
