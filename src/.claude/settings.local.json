@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet clean:*)",
+      "Bash(timeout:*)",
+      "Bash(dotnet run:*)",
+      "Bash(csc:*)",
+      "Bash(./quick_test.exe)",
+      "Bash(dotnet --version)",
+      "Read(//c/Code/Misc/SyslogLogging-2.0/**)",
+      "Bash(tee:*)",
+      "Bash(dotnet:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

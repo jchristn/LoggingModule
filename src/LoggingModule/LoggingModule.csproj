@@ -3,18 +3,18 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net462;net48;net6.0;net8.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.8</Version>
+    <Version>2.0.9</Version>
     <Authors>Joel Christner</Authors>
     <PackageId>SyslogLogging</PackageId>
     <Product>SyslogLogging</Product>
     <Description>The easiest logging library to use to send log messages to syslog, the console, or the file system.  It's.  REALLY.  Easy.</Description>
     <Copyright>(c)2025 Joel Christner</Copyright>
-    <PackageTags>syslog logging console log logger udp event</PackageTags>
+    <PackageTags>syslog logging console log logger udp event structured async</PackageTags>
     <PackageProjectUrl>https://github.com/jchristn/LoggingModule</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageLicenseUrl></PackageLicenseUrl>
-    <PackageReleaseNotes>Retarget</PackageReleaseNotes>
+    <PackageReleaseNotes>Added async support, structured logging, background queuing, and Microsoft.Extensions.Logging integration</PackageReleaseNotes>
     <PackageIconUrl></PackageIconUrl>
     <RootNamespace>SyslogLogging</RootNamespace>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
@@ -25,7 +25,17 @@
     <Title>SyslogLogging</Title>
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0' OR '$(TargetFramework)' == 'net8.0'">
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="logo.ico" />

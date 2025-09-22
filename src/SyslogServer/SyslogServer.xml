@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SyslogServer</name>
+    </assembly>
+    <members>
+        <member name="T:Syslog.Settings">
+            <summary>
+            Settings.
+            </summary>
+        </member>
+        <member name="P:Syslog.Settings.UdpPort">
+            <summary>
+            UDP port on which to listen2. Valid range: 0-65535.
+            </summary>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when value is not between 0 and 65535.</exception>
+        </member>
+        <member name="P:Syslog.Settings.DisplayTimestamps">
+            <summary>
+            Flag to enable or disable displaying timestamps.
+            </summary>
+        </member>
+        <member name="P:Syslog.Settings.LogFileDirectory">
+            <summary>
+            Directory in which to write log files. Cannot be null or empty.
+            </summary>
+            <exception cref="T:System.ArgumentException">Thrown when value is null or empty.</exception>
+        </member>
+        <member name="P:Syslog.Settings.LogFilename">
+            <summary>
+            Log filename. Cannot be null or empty.
+            </summary>
+            <exception cref="T:System.ArgumentException">Thrown when value is null or empty.</exception>
+        </member>
+        <member name="P:Syslog.Settings.LogWriterIntervalSec">
+            <summary>
+            Number of seconds between each log file update. Valid range: 1 or greater.
+            </summary>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when value is less than 1.</exception>
+        </member>
+        <member name="M:Syslog.Settings.#ctor">
+            <summary>
+            Settings.
+            </summary>
+        </member>
+        <member name="M:Syslog.Settings.ToString">
+            <summary>
+            Human readable representation of the object.
+            </summary>
+            <returns>String.</returns>
+        </member>
+        <member name="T:Syslog.SyslogServer">
+            <summary>
+            Syslog server.
+            </summary>
+        </member>
+    </members>
+</doc>

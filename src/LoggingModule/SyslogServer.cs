@@ -7,15 +7,17 @@
     using System.Text;
 
     /// <summary>
-    /// Syslog server.
+    /// Syslog server with proper resource management and thread safety.
     /// </summary>
-    public class SyslogServer
+    public class SyslogServer : IDisposable
     {
-        #region Public-Members
+#pragma warning disable CS8625
+#pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
 
         /// <summary>
-        /// Hostname.
+        /// Hostname. Cannot be null or empty.
         /// </summary>
+        /// <exception cref="ArgumentException">Thrown when value is null or empty.</exception>
         public string Hostname
         {
             get
@@ -24,7 +26,7 @@
             }
             set
             {
-                if (String.IsNullOrEmpty(value)) throw new ArgumentNullException(nameof(Hostname));
+                if (string.IsNullOrEmpty(value)) throw new ArgumentException("Hostname cannot be null or empty.", nameof(Hostname));
                 _Hostname = value;
 
                 SetUdp();
@@ -32,8 +34,9 @@
         }
 
         /// <summary>
-        /// UDP port.
+        /// UDP port. Valid range: 0-65535.
         /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when value is not between 0 and 65535.</exception>
         public int Port
         {
             get
@@ -42,7 +45,7 @@
             }
             set
             {
-                if (value < 0) throw new ArgumentException("Port must be zero or greater.");
+                if (value < 0 || value > 65535) throw new ArgumentOutOfRangeException(nameof(Port), "Port must be between 0 and 65535.");
                 _Port = value;
 
                 SetUdp();
@@ -60,18 +63,11 @@
             }
         }
 
-        #endregion
-
-        #region Private-Members
-
         internal readonly object SendLock = new object();
-        internal UdpClient Udp = null;
+        internal UdpClient? Udp = null;
         private string _Hostname = "127.0.0.1";
         private int _Port = 514;
-
-        #endregion
-
-        #region Constructors-and-Factories
+        private bool _Disposed = false;
 
         /// <summary>
         /// Instantiate the object.
@@ -91,10 +87,6 @@
             Port = port;
         }
 
-        #endregion
-
-        #region Public-Methods
-
         /// <summary>
         /// Display a human-readable string of the object.
         /// </summary>
@@ -104,16 +96,70 @@
             return "Syslog server: " + Hostname + ":" + Port + " (ip:port " + IpPort + ")";
         }
 
-        #endregion
-
-        #region Private-Methods
-
         private void SetUdp()
         {
-            Udp = null;
-            Udp = new UdpClient(_Hostname, _Port);
+            ThrowIfDisposed();
+
+            lock (SendLock)
+            {
+                try
+                {
+                    Udp?.Dispose();
+                    Udp = null;
+                    Udp = new UdpClient(_Hostname, _Port);
+                }
+                catch
+                {
+                    // If UdpClient creation fails, ensure we don't have a disposed reference
+                    Udp = null;
+                    throw;
+                }
+            }
         }
 
-        #endregion
+        private void ThrowIfDisposed()
+        {
+            if (_Disposed) throw new ObjectDisposedException(nameof(SyslogServer));
+        }
+
+        /// <summary>
+        /// Dispose of the syslog server and release network resources.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Dispose of the syslog server.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_Disposed)
+            {
+                if (disposing)
+                {
+                    lock (SendLock)
+                    {
+                        Udp?.Dispose();
+                        Udp = null;
+                    }
+                }
+                _Disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// Finalizer to ensure resources are cleaned up.
+        /// </summary>
+        ~SyslogServer()
+        {
+            Dispose(false);
+        }
+
+#pragma warning restore CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+#pragma warning restore CS8625
     }
 }

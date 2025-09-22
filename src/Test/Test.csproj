@@ -3,10 +3,16 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFrameworks>net462;net48;net6.0;net8.0</TargetFrameworks>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net6.0' OR '$(TargetFramework)' == 'net8.0'">
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\LoggingModule\LoggingModule.csproj" />
+		<ProjectReference Include="..\SyslogServer\SyslogServer.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

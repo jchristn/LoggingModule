@@ -6,20 +6,31 @@
     using System.Text;
 
     /// <summary>
-    /// Logging settings.
+    /// Simplified logging settings for direct processing mode.
     /// </summary>
     public class LoggingSettings
     {
-        #region Public-Members
-
+#pragma warning disable CS8600
+#pragma warning disable CS8625
         /// <summary>
-        /// Header format.  Provide a string that specifies how the preamble of each message should be structured.  You can use variables including:
-        /// {ts}: UTC timestamp
-        /// {host}: Hostname
+        /// Header format template. Supports the following placeholders:
+        /// {ts}: Timestamp (formatted per TimestampFormat setting)
+        /// {host}: Hostname/machine name
         /// {thread}: Thread ID
-        /// {sev}: Severity
-        /// Default: {ts} {host} {thread} {sev}
+        /// {sev}: Severity level name (Debug, Info, Warn, etc.)
+        /// {level}: Severity level number (0-7)
+        /// {pid}: Process ID
+        /// {user}: Current username
+        /// {app}: Application/process name
+        /// {domain}: Application domain name
+        /// {cpu}: Number of processor cores
+        /// {mem}: Current working set memory (MB)
+        /// {uptime}: Process uptime (HH:mm:ss)
+        /// {correlation}: Correlation ID (if present in log entry)
+        /// {source}: Log source (if present in log entry)
+        /// Default: {ts} {host} {sev}
         /// A space will be inserted between the header and the message.
+        /// Setting to null or empty will result in an empty header.
         /// </summary>
         public string HeaderFormat
         {
@@ -29,14 +40,14 @@
             }
             set
             {
-                if (String.IsNullOrEmpty(value)) _HeaderFormat = "";
-                else _HeaderFormat = value;
+                _HeaderFormat = value ?? "";
             }
         }
 
         /// <summary>
-        /// Timestamp format.
+        /// Timestamp format. Cannot be null or empty. Must be a valid DateTime format string.
         /// </summary>
+        /// <exception cref="ArgumentException">Thrown when value is null or empty.</exception>
         public string TimestampFormat
         {
             get
@@ -45,7 +56,7 @@
             }
             set
             {
-                if (String.IsNullOrEmpty(value)) throw new ArgumentNullException(nameof(HeaderFormat));
+                if (string.IsNullOrEmpty(value)) throw new ArgumentException("Timestamp format cannot be null or empty.", nameof(TimestampFormat));
                 _TimestampFormat = value;
             }
         }
@@ -56,8 +67,8 @@
         public bool UseUtcTime { get; set; } = true;
 
         /// <summary>
-        /// Enable or disable console logging.  
-        /// Settings this to true will first validate if a console exists. 
+        /// Enable or disable console logging.
+        /// Setting this to true will first validate if a console exists.
         /// If a console is not available, it will be set to false.
         /// </summary>
         public bool EnableConsole
@@ -77,7 +88,7 @@
         /// Minimum severity required to send a message.
         /// </summary>
         public Severity MinimumSeverity { get; set; } = Severity.Debug;
-         
+
         /// <summary>
         /// Enable or disable use of color for console messages.
         /// </summary>
@@ -135,13 +146,15 @@
         }
 
         /// <summary>
-        /// The severity level to use when logging exceptions through the .Exception() method.  
+        /// The severity level to use when logging exceptions through the .Exception() method.
         /// </summary>
         public Severity ExceptionSeverity { get; set; } = Severity.Alert;
 
         /// <summary>
-        /// Maximum message length.  Must be greater than or equal to 32.  Default is 1024.
+        /// Maximum message length. Valid range: 32 or greater. Default is 1024.
+        /// Messages longer than this will be split into multiple messages with sequence numbers.
         /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when value is less than 32.</exception>
         public int MaxMessageLength
         {
             get
@@ -150,14 +163,10 @@
             }
             set
             {
-                if (value < 32) throw new ArgumentException("Maximum message length must be at least 32.");
+                if (value < 32) throw new ArgumentOutOfRangeException(nameof(MaxMessageLength), "Maximum message length must be at least 32.");
                 _MaxMessageLength = value;
             }
         }
-
-        #endregion
-
-        #region Private-Members
 
         private string _HeaderFormat = "{ts} {host} {sev}";
         private string _TimestampFormat = "yyyy-MM-dd HH:mm:ss";
@@ -166,10 +175,6 @@
         private ColorSchema _Colors = new ColorSchema();
         private string _LogFilename = null;
 
-        #endregion
-
-        #region Constructors-and-Factories
-
         /// <summary>
         /// Instantiate the object.
         /// </summary>
@@ -177,14 +182,6 @@
         {
 
         }
-
-        #endregion
-
-        #region Public-Methods
-
-        #endregion
-
-        #region Private-Methods
 
         private bool ConsoleExists()
         {
@@ -199,7 +196,7 @@
                 return false;
             }
         }
-
-        #endregion
+#pragma warning restore CS8625
+#pragma warning restore CS8600
     }
 }

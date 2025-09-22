@@ -9,39 +9,51 @@
             Colors to use when writing to the console.
             </summary>
         </member>
-        <member name="F:SyslogLogging.ColorSchema.Debug">
+        <member name="P:SyslogLogging.ColorSchema.Debug">
             <summary>
-            The color to use for debug messages.  Default is dark gray on black.
+            The color to use for debug messages. Default is dark gray on black.
             </summary>
+            <exception cref="T:System.ArgumentNullException">Thrown when value is null.</exception>
         </member>
-        <member name="F:SyslogLogging.ColorSchema.Info">
+        <member name="P:SyslogLogging.ColorSchema.Info">
             <summary>
-            The color to use for informational messages.  Default is gray on black.
+            The color to use for informational messages. Default is gray on black.
             </summary>
+            <exception cref="T:System.ArgumentNullException">Thrown when value is null.</exception>
         </member>
-        <member name="F:SyslogLogging.ColorSchema.Warn">
+        <member name="P:SyslogLogging.ColorSchema.Warn">
             <summary>
-            The color to use for warning messages.  Default is dark red on black.
+            The color to use for warning messages. Default is dark red on black.
             </summary>
+            <exception cref="T:System.ArgumentNullException">Thrown when value is null.</exception>
         </member>
-        <member name="F:SyslogLogging.ColorSchema.Error">
+        <member name="P:SyslogLogging.ColorSchema.Error">
             <summary>
-            The color to use for error messages.  Default is red on black.
+            The color to use for error messages. Default is red on black.
             </summary>
+            <exception cref="T:System.ArgumentNullException">Thrown when value is null.</exception>
         </member>
-        <member name="F:SyslogLogging.ColorSchema.Alert">
+        <member name="P:SyslogLogging.ColorSchema.Alert">
             <summary>
-            The color to use for alert messages.  Default is dark yellow on black.
+            The color to use for alert messages. Default is dark yellow on black.
             </summary>
+            <exception cref="T:System.ArgumentNullException">Thrown when value is null.</exception>
         </member>
-        <member name="F:SyslogLogging.ColorSchema.Critical">
+        <member name="P:SyslogLogging.ColorSchema.Critical">
             <summary>
-            The color to use for critical messages.  Default is yellow on black.
+            The color to use for critical messages. Default is yellow on black.
             </summary>
+            <exception cref="T:System.ArgumentNullException">Thrown when value is null.</exception>
         </member>
-        <member name="F:SyslogLogging.ColorSchema.Emergency">
+        <member name="P:SyslogLogging.ColorSchema.Emergency">
             <summary>
-            The color to use for emergency messages.  Default is white on red.
+            The color to use for emergency messages. Default is white on red.
+            </summary>
+            <exception cref="T:System.ArgumentNullException">Thrown when value is null.</exception>
+        </member>
+        <member name="M:SyslogLogging.ColorSchema.#ctor">
+            <summary>
+            Instantiate the object.
             </summary>
         </member>
         <member name="T:SyslogLogging.ColorScheme">
@@ -49,14 +61,21 @@
             Color scheme for logging messages.
             </summary>
         </member>
-        <member name="F:SyslogLogging.ColorScheme.Foreground">
+        <member name="P:SyslogLogging.ColorScheme.Foreground">
             <summary>
-            Foreground color.
+            Foreground color. Must be a valid ConsoleColor value.
             </summary>
+            <exception cref="T:System.ArgumentException">Thrown when value is not a valid ConsoleColor.</exception>
         </member>
-        <member name="F:SyslogLogging.ColorScheme.Background">
+        <member name="P:SyslogLogging.ColorScheme.Background">
             <summary>
-            Background color.
+            Background color. Must be a valid ConsoleColor value.
+            </summary>
+            <exception cref="T:System.ArgumentException">Thrown when value is not a valid ConsoleColor.</exception>
+        </member>
+        <member name="M:SyslogLogging.ColorScheme.#ctor">
+            <summary>
+            Instantiates a new color scheme with default colors.
             </summary>
         </member>
         <member name="M:SyslogLogging.ColorScheme.#ctor(System.ConsoleColor,System.ConsoleColor)">
@@ -65,6 +84,7 @@
             </summary>
             <param name="foreground">Foreground color.</param>
             <param name="background">Background color.</param>
+            <exception cref="T:System.ArgumentException">Thrown when foreground or background is not a valid ConsoleColor.</exception>
         </member>
         <member name="T:SyslogLogging.FileLoggingMode">
             <summary>
@@ -89,9 +109,118 @@
             All messages will be appended to a file, where the name of the file is the supplied filename followed by '.yyyyMMdd'.
             </summary>
         </member>
+        <member name="T:SyslogLogging.LogEntry">
+            <summary>
+            Represents a structured log entry with properties and context.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LogEntry.Severity">
+            <summary>
+            The severity level of the log entry.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LogEntry.Message">
+            <summary>
+            The main log message. Cannot be null (empty string is allowed).
+            </summary>
+            <exception cref="T:System.ArgumentNullException">Thrown when value is null.</exception>
+        </member>
+        <member name="P:SyslogLogging.LogEntry.Timestamp">
+            <summary>
+            Timestamp when the log entry was created. Default is UTC now.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LogEntry.Properties">
+            <summary>
+            Additional structured properties for the log entry.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LogEntry.Exception">
+            <summary>
+            Exception associated with this log entry, if any.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LogEntry.CorrelationId">
+            <summary>
+            Correlation ID for tracking related log entries.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LogEntry.Source">
+            <summary>
+            Source context (typically class name or module).
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LogEntry.ThreadId">
+            <summary>
+            Thread ID where the log entry was created.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.LogEntry.#ctor">
+            <summary>
+            Create a new log entry.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.LogEntry.#ctor(SyslogLogging.Severity,System.String)">
+            <summary>
+            Create a new log entry with the specified message and severity.
+            </summary>
+            <param name="severity">Log severity level.</param>
+            <param name="message">Log message.</param>
+        </member>
+        <member name="M:SyslogLogging.LogEntry.#ctor(SyslogLogging.Severity,System.String,System.Exception)">
+            <summary>
+            Create a new log entry with the specified message, severity, and exception.
+            </summary>
+            <param name="severity">Log severity level.</param>
+            <param name="message">Log message.</param>
+            <param name="exception">Associated exception.</param>
+        </member>
+        <member name="M:SyslogLogging.LogEntry.WithProperty(System.String,System.Object)">
+            <summary>
+            Add a structured property to the log entry.
+            </summary>
+            <param name="key">Property key.</param>
+            <param name="value">Property value.</param>
+            <returns>This log entry for method chaining.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when key is null or empty.</exception>
+        </member>
+        <member name="M:SyslogLogging.LogEntry.WithProperties(System.Collections.Generic.Dictionary{System.String,System.Object})">
+            <summary>
+            Add multiple structured properties to the log entry.
+            </summary>
+            <param name="properties">Dictionary of properties to add.</param>
+            <returns>This log entry for method chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when properties is null.</exception>
+        </member>
+        <member name="M:SyslogLogging.LogEntry.WithCorrelationId(System.String)">
+            <summary>
+            Set the correlation ID for this log entry.
+            </summary>
+            <param name="correlationId">Correlation ID.</param>
+            <returns>This log entry for method chaining.</returns>
+        </member>
+        <member name="M:SyslogLogging.LogEntry.WithSource(System.String)">
+            <summary>
+            Set the source context for this log entry.
+            </summary>
+            <param name="source">Source context.</param>
+            <returns>This log entry for method chaining.</returns>
+        </member>
+        <member name="M:SyslogLogging.LogEntry.ToJson">
+            <summary>
+            Serialize the log entry to JSON format.
+            </summary>
+            <returns>JSON representation of the log entry.</returns>
+        </member>
         <member name="T:SyslogLogging.LoggingModule">
             <summary>
-            Syslog, console, and file logging module.
+            Simplified syslog, console, and file logging module with direct processing.
+            Thread-safe with immediate log delivery - no persistence or background processing.
+            </summary>
+        </member>
+        <member name="E:SyslogLogging.LoggingModule.OnLoggingError">
+            <summary>
+            Event fired when a logging error occurs. Provides visibility into logging failures.
             </summary>
         </member>
         <member name="P:SyslogLogging.LoggingModule.Settings">
@@ -104,122 +233,370 @@
             List of syslog servers.
             </summary>
         </member>
+        <member name="T:SyslogLogging.LoggingModule.HeaderVariable">
+            <summary>
+            Represents a dynamic variable in the header format.
+            </summary>
+        </member>
         <member name="M:SyslogLogging.LoggingModule.#ctor">
             <summary>
-            Instantiate the object using localhost syslog (UDP port 514).
+            Instantiate the object.
             </summary>
         </member>
         <member name="M:SyslogLogging.LoggingModule.#ctor(System.String,System.Int32,System.Boolean)">
             <summary>
-            Instantiate the object using the specified syslog server IP address and UDP port.
+            Instantiate the object.
             </summary>
-            <param name="serverIp">Server IP address.</param>
-            <param name="serverPort">Server port number.</param>
-            <param name="enableConsole">Enable or disable console logging.</param>
+            <param name="hostname">Hostname of the syslog server.</param>
+            <param name="port">Port number of the syslog server.</param>
+            <param name="enableConsole">Enable console logging.</param>
         </member>
         <member name="M:SyslogLogging.LoggingModule.#ctor(System.Collections.Generic.List{SyslogLogging.SyslogServer},System.Boolean)">
             <summary>
-            Instantiate the object using a series of servers.
+            Instantiate the object.
             </summary>
-            <param name="servers">Servers.</param>
-            <param name="enableConsole">Enable or disable console logging.</param>
+            <param name="servers">List of syslog servers.</param>
+            <param name="enableConsole">Enable console logging.</param>
         </member>
         <member name="M:SyslogLogging.LoggingModule.#ctor(System.String,SyslogLogging.FileLoggingMode,System.Boolean)">
             <summary>
-            Instantiate the object to enable either file logging or console logging.
+            Instantiate the object for file logging only.
             </summary>
-            <param name="filename">Filename.</param>
-            <param name="fileLoggingMode">File logging mode.  If you specify 'FileWithDate', .yyyyMMdd will be appended to the specified filename.</param>
-            <param name="enableConsole">Enable or disable console logging.</param>
-        </member>
-        <member name="M:SyslogLogging.LoggingModule.Dispose">
-            <summary>
-            Tear down the client and dispose of background workers.
-            </summary>
+            <param name="filename">Log filename.</param>
+            <param name="fileLogging">File logging mode.</param>
+            <param name="enableConsole">Enable console logging.</param>
         </member>
         <member name="M:SyslogLogging.LoggingModule.Debug(System.String)">
             <summary>
-            Send a log message using 'Debug' severity.
+            Write a debug log entry.
             </summary>
-            <param name="msg">Message to send.</param>
+            <param name="message">Message to log.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.DebugAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Write a debug log entry asynchronously.
+            </summary>
+            <param name="message">Message to log.</param>
+            <param name="token">Cancellation token.</param>
         </member>
         <member name="M:SyslogLogging.LoggingModule.Info(System.String)">
             <summary>
-            Send a log message using 'Info' severity.
+            Write an informational log entry.
             </summary>
-            <param name="msg">Message to send.</param>
+            <param name="message">Message to log.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.InfoAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Write an informational log entry asynchronously.
+            </summary>
+            <param name="message">Message to log.</param>
+            <param name="token">Cancellation token.</param>
         </member>
         <member name="M:SyslogLogging.LoggingModule.Warn(System.String)">
             <summary>
-            Send a log message using 'Warn' severity.
+            Write a warning log entry.
             </summary>
-            <param name="msg">Message to send.</param>
+            <param name="message">Message to log.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.WarnAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Write a warning log entry asynchronously.
+            </summary>
+            <param name="message">Message to log.</param>
+            <param name="token">Cancellation token.</param>
         </member>
         <member name="M:SyslogLogging.LoggingModule.Error(System.String)">
             <summary>
-            Send a log message using 'Error' severity.
+            Write an error log entry.
             </summary>
-            <param name="msg">Message to send.</param>
+            <param name="message">Message to log.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.ErrorAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Write an error log entry asynchronously.
+            </summary>
+            <param name="message">Message to log.</param>
+            <param name="token">Cancellation token.</param>
         </member>
         <member name="M:SyslogLogging.LoggingModule.Alert(System.String)">
             <summary>
-            Send a log message using 'Alert' severity.
+            Write an alert log entry.
             </summary>
-            <param name="msg">Message to send.</param>
+            <param name="message">Message to log.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.AlertAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Write an alert log entry asynchronously.
+            </summary>
+            <param name="message">Message to log.</param>
+            <param name="token">Cancellation token.</param>
         </member>
         <member name="M:SyslogLogging.LoggingModule.Critical(System.String)">
             <summary>
-            Send a log message using 'Critical' severity.
+            Write a critical log entry.
             </summary>
-            <param name="msg">Message to send.</param>
+            <param name="message">Message to log.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.CriticalAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Write a critical log entry asynchronously.
+            </summary>
+            <param name="message">Message to log.</param>
+            <param name="token">Cancellation token.</param>
         </member>
         <member name="M:SyslogLogging.LoggingModule.Emergency(System.String)">
             <summary>
-            Send a log message using 'Emergency' severity.
+            Write an emergency log entry.
             </summary>
-            <param name="msg">Message to send.</param>
+            <param name="message">Message to log.</param>
         </member>
-        <member name="M:SyslogLogging.LoggingModule.Exception(System.Exception,System.String,System.String)">
+        <member name="M:SyslogLogging.LoggingModule.EmergencyAsync(System.String,System.Threading.CancellationToken)">
             <summary>
-            Send log messages containing Exception details using 'Alert' severity.
+            Write an emergency log entry asynchronously.
             </summary>
-            <param name="module">Module name (user-specified).</param>
-            <param name="method">Method name (user-specified).</param>
-            <param name="e">Exception.</param>
+            <param name="message">Message to log.</param>
+            <param name="token">Cancellation token.</param>
         </member>
         <member name="M:SyslogLogging.LoggingModule.Log(SyslogLogging.Severity,System.String)">
             <summary>
-            Send a log message using the specified severity.
+            Write a log entry with specified severity.
             </summary>
-            <param name="sev">Severity of the message.</param>
-            <param name="msg">Message to send.</param>
+            <param name="severity">Severity level.</param>
+            <param name="message">Message to log.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.LogAsync(SyslogLogging.Severity,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Write a log entry with specified severity asynchronously.
+            </summary>
+            <param name="severity">Severity level.</param>
+            <param name="message">Message to log.</param>
+            <param name="token">Cancellation token.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.LogEntry(SyslogLogging.LogEntry)">
+            <summary>
+            Write a structured log entry.
+            </summary>
+            <param name="entry">Log entry to write.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.LogEntryAsync(SyslogLogging.LogEntry,System.Threading.CancellationToken)">
+            <summary>
+            Write a structured log entry asynchronously.
+            </summary>
+            <param name="entry">Log entry to write.</param>
+            <param name="token">Cancellation token.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.Exception(System.Exception,System.String,System.String)">
+            <summary>
+            Log an exception.
+            </summary>
+            <param name="exception">Exception to log.</param>
+            <param name="module">Module name.</param>
+            <param name="method">Method name.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.ExceptionAsync(System.Exception,System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Log an exception asynchronously.
+            </summary>
+            <param name="exception">Exception to log.</param>
+            <param name="module">Module name.</param>
+            <param name="method">Method name.</param>
+            <param name="token">Cancellation token.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.BeginStructuredLog(SyslogLogging.Severity,System.String)">
+            <summary>
+            Begin building a structured log entry using fluent syntax.
+            </summary>
+            <param name="severity">Severity level.</param>
+            <param name="message">Message to log.</param>
+            <returns>Structured log builder.</returns>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.FlushAsync(System.Threading.CancellationToken)">
+            <summary>
+            Flush any pending log entries. In direct processing mode, this is a no-op.
+            </summary>
+            <param name="token">Cancellation token.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.Dispose">
+            <summary>
+            Dispose of the object.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.DisposeAsync">
+            <summary>
+            Dispose of the object asynchronously.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.ProcessLogEntry(SyslogLogging.LogEntry)">
+            <summary>
+            Process a log entry by sending it to all configured destinations immediately.
+            </summary>
+            <param name="entry">Log entry to process.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.ProcessLogEntryAsync(SyslogLogging.LogEntry,System.Threading.CancellationToken)">
+            <summary>
+            Process a log entry asynchronously by sending it to all configured destinations immediately.
+            </summary>
+            <param name="entry">Log entry to process.</param>
+            <param name="token">Cancellation token.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.SplitMessage(System.String,System.Int32)">
+            <summary>
+            Split a message if it exceeds the maximum length.
+            </summary>
+            <param name="message">Message to split.</param>
+            <param name="maxLength">Maximum length per chunk.</param>
+            <returns>Enumerable of message chunks.</returns>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.CreateSplitEntry(SyslogLogging.LogEntry,System.String,System.Int32,System.Boolean)">
+            <summary>
+            Create a split log entry from the original entry and message part.
+            </summary>
+            <param name="originalEntry">Original log entry.</param>
+            <param name="messagePart">Message part for this split entry.</param>
+            <param name="sequenceNumber">Sequence number for split messages.</param>
+            <param name="isMultiPart">Whether this is part of a multi-part message.</param>
+            <returns>Split log entry.</returns>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.WriteToConsole(SyslogLogging.LogEntry)">
+            <summary>
+            Write log entry to console with color coding.
+            </summary>
+            <param name="entry">Log entry to write.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.WriteToFile(SyslogLogging.LogEntry)">
+            <summary>
+            Write log entry to file.
+            </summary>
+            <param name="entry">Log entry to write.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.WriteToFileAsync(SyslogLogging.LogEntry,System.Threading.CancellationToken)">
+            <summary>
+            Write log entry to file asynchronously.
+            </summary>
+            <param name="entry">Log entry to write.</param>
+            <param name="token">Cancellation token.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.SendToSyslog(SyslogLogging.SyslogServer,SyslogLogging.LogEntry)">
+            <summary>
+            Send log entry to syslog server.
+            </summary>
+            <param name="server">Syslog server.</param>
+            <param name="entry">Log entry to send.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.SendToSyslogAsync(SyslogLogging.SyslogServer,SyslogLogging.LogEntry,System.Threading.CancellationToken)">
+            <summary>
+            Send log entry to syslog server asynchronously.
+            </summary>
+            <param name="server">Syslog server.</param>
+            <param name="entry">Log entry to send.</param>
+            <param name="token">Cancellation token.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.CreateUdpClient(System.String,System.Int32)">
+            <summary>
+            Create a UDP client for the specified hostname and port.
+            </summary>
+            <param name="hostname">Hostname of the syslog server.</param>
+            <param name="port">Port number of the syslog server.</param>
+            <returns>UDP client connected to the server.</returns>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.InitializeHeaderFormat">
+            <summary>
+            Initialize the header format by pre-compiling static and dynamic parts.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.GetProcessId">
+            <summary>
+            Get process ID safely.
+            </summary>
+            <returns>Process ID or "unknown" if unavailable.</returns>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.GetProcessName">
+            <summary>
+            Get process name safely.
+            </summary>
+            <returns>Process name or "unknown" if unavailable.</returns>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.FormatLogEntry(SyslogLogging.LogEntry)">
+            <summary>
+            Format a log entry according to the configured header format.
+            </summary>
+            <param name="entry">Log entry to format.</param>
+            <returns>Formatted log message.</returns>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.BuildSyslogMessage(SyslogLogging.LogEntry)">
+            <summary>
+            Build RFC3164 syslog message format.
+            </summary>
+            <param name="entry">Log entry to format.</param>
+            <returns>Syslog formatted message.</returns>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.GetConsoleColors(SyslogLogging.Severity)">
+            <summary>
+            Get console colors (foreground and background) for severity level.
+            </summary>
+            <param name="severity">Severity level.</param>
+            <returns>Color scheme for the severity level.</returns>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.GetLogFilename">
+            <summary>
+            Get the log filename based on the file logging mode.
+            </summary>
+            <returns>Log filename.</returns>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.EnsureDirectoryExists(System.String)">
+            <summary>
+            Ensure the directory for the log file exists.
+            </summary>
+            <param name="filename">Log filename.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.ThrowIfDisposed">
+            <summary>
+            Throw ObjectDisposedException if the object is disposed.
+            </summary>
         </member>
         <member name="M:SyslogLogging.LoggingModule.Dispose(System.Boolean)">
             <summary>
-            Dispose of the resource.
+            Dispose of resources.
             </summary>
-            <param name="disposing">Disposing.</param>
+            <param name="disposing">True if disposing managed resources.</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.DisposeAsyncCore">
+            <summary>
+            Async disposal core implementation.
+            </summary>
         </member>
         <member name="T:SyslogLogging.LoggingSettings">
             <summary>
-            Logging settings.
+            Simplified logging settings for direct processing mode.
             </summary>
         </member>
         <member name="P:SyslogLogging.LoggingSettings.HeaderFormat">
             <summary>
-            Header format.  Provide a string that specifies how the preamble of each message should be structured.  You can use variables including:
-            {ts}: UTC timestamp
-            {host}: Hostname
+            Header format template. Supports the following placeholders:
+            {ts}: Timestamp (formatted per TimestampFormat setting)
+            {host}: Hostname/machine name
             {thread}: Thread ID
-            {sev}: Severity
-            Default: {ts} {host} {thread} {sev}
+            {sev}: Severity level name (Debug, Info, Warn, etc.)
+            {level}: Severity level number (0-7)
+            {pid}: Process ID
+            {user}: Current username
+            {app}: Application/process name
+            {domain}: Application domain name
+            {cpu}: Number of processor cores
+            {mem}: Current working set memory (MB)
+            {uptime}: Process uptime (HH:mm:ss)
+            {correlation}: Correlation ID (if present in log entry)
+            {source}: Log source (if present in log entry)
+            Default: {ts} {host} {sev}
             A space will be inserted between the header and the message.
+            Setting to null or empty will result in an empty header.
             </summary>
         </member>
         <member name="P:SyslogLogging.LoggingSettings.TimestampFormat">
             <summary>
-            Timestamp format.
+            Timestamp format. Cannot be null or empty. Must be a valid DateTime format string.
             </summary>
+            <exception cref="T:System.ArgumentException">Thrown when value is null or empty.</exception>
         </member>
         <member name="P:SyslogLogging.LoggingSettings.UseUtcTime">
             <summary>
@@ -228,8 +605,8 @@
         </member>
         <member name="P:SyslogLogging.LoggingSettings.EnableConsole">
             <summary>
-            Enable or disable console logging.  
-            Settings this to true will first validate if a console exists. 
+            Enable or disable console logging.
+            Setting this to true will first validate if a console exists.
             If a console is not available, it will be set to false.
             </summary>
         </member>
@@ -263,13 +640,15 @@
         </member>
         <member name="P:SyslogLogging.LoggingSettings.ExceptionSeverity">
             <summary>
-            The severity level to use when logging exceptions through the .Exception() method.  
+            The severity level to use when logging exceptions through the .Exception() method.
             </summary>
         </member>
         <member name="P:SyslogLogging.LoggingSettings.MaxMessageLength">
             <summary>
-            Maximum message length.  Must be greater than or equal to 32.  Default is 1024.
+            Maximum message length. Valid range: 32 or greater. Default is 1024.
+            Messages longer than this will be split into multiple messages with sequence numbers.
             </summary>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when value is less than 32.</exception>
         </member>
         <member name="M:SyslogLogging.LoggingSettings.#ctor">
             <summary>
@@ -316,20 +695,209 @@
             Emergency messages.
             </summary>
         </member>
+        <member name="T:SyslogLogging.StructuredLogBuilder">
+            <summary>
+            Fluent builder for creating structured log entries.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.StructuredLogBuilder.#ctor(SyslogLogging.LoggingModule,SyslogLogging.Severity,System.String)">
+            <summary>
+            Create a new structured log builder.
+            </summary>
+            <param name="logger">The logging module.</param>
+            <param name="severity">Log severity level.</param>
+            <param name="message">Log message.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when logger is null.</exception>
+        </member>
+        <member name="M:SyslogLogging.StructuredLogBuilder.WithProperty(System.String,System.Object)">
+            <summary>
+            Add a property to the log entry.
+            </summary>
+            <param name="key">Property key.</param>
+            <param name="value">Property value.</param>
+            <returns>This builder for method chaining.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when key is null or empty.</exception>
+        </member>
+        <member name="M:SyslogLogging.StructuredLogBuilder.WithProperties(System.Collections.Generic.Dictionary{System.String,System.Object})">
+            <summary>
+            Add multiple properties to the log entry.
+            </summary>
+            <param name="properties">Dictionary of properties.</param>
+            <returns>This builder for method chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when properties is null.</exception>
+        </member>
+        <member name="M:SyslogLogging.StructuredLogBuilder.WithCorrelationId(System.String)">
+            <summary>
+            Set the correlation ID for the log entry.
+            </summary>
+            <param name="correlationId">Correlation ID.</param>
+            <returns>This builder for method chaining.</returns>
+        </member>
+        <member name="M:SyslogLogging.StructuredLogBuilder.WithSource(System.String)">
+            <summary>
+            Set the source context for the log entry.
+            </summary>
+            <param name="source">Source context.</param>
+            <returns>This builder for method chaining.</returns>
+        </member>
+        <member name="M:SyslogLogging.StructuredLogBuilder.WithException(System.Exception)">
+            <summary>
+            Set the exception for the log entry.
+            </summary>
+            <param name="exception">Exception.</param>
+            <returns>This builder for method chaining.</returns>
+        </member>
+        <member name="M:SyslogLogging.StructuredLogBuilder.Write">
+            <summary>
+            Write the log entry.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.StructuredLogBuilder.WriteAsync(System.Threading.CancellationToken)">
+            <summary>
+            Write the log entry asynchronously.
+            </summary>
+            <param name="token">Cancellation token.</param>
+            <returns>Task representing the async operation.</returns>
+        </member>
+        <member name="T:SyslogLogging.SyslogExtensions">
+            <summary>
+            Extension methods for integrating SyslogLogging with Microsoft.Extensions.Logging.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.SyslogExtensions.AddSyslog(Microsoft.Extensions.Logging.ILoggingBuilder,System.Action{SyslogLogging.LoggingModule})">
+            <summary>
+            Add syslog logging to the logging builder.
+            </summary>
+            <param name="builder">The logging builder.</param>
+            <param name="configure">Configuration action for the logging module.</param>
+            <returns>The logging builder for method chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when builder is null.</exception>
+        </member>
+        <member name="M:SyslogLogging.SyslogExtensions.AddSyslog(Microsoft.Extensions.Logging.ILoggingBuilder,System.Collections.Generic.List{SyslogLogging.SyslogServer},System.Boolean,System.Action{SyslogLogging.LoggingModule})">
+            <summary>
+            Add syslog logging to the logging builder with specific servers.
+            </summary>
+            <param name="builder">The logging builder.</param>
+            <param name="servers">List of syslog servers.</param>
+            <param name="enableConsole">Enable console logging.</param>
+            <param name="configure">Configuration action for the logging module.</param>
+            <returns>The logging builder for method chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when builder or servers is null.</exception>
+        </member>
+        <member name="M:SyslogLogging.SyslogExtensions.AddSyslog(Microsoft.Extensions.Logging.ILoggingBuilder,System.String,System.Int32,System.Boolean,System.Action{SyslogLogging.LoggingModule})">
+            <summary>
+            Add syslog logging to the logging builder with a single server.
+            </summary>
+            <param name="builder">The logging builder.</param>
+            <param name="hostname">Syslog server hostname.</param>
+            <param name="port">Syslog server port.</param>
+            <param name="enableConsole">Enable console logging.</param>
+            <param name="configure">Configuration action for the logging module.</param>
+            <returns>The logging builder for method chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when builder or hostname is null.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when port is invalid.</exception>
+        </member>
+        <member name="M:SyslogLogging.SyslogExtensions.AddFileLogging(Microsoft.Extensions.Logging.ILoggingBuilder,System.String,SyslogLogging.FileLoggingMode,System.Boolean,System.Action{SyslogLogging.LoggingModule})">
+            <summary>
+            Add file logging to the logging builder.
+            </summary>
+            <param name="builder">The logging builder.</param>
+            <param name="filename">Log filename.</param>
+            <param name="fileLoggingMode">File logging mode.</param>
+            <param name="enableConsole">Enable console logging.</param>
+            <param name="configure">Configuration action for the logging module.</param>
+            <returns>The logging builder for method chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when builder is null.</exception>
+        </member>
+        <member name="M:SyslogLogging.SyslogExtensions.BeginStructuredLog(SyslogLogging.LoggingModule,SyslogLogging.Severity,System.String)">
+            <summary>
+            Create a structured log entry builder for fluent logging.
+            </summary>
+            <param name="logger">The logger instance.</param>
+            <param name="severity">Log severity level.</param>
+            <param name="message">Log message.</param>
+            <returns>Structured log entry builder.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when logger is null.</exception>
+        </member>
+        <member name="T:SyslogLogging.SyslogLogger">
+            <summary>
+            Logger implementation for Microsoft.Extensions.Logging integration.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.SyslogLogger.#ctor(System.String,SyslogLogging.LoggingModule)">
+            <summary>
+            Create a new syslog logger.
+            </summary>
+            <param name="categoryName">The category name for this logger.</param>
+            <param name="loggingModule">The underlying logging module.</param>
+        </member>
+        <member name="M:SyslogLogging.SyslogLogger.BeginScope``1(``0)">
+            <summary>
+            Begin a logical operation scope.
+            </summary>
+            <typeparam name="TState">The type of the state.</typeparam>
+            <param name="state">The identifier for the scope.</param>
+            <returns>A disposable scope object.</returns>
+        </member>
+        <member name="M:SyslogLogging.SyslogLogger.IsEnabled(Microsoft.Extensions.Logging.LogLevel)">
+            <summary>
+            Check if the given log level is enabled.
+            </summary>
+            <param name="logLevel">The log level to check.</param>
+            <returns>True if the log level is enabled.</returns>
+        </member>
+        <member name="M:SyslogLogging.SyslogLogger.Log``1(Microsoft.Extensions.Logging.LogLevel,Microsoft.Extensions.Logging.EventId,``0,System.Exception,System.Func{``0,System.Exception,System.String})">
+            <summary>
+            Write a log entry.
+            </summary>
+            <typeparam name="TState">The type of the state.</typeparam>
+            <param name="logLevel">The log level.</param>
+            <param name="eventId">The event ID.</param>
+            <param name="state">The state.</param>
+            <param name="exception">The exception.</param>
+            <param name="formatter">The formatter function.</param>
+        </member>
+        <member name="T:SyslogLogging.SyslogLoggerProvider">
+            <summary>
+            Logger provider for Microsoft.Extensions.Logging integration.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.SyslogLoggerProvider.#ctor(SyslogLogging.LoggingModule)">
+            <summary>
+            Create a new syslog logger provider.
+            </summary>
+            <param name="loggingModule">The underlying logging module.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when loggingModule is null.</exception>
+        </member>
+        <member name="M:SyslogLogging.SyslogLoggerProvider.CreateLogger(System.String)">
+            <summary>
+            Create a logger for the specified category.
+            </summary>
+            <param name="categoryName">The category name for the logger.</param>
+            <returns>A logger instance.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when categoryName is null.</exception>
+        </member>
+        <member name="M:SyslogLogging.SyslogLoggerProvider.Dispose">
+            <summary>
+            Dispose of the logger provider.
+            </summary>
+        </member>
         <member name="T:SyslogLogging.SyslogServer">
             <summary>
-            Syslog server.
+            Syslog server with proper resource management and thread safety.
             </summary>
         </member>
         <member name="P:SyslogLogging.SyslogServer.Hostname">
             <summary>
-            Hostname.
+            Hostname. Cannot be null or empty.
             </summary>
+            <exception cref="T:System.ArgumentException">Thrown when value is null or empty.</exception>
         </member>
         <member name="P:SyslogLogging.SyslogServer.Port">
             <summary>
-            UDP port.
+            UDP port. Valid range: 0-65535.
             </summary>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when value is not between 0 and 65535.</exception>
         </member>
         <member name="P:SyslogLogging.SyslogServer.IpPort">
             <summary>
@@ -353,6 +921,22 @@
             Display a human-readable string of the object.
             </summary>
             <returns>String.</returns>
+        </member>
+        <member name="M:SyslogLogging.SyslogServer.Dispose">
+            <summary>
+            Dispose of the syslog server and release network resources.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.SyslogServer.Dispose(System.Boolean)">
+            <summary>
+            Dispose of the syslog server.
+            </summary>
+            <param name="disposing">True if disposing managed resources.</param>
+        </member>
+        <member name="M:SyslogLogging.SyslogServer.Finalize">
+            <summary>
+            Finalizer to ensure resources are cleaned up.
+            </summary>
         </member>
     </members>
 </doc>

@@ -1,0 +1,16 @@
+verbex.txt
+----------
+VBX_CLI.md
+- usage?
+- test batch file and shell script to exercise the CLI
+- ensure that the REST API is up to date with all of the capabilities including lemmatization, stop word removal, min/max token lengths for ingestion, use of lemmatization and stop word removal against search prompts
+
+--
+
+Refactor the TestConsole app to use similar command names and terminology as found in VerbexCli.  Make sure to update method names and strings accordingly.  Resolve ALL build errors and warnings across all projects.
+
+
+syslog
+- always fails on file handle limits test
+- find ways to improve message throughput per second without compromising reliability or correctness
+- reduce complexity where appropriate

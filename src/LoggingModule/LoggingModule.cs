@@ -1,7 +1,7 @@
-﻿namespace SyslogLogging
+namespace SyslogLogging
 {
     using System;
-    using System.Collections;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
@@ -13,11 +13,18 @@
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Syslog, console, and file logging module.
+    /// Simplified syslog, console, and file logging module with direct processing.
+    /// Thread-safe with immediate log delivery - no persistence or background processing.
     /// </summary>
-    public class LoggingModule : IDisposable
+    public class LoggingModule : IDisposable, IAsyncDisposable
     {
+#pragma warning disable CS8632
         #region Public-Members
+
+        /// <summary>
+        /// Event fired when a logging error occurs. Provides visibility into logging failures.
+        /// </summary>
+        public event Action<Exception>? OnLoggingError;
 
         /// <summary>
         /// Logging settings.
@@ -30,8 +37,8 @@
             }
             set
             {
-                if (value == null) _Settings = new LoggingSettings();
-                else _Settings = value;
+                _Settings = value ?? new LoggingSettings();
+                InitializeHeaderFormat(); // Re-initialize when settings change
             }
         }
 
@@ -42,14 +49,14 @@
         {
             get
             {
-                lock (_ServersLock)
-                    return _Servers;
+                lock (_IoLock)
+                    return new List<SyslogServer>(_Servers);
             }
             set
             {
                 if (value == null) value = new List<SyslogServer>();
 
-                lock (_ServersLock)
+                lock (_IoLock)
                 {
                     _Servers = new List<SyslogServer>();
 
@@ -68,306 +75,360 @@
 
         private bool _Disposed = false;
         private LoggingSettings _Settings = new LoggingSettings();
-        
+
         private List<SyslogServer> _Servers = new List<SyslogServer>();
-        private readonly object _ServersLock = new object();
-        private readonly object _FileLock = new object();
+        private readonly object _IoLock = new object(); // Single lock for all I/O operations
 
         private string _Hostname = Dns.GetHostName();
-        private CancellationTokenSource _TokenSource = new CancellationTokenSource();
-        private CancellationToken _Token;
+
+        // Pre-compiled header format for optimization
+        private string _StaticHeaderPart = string.Empty;
+        private List<HeaderVariable> _DynamicVariables = new List<HeaderVariable>();
+
+        /// <summary>
+        /// Represents a dynamic variable in the header format.
+        /// </summary>
+        private class HeaderVariable
+        {
+            public string Token { get; set; }
+            public Func<LogEntry, string> ValueProvider { get; set; }
+
+            public HeaderVariable(string token, Func<LogEntry, string> valueProvider)
+            {
+                Token = token;
+                ValueProvider = valueProvider;
+            }
+        }
 
         #endregion
 
         #region Constructors-and-Factories
 
         /// <summary>
-        /// Instantiate the object using localhost syslog (UDP port 514).
+        /// Instantiate the object.
         /// </summary>
         public LoggingModule()
         {
-            _Servers.Add(new SyslogServer("127.0.0.1", 514));
-
-            _Token = _TokenSource.Token;
+            _Servers = new List<SyslogServer> { new SyslogServer("127.0.0.1", 514) };
+            InitializeHeaderFormat();
         }
 
         /// <summary>
-        /// Instantiate the object using the specified syslog server IP address and UDP port.
+        /// Instantiate the object.
         /// </summary>
-        /// <param name="serverIp">Server IP address.</param>
-        /// <param name="serverPort">Server port number.</param>
-        /// <param name="enableConsole">Enable or disable console logging.</param>
-        public LoggingModule(
-            string serverIp,
-            int serverPort,
-            bool enableConsole = true)
+        /// <param name="hostname">Hostname of the syslog server.</param>
+        /// <param name="port">Port number of the syslog server.</param>
+        /// <param name="enableConsole">Enable console logging.</param>
+        public LoggingModule(string hostname, int port, bool enableConsole = true)
         {
-            if (String.IsNullOrEmpty(serverIp)) throw new ArgumentNullException(nameof(serverIp));
-            if (serverPort < 0) throw new ArgumentException("Server port must be zero or greater.");
+            if (string.IsNullOrEmpty(hostname)) throw new ArgumentNullException(nameof(hostname));
+            if (port < 0 || port > 65535) throw new ArgumentException("Port must be between 0 and 65535.", nameof(port));
 
-            _Servers.Add(new SyslogServer(serverIp, serverPort));
-
+            _Servers = new List<SyslogServer> { new SyslogServer(hostname, port) };
             _Settings.EnableConsole = enableConsole;
-            _Token = _TokenSource.Token;
+            InitializeHeaderFormat();
         }
 
         /// <summary>
-        /// Instantiate the object using a series of servers.
+        /// Instantiate the object.
         /// </summary>
-        /// <param name="servers">Servers.</param>
-        /// <param name="enableConsole">Enable or disable console logging.</param>
-        public LoggingModule(
-            List<SyslogServer> servers,
-            bool enableConsole = true)
+        /// <param name="servers">List of syslog servers.</param>
+        /// <param name="enableConsole">Enable console logging.</param>
+        public LoggingModule(List<SyslogServer> servers, bool enableConsole = true)
         {
             if (servers == null) throw new ArgumentNullException(nameof(servers));
-            if (servers.Count < 1) throw new ArgumentException("At least one server must be specified.");
+            if (servers.Count == 0) throw new ArgumentException("At least one server must be specified.", nameof(servers));
 
-            foreach (SyslogServer server in servers)
-            {
-                if (!_Servers.Any(s => s.IpPort.Equals(server.IpPort)))
-                    _Servers.Add(server);
-            }
-
+            _Servers = new List<SyslogServer>(servers);
             _Settings.EnableConsole = enableConsole;
-            _Token = _TokenSource.Token;
+            InitializeHeaderFormat();
         }
 
         /// <summary>
-        /// Instantiate the object to enable either file logging or console logging.
+        /// Instantiate the object for file logging only.
         /// </summary>
-        /// <param name="filename">Filename.</param>
-        /// <param name="fileLoggingMode">File logging mode.  If you specify 'FileWithDate', .yyyyMMdd will be appended to the specified filename.</param>
-        /// <param name="enableConsole">Enable or disable console logging.</param>
-        public LoggingModule(
-            string filename,
-            FileLoggingMode fileLoggingMode = FileLoggingMode.SingleLogFile,
-            bool enableConsole = true)
+        /// <param name="filename">Log filename.</param>
+        /// <param name="fileLogging">File logging mode.</param>
+        /// <param name="enableConsole">Enable console logging.</param>
+        public LoggingModule(string filename, FileLoggingMode fileLogging, bool enableConsole = true)
         {
-            if (String.IsNullOrEmpty(filename) && !enableConsole) throw new ArgumentException("Either a filename must be specified or console logging must be enabled.");
+            if (string.IsNullOrEmpty(filename)) throw new ArgumentNullException(nameof(filename));
 
-            _Settings.FileLogging = fileLoggingMode;
+            _Servers = new List<SyslogServer>();
             _Settings.LogFilename = filename;
+            _Settings.FileLogging = fileLogging;
             _Settings.EnableConsole = enableConsole;
-            _Token = _TokenSource.Token;
+            InitializeHeaderFormat();
         }
-       
+
         #endregion
 
         #region Public-Methods
 
         /// <summary>
-        /// Tear down the client and dispose of background workers.
+        /// Write a debug log entry.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        public void Debug(string message)
+        {
+            Log(Severity.Debug, message);
+        }
+
+        /// <summary>
+        /// Write a debug log entry asynchronously.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        /// <param name="token">Cancellation token.</param>
+        public async Task DebugAsync(string message, CancellationToken token = default)
+        {
+            await LogAsync(Severity.Debug, message, token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Write an informational log entry.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        public void Info(string message)
+        {
+            Log(Severity.Info, message);
+        }
+
+        /// <summary>
+        /// Write an informational log entry asynchronously.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        /// <param name="token">Cancellation token.</param>
+        public async Task InfoAsync(string message, CancellationToken token = default)
+        {
+            await LogAsync(Severity.Info, message, token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Write a warning log entry.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        public void Warn(string message)
+        {
+            Log(Severity.Warn, message);
+        }
+
+        /// <summary>
+        /// Write a warning log entry asynchronously.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        /// <param name="token">Cancellation token.</param>
+        public async Task WarnAsync(string message, CancellationToken token = default)
+        {
+            await LogAsync(Severity.Warn, message, token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Write an error log entry.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        public void Error(string message)
+        {
+            Log(Severity.Error, message);
+        }
+
+        /// <summary>
+        /// Write an error log entry asynchronously.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        /// <param name="token">Cancellation token.</param>
+        public async Task ErrorAsync(string message, CancellationToken token = default)
+        {
+            await LogAsync(Severity.Error, message, token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Write an alert log entry.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        public void Alert(string message)
+        {
+            Log(Severity.Alert, message);
+        }
+
+        /// <summary>
+        /// Write an alert log entry asynchronously.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        /// <param name="token">Cancellation token.</param>
+        public async Task AlertAsync(string message, CancellationToken token = default)
+        {
+            await LogAsync(Severity.Alert, message, token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Write a critical log entry.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        public void Critical(string message)
+        {
+            Log(Severity.Critical, message);
+        }
+
+        /// <summary>
+        /// Write a critical log entry asynchronously.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        /// <param name="token">Cancellation token.</param>
+        public async Task CriticalAsync(string message, CancellationToken token = default)
+        {
+            await LogAsync(Severity.Critical, message, token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Write an emergency log entry.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        public void Emergency(string message)
+        {
+            Log(Severity.Emergency, message);
+        }
+
+        /// <summary>
+        /// Write an emergency log entry asynchronously.
+        /// </summary>
+        /// <param name="message">Message to log.</param>
+        /// <param name="token">Cancellation token.</param>
+        public async Task EmergencyAsync(string message, CancellationToken token = default)
+        {
+            await LogAsync(Severity.Emergency, message, token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Write a log entry with specified severity.
+        /// </summary>
+        /// <param name="severity">Severity level.</param>
+        /// <param name="message">Message to log.</param>
+        public void Log(Severity severity, string message)
+        {
+            ThrowIfDisposed();
+            if (string.IsNullOrEmpty(message)) return;
+            if (severity < _Settings.MinimumSeverity) return;
+
+            LogEntry entry = new LogEntry(severity, message);
+            ProcessLogEntry(entry);
+        }
+
+        /// <summary>
+        /// Write a log entry with specified severity asynchronously.
+        /// </summary>
+        /// <param name="severity">Severity level.</param>
+        /// <param name="message">Message to log.</param>
+        /// <param name="token">Cancellation token.</param>
+        public async Task LogAsync(Severity severity, string message, CancellationToken token = default)
+        {
+            ThrowIfDisposed();
+            if (string.IsNullOrEmpty(message)) return;
+            if (severity < _Settings.MinimumSeverity) return;
+
+            LogEntry entry = new LogEntry(severity, message);
+            await ProcessLogEntryAsync(entry, token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Write a structured log entry.
+        /// </summary>
+        /// <param name="entry">Log entry to write.</param>
+        public void LogEntry(LogEntry entry)
+        {
+            ThrowIfDisposed();
+            if (entry == null) throw new ArgumentNullException(nameof(entry));
+            if (entry.Severity < _Settings.MinimumSeverity) return;
+
+            ProcessLogEntry(entry);
+        }
+
+        /// <summary>
+        /// Write a structured log entry asynchronously.
+        /// </summary>
+        /// <param name="entry">Log entry to write.</param>
+        /// <param name="token">Cancellation token.</param>
+        public async Task LogEntryAsync(LogEntry entry, CancellationToken token = default)
+        {
+            ThrowIfDisposed();
+            if (entry == null) throw new ArgumentNullException(nameof(entry));
+            if (entry.Severity < _Settings.MinimumSeverity) return;
+
+            await ProcessLogEntryAsync(entry, token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Log an exception.
+        /// </summary>
+        /// <param name="exception">Exception to log.</param>
+        /// <param name="module">Module name.</param>
+        /// <param name="method">Method name.</param>
+        public void Exception(Exception exception, string? module = null, string? method = null)
+        {
+            if (exception == null) throw new ArgumentNullException(nameof(exception));
+
+            string message = $"Exception in {module ?? "Unknown"}.{method ?? "Unknown"}: {exception.Message}";
+            if (exception.StackTrace != null)
+                message += Environment.NewLine + exception.StackTrace;
+
+            Log(Severity.Error, message);
+        }
+
+        /// <summary>
+        /// Log an exception asynchronously.
+        /// </summary>
+        /// <param name="exception">Exception to log.</param>
+        /// <param name="module">Module name.</param>
+        /// <param name="method">Method name.</param>
+        /// <param name="token">Cancellation token.</param>
+        public async Task ExceptionAsync(Exception exception, string? module = null, string? method = null, CancellationToken token = default)
+        {
+            if (exception == null) throw new ArgumentNullException(nameof(exception));
+
+            string message = $"Exception in {module ?? "Unknown"}.{method ?? "Unknown"}: {exception.Message}";
+            if (exception.StackTrace != null)
+                message += Environment.NewLine + exception.StackTrace;
+
+            await LogAsync(Severity.Error, message, token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Begin building a structured log entry using fluent syntax.
+        /// </summary>
+        /// <param name="severity">Severity level.</param>
+        /// <param name="message">Message to log.</param>
+        /// <returns>Structured log builder.</returns>
+        public StructuredLogBuilder BeginStructuredLog(Severity severity, string message)
+        {
+            return new StructuredLogBuilder(this, severity, message);
+        }
+
+        /// <summary>
+        /// Flush any pending log entries. In direct processing mode, this is a no-op.
+        /// </summary>
+        /// <param name="token">Cancellation token.</param>
+        public async Task FlushAsync(CancellationToken token = default)
+        {
+            // No-op in direct processing mode - all logs are immediately processed
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Dispose of the object.
         /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-          
-        /// <summary>
-        /// Send a log message using 'Debug' severity.
-        /// </summary>
-        /// <param name="msg">Message to send.</param>
-        public virtual void Debug(string msg)
-        {
-            if (String.IsNullOrEmpty(msg)) return;
-            Log(Severity.Debug, msg);
-        }
 
         /// <summary>
-        /// Send a log message using 'Info' severity.
+        /// Dispose of the object asynchronously.
         /// </summary>
-        /// <param name="msg">Message to send.</param>
-        public virtual void Info(string msg)
+        public async ValueTask DisposeAsync()
         {
-            if (String.IsNullOrEmpty(msg)) return;
-            Log(Severity.Info, msg); 
-        }
-
-        /// <summary>
-        /// Send a log message using 'Warn' severity.
-        /// </summary>
-        /// <param name="msg">Message to send.</param>
-        public virtual void Warn(string msg)
-        {
-            if (String.IsNullOrEmpty(msg)) return;
-            Log(Severity.Warn, msg);
-        }
-
-        /// <summary>
-        /// Send a log message using 'Error' severity.
-        /// </summary>
-        /// <param name="msg">Message to send.</param>
-        public virtual void Error(string msg)
-        {
-            if (String.IsNullOrEmpty(msg)) return;
-            Log(Severity.Error, msg);
-        }
-
-        /// <summary>
-        /// Send a log message using 'Alert' severity.
-        /// </summary>
-        /// <param name="msg">Message to send.</param>
-        public virtual void Alert(string msg)
-        {
-            if (String.IsNullOrEmpty(msg)) return;
-            Log(Severity.Alert, msg);
-        }
-
-        /// <summary>
-        /// Send a log message using 'Critical' severity.
-        /// </summary>
-        /// <param name="msg">Message to send.</param>
-        public virtual void Critical(string msg)
-        {
-            if (String.IsNullOrEmpty(msg)) return;
-            Log(Severity.Critical, msg);
-        }
-
-        /// <summary>
-        /// Send a log message using 'Emergency' severity.
-        /// </summary>
-        /// <param name="msg">Message to send.</param>
-        public virtual void Emergency(string msg)
-        {
-            if (String.IsNullOrEmpty(msg)) return;
-            Log(Severity.Emergency, msg);
-        }
-         
-        /// <summary>
-        /// Send log messages containing Exception details using 'Alert' severity.
-        /// </summary>
-        /// <param name="module">Module name (user-specified).</param>
-        /// <param name="method">Method name (user-specified).</param>
-        /// <param name="e">Exception.</param>
-        public virtual void Exception(Exception e, string module = null, string method = null)
-        {
-            if (e == null) throw new ArgumentNullException(nameof(e));
-            var st = new StackTrace(e, true);
-            var frame = st.GetFrame(0);
-            int fileLine = frame.GetFileLineNumber();
-            string filename = frame.GetFileName();
-
-            string message =
-                Environment.NewLine +
-                "--- Exception details ---" + Environment.NewLine +
-                (!String.IsNullOrEmpty(module) ? "  Module     : " + module + Environment.NewLine : "") +
-                (!String.IsNullOrEmpty(method) ? "  Method     : " + method + Environment.NewLine : "") +
-                "  Type       : " + e.GetType().ToString() + Environment.NewLine;
-
-            if (e.Data != null && e.Data.Count > 0)
-            {
-                message += "  Data       : " + Environment.NewLine;
-                foreach (DictionaryEntry curr in e.Data)
-                {
-                    message += "  | " + curr.Key + ": " + curr.Value + Environment.NewLine;
-                }
-            }
-            else
-            {
-                message += "  Data       : (none)" + Environment.NewLine;
-            }
-
-            message +=
-                "  Inner      : ";
-
-            if (e.InnerException == null) message += "(null)" + Environment.NewLine;
-            else
-            {
-                message += e.InnerException.GetType().ToString() + Environment.NewLine;
-                message +=
-                    "    Message    : " + e.InnerException.Message + Environment.NewLine +
-                    "    Source     : " + e.InnerException.Source + Environment.NewLine +
-                    "    StackTrace : " + e.InnerException.StackTrace + Environment.NewLine +
-                    "    ToString   : " + e.InnerException.ToString() + Environment.NewLine;
-
-                if (e.InnerException.Data != null && e.InnerException.Data.Count > 0)
-                {
-                    message += "    Data       : " + Environment.NewLine;
-                    foreach (DictionaryEntry curr in e.Data)
-                    {
-                        message += "    | " + curr.Key + ": " + curr.Value + Environment.NewLine;
-                    }
-                }
-                else
-                {
-                    message += "    Data       : (none)" + Environment.NewLine;
-                } 
-            }
-
-            message += 
-                "  Message    : " + e.Message + Environment.NewLine +
-                "  Source     : " + e.Source + Environment.NewLine +
-                "  StackTrace : " + e.StackTrace + Environment.NewLine +
-                "  Line       : " + fileLine + Environment.NewLine +
-                "  File       : " + filename + Environment.NewLine +
-                "  ToString   : " + e.ToString() + Environment.NewLine +
-                "---";
-
-            Log(_Settings.ExceptionSeverity, message);
-        }
-
-        /// <summary>
-        /// Send a log message using the specified severity.
-        /// </summary>
-        /// <param name="sev">Severity of the message.</param>
-        /// <param name="msg">Message to send.</param>
-        public virtual void Log(Severity sev, string msg)
-        {
-            if (String.IsNullOrEmpty(msg)) return;
-            if (sev < _Settings.MinimumSeverity) return;
-
-            string header = "";
-            string currMsg = "";
-            string remainder = "";
-
-            if (msg.Length > _Settings.MaxMessageLength)
-            {
-                currMsg = msg.Substring(0, _Settings.MaxMessageLength);
-                remainder = msg.Substring(_Settings.MaxMessageLength, (msg.Length - _Settings.MaxMessageLength));
-            }
-            else
-            {
-                currMsg = msg;
-            }
-            
-            header = _Settings.HeaderFormat;
-            if (header.Contains("{ts}"))
-            {
-                if (_Settings.UseUtcTime)
-                    header = header.Replace("{ts}", DateTime.Now.ToUniversalTime().ToString(_Settings.TimestampFormat));
-                else
-                    header = header.Replace("{ts}", DateTime.Now.ToString(_Settings.TimestampFormat));
-            }
-            if (header.Contains("{host}")) 
-                header = header.Replace("{host}", _Hostname);
-            if (header.Contains("{thread}")) 
-                header = header.Replace("{thread}", Thread.CurrentThread.ManagedThreadId.ToString());
-            if (header.Contains("{sev}")) 
-                header = header.Replace("{sev}", sev.ToString());
-
-            string message = header + " " + currMsg;
-
-            if (_Settings.EnableConsole)
-            {
-                SendConsole(sev, message);
-            }
-
-            if (!String.IsNullOrEmpty(_Settings.LogFilename) && _Settings.FileLogging != FileLoggingMode.Disabled)
-            {
-                SendFile(sev, message);
-            }
-
-            if (_Servers != null && _Servers.Count > 0)
-            {
-                SendServers(message);
-            }
-             
-            if (!String.IsNullOrEmpty(remainder))
-            {
-                Log(sev, remainder);
-            }
+            await DisposeAsyncCore().ConfigureAwait(false);
+            Dispose(false);
+            GC.SuppressFinalize(this);
         }
 
         #endregion
@@ -375,126 +436,533 @@
         #region Private-Methods
 
         /// <summary>
-        /// Dispose of the resource.
+        /// Process a log entry by sending it to all configured destinations immediately.
         /// </summary>
-        /// <param name="disposing">Disposing.</param>
-        protected virtual void Dispose(bool disposing)
+        /// <param name="entry">Log entry to process.</param>
+        private void ProcessLogEntry(LogEntry entry)
         {
-            if (_Disposed)
+            try
             {
+                // Handle message splitting if necessary
+                IEnumerable<string> messageParts = SplitMessage(entry.Message, _Settings.MaxMessageLength);
+                int sequenceNumber = 1;
+                bool isMultiPart = messageParts.Count() > 1;
+
+                foreach (string messagePart in messageParts)
+                {
+                    LogEntry splitEntry = CreateSplitEntry(entry, messagePart, sequenceNumber, isMultiPart);
+
+                    lock (_IoLock)
+                    {
+                        // Send to console
+                        if (_Settings.EnableConsole)
+                        {
+                            WriteToConsole(splitEntry);
+                        }
+
+                        // Send to file
+                        if (_Settings.FileLogging != FileLoggingMode.Disabled && !string.IsNullOrEmpty(_Settings.LogFilename))
+                        {
+                            WriteToFile(splitEntry);
+                        }
+
+                        // Send to syslog servers
+                        foreach (SyslogServer server in _Servers)
+                        {
+                            SendToSyslog(server, splitEntry);
+                        }
+                    }
+
+                    sequenceNumber++;
+                }
+            }
+            catch (Exception ex)
+            {
+                OnLoggingError?.Invoke(new Exception("Error processing log entry", ex));
+            }
+        }
+
+        /// <summary>
+        /// Process a log entry asynchronously by sending it to all configured destinations immediately.
+        /// </summary>
+        /// <param name="entry">Log entry to process.</param>
+        /// <param name="token">Cancellation token.</param>
+        private async Task ProcessLogEntryAsync(LogEntry entry, CancellationToken token)
+        {
+            try
+            {
+                // Handle message splitting if necessary
+                IEnumerable<string> messageParts = SplitMessage(entry.Message, _Settings.MaxMessageLength);
+                int sequenceNumber = 1;
+                bool isMultiPart = messageParts.Count() > 1;
+
+                foreach (string messagePart in messageParts)
+                {
+                    LogEntry splitEntry = CreateSplitEntry(entry, messagePart, sequenceNumber, isMultiPart);
+
+                    // Console writing is synchronous (always fast)
+                    if (_Settings.EnableConsole)
+                    {
+                        lock (_IoLock)
+                        {
+                            WriteToConsole(splitEntry);
+                        }
+                    }
+
+                    // File writing is truly async
+                    if (_Settings.FileLogging != FileLoggingMode.Disabled && !string.IsNullOrEmpty(_Settings.LogFilename))
+                    {
+                        await WriteToFileAsync(splitEntry, token).ConfigureAwait(false);
+                    }
+
+                    // Syslog sending is truly async
+                    List<SyslogServer> servers;
+                    lock (_IoLock)
+                    {
+                        servers = new List<SyslogServer>(_Servers);
+                    }
+
+                    foreach (SyslogServer server in servers)
+                    {
+                        await SendToSyslogAsync(server, splitEntry, token).ConfigureAwait(false);
+                    }
+
+                    sequenceNumber++;
+                }
+            }
+            catch (Exception ex)
+            {
+                OnLoggingError?.Invoke(new Exception("Error processing log entry async", ex));
+            }
+        }
+
+        /// <summary>
+        /// Split a message if it exceeds the maximum length.
+        /// </summary>
+        /// <param name="message">Message to split.</param>
+        /// <param name="maxLength">Maximum length per chunk.</param>
+        /// <returns>Enumerable of message chunks.</returns>
+        private static IEnumerable<string> SplitMessage(string message, int maxLength)
+        {
+            if (message.Length <= maxLength)
+            {
+                yield return message;
+                yield break;
+            }
+
+            for (int i = 0; i < message.Length; i += maxLength)
+            {
+                yield return message.Substring(i, Math.Min(maxLength, message.Length - i));
+            }
+        }
+
+        /// <summary>
+        /// Create a split log entry from the original entry and message part.
+        /// </summary>
+        /// <param name="originalEntry">Original log entry.</param>
+        /// <param name="messagePart">Message part for this split entry.</param>
+        /// <param name="sequenceNumber">Sequence number for split messages.</param>
+        /// <param name="isMultiPart">Whether this is part of a multi-part message.</param>
+        /// <returns>Split log entry.</returns>
+        private static LogEntry CreateSplitEntry(LogEntry originalEntry, string messagePart, int sequenceNumber, bool isMultiPart)
+        {
+            LogEntry splitEntry = new LogEntry(originalEntry.Severity, messagePart)
+            {
+                Timestamp = originalEntry.Timestamp,
+                ThreadId = originalEntry.ThreadId,
+                Source = originalEntry.Source,
+                CorrelationId = originalEntry.CorrelationId,
+                Exception = originalEntry.Exception
+            };
+
+            // Copy properties
+            foreach (KeyValuePair<string, object?> prop in originalEntry.Properties)
+            {
+                splitEntry.Properties[prop.Key] = prop.Value;
+            }
+
+            // Add sequence information for split messages
+            if (isMultiPart)
+            {
+                splitEntry.WithProperty("MessageSequence", sequenceNumber);
+                splitEntry.WithProperty("IsSplitMessage", true);
+            }
+
+            return splitEntry;
+        }
+
+        /// <summary>
+        /// Write log entry to console with color coding.
+        /// </summary>
+        /// <param name="entry">Log entry to write.</param>
+        private void WriteToConsole(LogEntry entry)
+        {
+            try
+            {
+                string formattedMessage = FormatLogEntry(entry);
+
+                // Note: _IoLock is already held by caller
+                if (_Settings.EnableColors)
+                {
+                    ColorScheme colors = GetConsoleColors(entry.Severity);
+                    Console.ForegroundColor = colors.Foreground;
+                    Console.BackgroundColor = colors.Background;
+                    Console.WriteLine(formattedMessage);
+                    Console.ResetColor(); // Always reset to prevent color bleeding
+                }
+                else
+                {
+                    Console.WriteLine(formattedMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                OnLoggingError?.Invoke(new Exception("Error writing to console", ex));
+            }
+        }
+
+        /// <summary>
+        /// Write log entry to file.
+        /// </summary>
+        /// <param name="entry">Log entry to write.</param>
+        private void WriteToFile(LogEntry entry)
+        {
+            try
+            {
+                string formattedMessage = FormatLogEntry(entry);
+
+                // Note: _IoLock is already held by caller
+                string filename = GetLogFilename();
+                EnsureDirectoryExists(filename);
+                File.AppendAllText(filename, formattedMessage + Environment.NewLine);
+            }
+            catch (Exception ex)
+            {
+                OnLoggingError?.Invoke(new Exception("Error writing to file", ex));
+            }
+        }
+
+        /// <summary>
+        /// Write log entry to file asynchronously.
+        /// </summary>
+        /// <param name="entry">Log entry to write.</param>
+        /// <param name="token">Cancellation token.</param>
+        private async Task WriteToFileAsync(LogEntry entry, CancellationToken token)
+        {
+            try
+            {
+                string formattedMessage = FormatLogEntry(entry) + Environment.NewLine;
+                string filename = GetLogFilename();
+                EnsureDirectoryExists(filename);
+
+#if NET6_0_OR_GREATER
+                // True async file I/O for modern .NET
+                await File.AppendAllTextAsync(filename, formattedMessage, token).ConfigureAwait(false);
+#else
+                // For older frameworks, use FileStream with async
+                using (FileStream fs = new FileStream(filename, FileMode.Append, FileAccess.Write, FileShare.Read, 4096, true))
+                using (StreamWriter writer = new StreamWriter(fs))
+                {
+                    await writer.WriteAsync(formattedMessage).ConfigureAwait(false);
+                }
+#endif
+            }
+            catch (Exception ex)
+            {
+                OnLoggingError?.Invoke(new Exception("Error writing to file async", ex));
+            }
+        }
+
+        /// <summary>
+        /// Send log entry to syslog server.
+        /// </summary>
+        /// <param name="server">Syslog server.</param>
+        /// <param name="entry">Log entry to send.</param>
+        private void SendToSyslog(SyslogServer server, LogEntry entry)
+        {
+            try
+            {
+                using (UdpClient client = CreateUdpClient(server.Hostname, server.Port))
+                {
+                    string syslogMessage = BuildSyslogMessage(entry);
+                    byte[] data = Encoding.UTF8.GetBytes(syslogMessage);
+                    client.Send(data, data.Length);
+                }
+            }
+            catch (Exception ex)
+            {
+                OnLoggingError?.Invoke(new Exception($"Error sending to syslog {server.IpPort}", ex));
+            }
+        }
+
+        /// <summary>
+        /// Send log entry to syslog server asynchronously.
+        /// </summary>
+        /// <param name="server">Syslog server.</param>
+        /// <param name="entry">Log entry to send.</param>
+        /// <param name="token">Cancellation token.</param>
+        private async Task SendToSyslogAsync(SyslogServer server, LogEntry entry, CancellationToken token)
+        {
+            try
+            {
+                using (UdpClient client = CreateUdpClient(server.Hostname, server.Port))
+                {
+                    string syslogMessage = BuildSyslogMessage(entry);
+                    byte[] data = Encoding.UTF8.GetBytes(syslogMessage);
+                    await client.SendAsync(data, data.Length).ConfigureAwait(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                OnLoggingError?.Invoke(new Exception($"Error sending to syslog async {server.IpPort}", ex));
+            }
+        }
+
+        /// <summary>
+        /// Create a UDP client for the specified hostname and port.
+        /// </summary>
+        /// <param name="hostname">Hostname of the syslog server.</param>
+        /// <param name="port">Port number of the syslog server.</param>
+        /// <returns>UDP client connected to the server.</returns>
+        private UdpClient CreateUdpClient(string hostname, int port)
+        {
+            try
+            {
+                return new UdpClient(hostname, port);
+            }
+            catch (Exception ex)
+            {
+                OnLoggingError?.Invoke(new Exception($"Failed to create UDP client for {hostname}:{port}", ex));
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Initialize the header format by pre-compiling static and dynamic parts.
+        /// </summary>
+        private void InitializeHeaderFormat()
+        {
+            string headerFormat = _Settings.HeaderFormat;
+            if (string.IsNullOrEmpty(headerFormat))
+            {
+                _StaticHeaderPart = string.Empty;
+                _DynamicVariables.Clear();
                 return;
             }
 
-            if (disposing)
+            _DynamicVariables.Clear();
+
+            // Define all possible dynamic variables
+            Dictionary<string, Func<LogEntry, string>> variableProviders = new Dictionary<string, Func<LogEntry, string>>
             {
-                _TokenSource.Cancel();
+                {"{ts}", entry => _Settings.UseUtcTime ? entry.Timestamp.ToString(_Settings.TimestampFormat) : entry.Timestamp.ToLocalTime().ToString(_Settings.TimestampFormat)},
+                {"{host}", _ => Environment.MachineName},
+                {"{thread}", entry => entry.ThreadId.ToString()},
+                {"{sev}", entry => entry.Severity.ToString()},
+                {"{level}", entry => ((int)entry.Severity).ToString()},
+                {"{pid}", _ => GetProcessId()},
+                {"{user}", _ => Environment.UserName ?? "unknown"},
+                {"{app}", _ => GetProcessName()},
+                {"{correlation}", entry => entry.CorrelationId ?? ""},
+                {"{source}", entry => entry.Source ?? ""}
+            };
+
+            // Find all dynamic variables in the header format
+            foreach (KeyValuePair<string, Func<LogEntry, string>> kvp in variableProviders)
+            {
+                if (headerFormat.Contains(kvp.Key))
+                {
+                    _DynamicVariables.Add(new HeaderVariable(kvp.Key, kvp.Value));
+                }
             }
 
-            _Disposed = true;
+            // Pre-compute static part (everything that doesn't contain variables)
+            _StaticHeaderPart = headerFormat;
+            foreach (HeaderVariable variable in _DynamicVariables)
+            {
+                _StaticHeaderPart = _StaticHeaderPart.Replace(variable.Token, "§" + variable.Token.Substring(1, variable.Token.Length - 2) + "§");
+            }
         }
 
-        private void SendConsole(Severity sev, string msg)
+        /// <summary>
+        /// Get process ID safely.
+        /// </summary>
+        /// <returns>Process ID or "unknown" if unavailable.</returns>
+        private static string GetProcessId()
         {
-            if (String.IsNullOrEmpty(msg)) return;
-            if (!_Settings.EnableConsole) return;
-            if (_Settings.EnableColors)
+            try
             {
-                ConsoleColor prevForeground = Console.ForegroundColor;
-                ConsoleColor prevBackground = Console.BackgroundColor;
+                return Process.GetCurrentProcess().Id.ToString();
+            }
+            catch
+            {
+                return "unknown";
+            }
+        }
 
-                if (_Settings.Colors != null)
+        /// <summary>
+        /// Get process name safely.
+        /// </summary>
+        /// <returns>Process name or "unknown" if unavailable.</returns>
+        private static string GetProcessName()
+        {
+            try
+            {
+                return Process.GetCurrentProcess().ProcessName;
+            }
+            catch
+            {
+                return "unknown";
+            }
+        }
+
+        /// <summary>
+        /// Format a log entry according to the configured header format.
+        /// </summary>
+        /// <param name="entry">Log entry to format.</param>
+        /// <returns>Formatted log message.</returns>
+        private string FormatLogEntry(LogEntry entry)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            // Start with static header part and apply dynamic variables
+            string header = _StaticHeaderPart;
+            foreach (HeaderVariable variable in _DynamicVariables)
+            {
+                string placeholder = "§" + variable.Token.Substring(1, variable.Token.Length - 2) + "§";
+                string value = variable.ValueProvider(entry);
+                header = header.Replace(placeholder, value);
+            }
+
+            sb.Append(header);
+
+            // Add structured data if present
+            if (entry.Properties.Count > 0)
+            {
+                sb.Append(" [");
+                bool first = true;
+                foreach (KeyValuePair<string, object?> prop in entry.Properties)
                 {
-                    switch (sev)
-                    {
-                        case Severity.Debug:
-                            Console.ForegroundColor = _Settings.Colors.Debug.Foreground;
-                            Console.BackgroundColor = _Settings.Colors.Debug.Background;
-                            break;
-                        case Severity.Info:
-                            Console.ForegroundColor = _Settings.Colors.Info.Foreground;
-                            Console.BackgroundColor = _Settings.Colors.Info.Background;
-                            break;
-                        case Severity.Warn:
-                            Console.ForegroundColor = _Settings.Colors.Warn.Foreground;
-                            Console.BackgroundColor = _Settings.Colors.Warn.Background;
-                            break;
-                        case Severity.Error:
-                            Console.ForegroundColor = _Settings.Colors.Error.Foreground;
-                            Console.BackgroundColor = _Settings.Colors.Error.Background;
-                            break;
-                        case Severity.Alert:
-                            Console.ForegroundColor = _Settings.Colors.Alert.Foreground;
-                            Console.BackgroundColor = _Settings.Colors.Alert.Background;
-                            break;
-                        case Severity.Critical:
-                            Console.ForegroundColor = _Settings.Colors.Critical.Foreground;
-                            Console.BackgroundColor = _Settings.Colors.Critical.Background;
-                            break;
-                        case Severity.Emergency:
-                            Console.ForegroundColor = _Settings.Colors.Emergency.Foreground;
-                            Console.BackgroundColor = _Settings.Colors.Emergency.Background;
-                            break;
-                    }
+                    if (!first) sb.Append(" ");
+                    sb.Append($"{prop.Key}={prop.Value}");
+                    first = false;
+                }
+                sb.Append("]");
+            }
+
+            // Add the main message
+            sb.Append(" ");
+            sb.Append(entry.Message);
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Build RFC3164 syslog message format.
+        /// </summary>
+        /// <param name="entry">Log entry to format.</param>
+        /// <returns>Syslog formatted message.</returns>
+        private string BuildSyslogMessage(LogEntry entry)
+        {
+            // Priority calculation: facility * 8 + severity
+            int facility = 16; // Local use 0
+            int priority = facility * 8 + (int)entry.Severity;
+
+            string timestamp = entry.Timestamp.ToString("MMM dd HH:mm:ss");
+            string hostname = _Hostname;
+            string message = FormatLogEntry(entry);
+
+            return $"<{priority}>{timestamp} {hostname} {message}";
+        }
+
+        /// <summary>
+        /// Get console colors (foreground and background) for severity level.
+        /// </summary>
+        /// <param name="severity">Severity level.</param>
+        /// <returns>Color scheme for the severity level.</returns>
+        private ColorScheme GetConsoleColors(Severity severity)
+        {
+            return severity switch
+            {
+                Severity.Debug => _Settings.Colors.Debug,
+                Severity.Info => _Settings.Colors.Info,
+                Severity.Warn => _Settings.Colors.Warn,
+                Severity.Error => _Settings.Colors.Error,
+                Severity.Alert => _Settings.Colors.Alert,
+                Severity.Critical => _Settings.Colors.Critical,
+                Severity.Emergency => _Settings.Colors.Emergency,
+                _ => new ColorScheme(ConsoleColor.White, ConsoleColor.Black)
+            };
+        }
+
+        /// <summary>
+        /// Get the log filename based on the file logging mode.
+        /// </summary>
+        /// <returns>Log filename.</returns>
+        private string GetLogFilename()
+        {
+            if (_Settings.FileLogging == FileLoggingMode.FileWithDate)
+            {
+                string directory = Path.GetDirectoryName(_Settings.LogFilename) ?? "";
+                string filenameWithoutExtension = Path.GetFileNameWithoutExtension(_Settings.LogFilename);
+                string extension = Path.GetExtension(_Settings.LogFilename);
+                string dateString = DateTime.Now.ToString("yyyyMMdd");
+
+                return Path.Combine(directory, $"{filenameWithoutExtension}_{dateString}{extension}");
+            }
+
+            return _Settings.LogFilename;
+        }
+
+        /// <summary>
+        /// Ensure the directory for the log file exists.
+        /// </summary>
+        /// <param name="filename">Log filename.</param>
+        private void EnsureDirectoryExists(string filename)
+        {
+            string? directory = Path.GetDirectoryName(filename);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+        }
+
+        /// <summary>
+        /// Throw ObjectDisposedException if the object is disposed.
+        /// </summary>
+        private void ThrowIfDisposed()
+        {
+            if (_Disposed)
+                throw new ObjectDisposedException(nameof(LoggingModule));
+        }
+
+        /// <summary>
+        /// Dispose of resources.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        private void Dispose(bool disposing)
+        {
+            if (!_Disposed)
+            {
+                if (disposing)
+                {
+                    // No resources to dispose in simplified implementation
                 }
 
-                Console.WriteLine(msg);
-                Console.ForegroundColor = prevForeground;
-                Console.BackgroundColor = prevBackground;
-            }
-            else
-            {
-                Console.WriteLine(msg);
+                _Disposed = true;
             }
         }
 
-        private void SendFile(Severity sev, string msg)
+        /// <summary>
+        /// Async disposal core implementation.
+        /// </summary>
+        private async ValueTask DisposeAsyncCore()
         {
-            if (String.IsNullOrEmpty(msg)) return;
-            if (String.IsNullOrEmpty(_Settings.LogFilename)) return;
-
-            switch (_Settings.FileLogging)
-            {
-                case FileLoggingMode.Disabled:
-                    return;
-
-                case FileLoggingMode.SingleLogFile:
-                    lock (_FileLock)
-                    {
-                        File.AppendAllText(_Settings.LogFilename, msg + Environment.NewLine);
-                    }
-                    return;
-
-                case FileLoggingMode.FileWithDate:
-                    string filename = _Settings.LogFilename + "." + DateTime.Now.ToString("yyyyMMdd");
-                    lock (_FileLock)
-                    {
-                        File.AppendAllText(filename, msg + Environment.NewLine);
-                    }
-                    return;
-            }
-        }
-
-        private void SendServers(string msg)
-        {
-            if (String.IsNullOrEmpty(msg)) return;
-            byte[] data = Encoding.UTF8.GetBytes(msg);
-
-            foreach (SyslogServer server in _Servers)
-            {
-                lock (server.SendLock)
-                {
-                    try
-                    {
-                        server.Udp.Send(data, data.Length);
-                    }
-                    catch (Exception)
-                    {
-
-                    }
-                }
-            } 
+            // No resources to dispose in simplified implementation
+            await Task.CompletedTask;
         }
 
         #endregion
+#pragma warning restore CS8632
     }
 }
