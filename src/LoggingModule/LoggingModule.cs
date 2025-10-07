@@ -19,6 +19,7 @@ namespace SyslogLogging
     public class LoggingModule : IDisposable, IAsyncDisposable
     {
 #pragma warning disable CS8632
+
         #region Public-Members
 
         /// <summary>
@@ -426,7 +427,6 @@ namespace SyslogLogging
         /// </summary>
         public async ValueTask DisposeAsync()
         {
-            await DisposeAsyncCore().ConfigureAwait(false);
             Dispose(false);
             GC.SuppressFinalize(this);
         }
@@ -443,7 +443,6 @@ namespace SyslogLogging
         {
             try
             {
-                // Handle message splitting if necessary
                 IEnumerable<string> messageParts = SplitMessage(entry.Message, _Settings.MaxMessageLength);
                 int sequenceNumber = 1;
                 bool isMultiPart = messageParts.Count() > 1;
@@ -454,19 +453,14 @@ namespace SyslogLogging
 
                     lock (_IoLock)
                     {
-                        // Send to console
-                        if (_Settings.EnableConsole)
-                        {
-                            WriteToConsole(splitEntry);
-                        }
+                        if (_Settings.EnableConsole) WriteToConsole(splitEntry);
 
-                        // Send to file
-                        if (_Settings.FileLogging != FileLoggingMode.Disabled && !string.IsNullOrEmpty(_Settings.LogFilename))
+                        if (_Settings.FileLogging != FileLoggingMode.Disabled 
+                            && !string.IsNullOrEmpty(_Settings.LogFilename))
                         {
                             WriteToFile(splitEntry);
                         }
 
-                        // Send to syslog servers
                         foreach (SyslogServer server in _Servers)
                         {
                             SendToSyslog(server, splitEntry);
@@ -491,7 +485,6 @@ namespace SyslogLogging
         {
             try
             {
-                // Handle message splitting if necessary
                 IEnumerable<string> messageParts = SplitMessage(entry.Message, _Settings.MaxMessageLength);
                 int sequenceNumber = 1;
                 bool isMultiPart = messageParts.Count() > 1;
@@ -500,7 +493,6 @@ namespace SyslogLogging
                 {
                     LogEntry splitEntry = CreateSplitEntry(entry, messagePart, sequenceNumber, isMultiPart);
 
-                    // Console writing is synchronous (always fast)
                     if (_Settings.EnableConsole)
                     {
                         lock (_IoLock)
@@ -509,13 +501,11 @@ namespace SyslogLogging
                         }
                     }
 
-                    // File writing is truly async
                     if (_Settings.FileLogging != FileLoggingMode.Disabled && !string.IsNullOrEmpty(_Settings.LogFilename))
                     {
                         await WriteToFileAsync(splitEntry, token).ConfigureAwait(false);
                     }
 
-                    // Syslog sending is truly async
                     List<SyslogServer> servers;
                     lock (_IoLock)
                     {
@@ -564,7 +554,11 @@ namespace SyslogLogging
         /// <param name="sequenceNumber">Sequence number for split messages.</param>
         /// <param name="isMultiPart">Whether this is part of a multi-part message.</param>
         /// <returns>Split log entry.</returns>
-        private static LogEntry CreateSplitEntry(LogEntry originalEntry, string messagePart, int sequenceNumber, bool isMultiPart)
+        private static LogEntry CreateSplitEntry(
+            LogEntry originalEntry, 
+            string messagePart, 
+            int sequenceNumber, 
+            bool isMultiPart)
         {
             LogEntry splitEntry = new LogEntry(originalEntry.Severity, messagePart)
             {
@@ -584,8 +578,8 @@ namespace SyslogLogging
             // Add sequence information for split messages
             if (isMultiPart)
             {
-                splitEntry.WithProperty("MessageSequence", sequenceNumber);
-                splitEntry.WithProperty("IsSplitMessage", true);
+                splitEntry.WithProperty("Sequence", sequenceNumber);
+                splitEntry.WithProperty("IsSplit", true);
             }
 
             return splitEntry;
@@ -907,10 +901,8 @@ namespace SyslogLogging
                 string filenameWithoutExtension = Path.GetFileNameWithoutExtension(_Settings.LogFilename);
                 string extension = Path.GetExtension(_Settings.LogFilename);
                 string dateString = DateTime.Now.ToString("yyyyMMdd");
-
-                return Path.Combine(directory, $"{filenameWithoutExtension}_{dateString}{extension}");
+                return Path.Combine(directory, $"{filenameWithoutExtension}{extension}.{dateString}");
             }
-
             return _Settings.LogFilename;
         }
 
@@ -953,16 +945,8 @@ namespace SyslogLogging
             }
         }
 
-        /// <summary>
-        /// Async disposal core implementation.
-        /// </summary>
-        private async ValueTask DisposeAsyncCore()
-        {
-            // No resources to dispose in simplified implementation
-            await Task.CompletedTask;
-        }
-
         #endregion
+
 #pragma warning restore CS8632
     }
 }

@@ -560,11 +560,6 @@
             </summary>
             <param name="disposing">True if disposing managed resources.</param>
         </member>
-        <member name="M:SyslogLogging.LoggingModule.DisposeAsyncCore">
-            <summary>
-            Async disposal core implementation.
-            </summary>
-        </member>
         <member name="T:SyslogLogging.LoggingSettings">
             <summary>
             Simplified logging settings for direct processing mode.

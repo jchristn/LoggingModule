@@ -10,6 +10,7 @@ namespace SyslogLogging
     public class LogEntry
     {
 #pragma warning disable CS8632
+
         /// <summary>
         /// The severity level of the log entry.
         /// </summary>
@@ -171,6 +172,7 @@ namespace SyslogLogging
 
             return JsonSerializer.Serialize(serializable, new JsonSerializerOptions { WriteIndented = false });
         }
+
 #pragma warning restore CS8632
     }
 }
