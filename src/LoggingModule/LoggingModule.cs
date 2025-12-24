@@ -18,8 +18,6 @@ namespace SyslogLogging
     /// </summary>
     public class LoggingModule : IDisposable, IAsyncDisposable
     {
-#pragma warning disable CS8632
-
         #region Public-Members
 
         /// <summary>
@@ -946,7 +944,5 @@ namespace SyslogLogging
         }
 
         #endregion
-
-#pragma warning restore CS8632
     }
 }

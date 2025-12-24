@@ -10,8 +10,6 @@
     /// </summary>
     public class LoggingSettings
     {
-#pragma warning disable CS8600
-#pragma warning disable CS8625
         /// <summary>
         /// Header format template. Supports the following placeholders:
         /// {ts}: Timestamp (formatted per TimestampFormat setting)
@@ -196,7 +194,5 @@
                 return false;
             }
         }
-#pragma warning restore CS8625
-#pragma warning restore CS8600
     }
 }

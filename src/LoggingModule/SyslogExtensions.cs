@@ -10,7 +10,6 @@ namespace SyslogLogging
     /// </summary>
     public static class SyslogExtensions
     {
-#pragma warning disable CS8632
         /// <summary>
         /// Add syslog logging to the logging builder.
         /// </summary>
@@ -117,6 +116,5 @@ namespace SyslogLogging
 
             return new StructuredLogBuilder(logger, severity, message);
         }
-#pragma warning restore CS8632
     }
 }
