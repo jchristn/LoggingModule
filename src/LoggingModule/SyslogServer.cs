@@ -61,7 +61,7 @@
         }
 
         internal readonly object SendLock = new object();
-        internal UdpClient? Udp = null;
+        internal UdpClient Udp = null;
         private string _Hostname = "127.0.0.1";
         private int _Port = 514;
         private bool _Disposed = false;

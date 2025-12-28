@@ -28,22 +28,22 @@ namespace SyslogLogging
         /// <summary>
         /// Additional structured properties for the log entry.
         /// </summary>
-        public Dictionary<string, object?> Properties { get; set; } = new Dictionary<string, object?>();
+        public Dictionary<string, object> Properties { get; set; } = new Dictionary<string, object>();
 
         /// <summary>
         /// Exception associated with this log entry, if any.
         /// </summary>
-        public Exception? Exception { get; set; }
+        public Exception Exception { get; set; }
 
         /// <summary>
         /// Correlation ID for tracking related log entries.
         /// </summary>
-        public string? CorrelationId { get; set; }
+        public string CorrelationId { get; set; }
 
         /// <summary>
         /// Source context (typically class name or module).
         /// </summary>
-        public string? Source { get; set; }
+        public string Source { get; set; }
 
         /// <summary>
         /// Thread ID where the log entry was created.
@@ -74,7 +74,7 @@ namespace SyslogLogging
         /// <param name="severity">Log severity level.</param>
         /// <param name="message">Log message.</param>
         /// <param name="exception">Associated exception.</param>
-        public LogEntry(Severity severity, string message, Exception? exception)
+        public LogEntry(Severity severity, string message, Exception exception)
         {
             Severity = severity;
             Message = message ?? string.Empty;
@@ -88,7 +88,7 @@ namespace SyslogLogging
         /// <param name="value">Property value.</param>
         /// <returns>This log entry for method chaining.</returns>
         /// <exception cref="ArgumentException">Thrown when key is null or empty.</exception>
-        public LogEntry WithProperty(string key, object? value)
+        public LogEntry WithProperty(string key, object value)
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentException("Property key cannot be null or empty.", nameof(key));
 
@@ -102,11 +102,11 @@ namespace SyslogLogging
         /// <param name="properties">Dictionary of properties to add.</param>
         /// <returns>This log entry for method chaining.</returns>
         /// <exception cref="ArgumentNullException">Thrown when properties is null.</exception>
-        public LogEntry WithProperties(Dictionary<string, object?> properties)
+        public LogEntry WithProperties(Dictionary<string, object> properties)
         {
             if (properties == null) throw new ArgumentNullException(nameof(properties));
 
-            foreach (KeyValuePair<string, object?> kvp in properties)
+            foreach (KeyValuePair<string, object> kvp in properties)
             {
                 Properties[kvp.Key] = kvp.Value;
             }
@@ -118,7 +118,7 @@ namespace SyslogLogging
         /// </summary>
         /// <param name="correlationId">Correlation ID.</param>
         /// <returns>This log entry for method chaining.</returns>
-        public LogEntry WithCorrelationId(string? correlationId)
+        public LogEntry WithCorrelationId(string correlationId)
         {
             CorrelationId = correlationId;
             return this;
@@ -129,7 +129,7 @@ namespace SyslogLogging
         /// </summary>
         /// <param name="source">Source context.</param>
         /// <returns>This log entry for method chaining.</returns>
-        public LogEntry WithSource(string? source)
+        public LogEntry WithSource(string source)
         {
             Source = source;
             return this;
@@ -141,7 +141,7 @@ namespace SyslogLogging
         /// <returns>JSON representation of the log entry.</returns>
         public string ToJson()
         {
-            Dictionary<string, object?> serializable = new Dictionary<string, object?>
+            Dictionary<string, object> serializable = new Dictionary<string, object>
             {
                 ["timestamp"] = Timestamp.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
                 ["severity"] = Severity.ToString(),
@@ -157,7 +157,7 @@ namespace SyslogLogging
 
             if (Exception != null)
             {
-                serializable["exception"] = new Dictionary<string, object?>
+                serializable["exception"] = new Dictionary<string, object>
                 {
                     ["type"] = Exception.GetType().FullName,
                     ["message"] = Exception.Message,

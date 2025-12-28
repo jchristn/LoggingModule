@@ -23,7 +23,7 @@ namespace SyslogLogging
         /// <summary>
         /// Event fired when a logging error occurs. Provides visibility into logging failures.
         /// </summary>
-        public event Action<Exception>? OnLoggingError;
+        public event Action<Exception> OnLoggingError;
 
         /// <summary>
         /// Logging settings.
@@ -81,8 +81,8 @@ namespace SyslogLogging
         private readonly object _IoLock = new object(); // Single lock for all I/O operations
 
         // Log file cleanup members
-        private Timer? _RetentionTimer;
-        private CancellationTokenSource? _RetentionCts;
+        private Timer _RetentionTimer;
+        private CancellationTokenSource _RetentionCts;
         private readonly object _RetentionLock = new object();
         private bool _RetentionStarted = false;
 
@@ -373,7 +373,7 @@ namespace SyslogLogging
         /// <param name="exception">Exception to log.</param>
         /// <param name="module">Module name.</param>
         /// <param name="method">Method name.</param>
-        public void Exception(Exception exception, string? module = null, string? method = null)
+        public void Exception(Exception exception, string module = null, string method = null)
         {
             if (exception == null) throw new ArgumentNullException(nameof(exception));
 
@@ -391,7 +391,7 @@ namespace SyslogLogging
         /// <param name="module">Module name.</param>
         /// <param name="method">Method name.</param>
         /// <param name="token">Cancellation token.</param>
-        public async Task ExceptionAsync(Exception exception, string? module = null, string? method = null, CancellationToken token = default)
+        public async Task ExceptionAsync(Exception exception, string module = null, string method = null, CancellationToken token = default)
         {
             if (exception == null) throw new ArgumentNullException(nameof(exception));
 
@@ -580,7 +580,7 @@ namespace SyslogLogging
             };
 
             // Copy properties
-            foreach (KeyValuePair<string, object?> prop in originalEntry.Properties)
+            foreach (KeyValuePair<string, object> prop in originalEntry.Properties)
             {
                 splitEntry.Properties[prop.Key] = prop.Value;
             }
@@ -845,7 +845,7 @@ namespace SyslogLogging
             {
                 sb.Append(" [");
                 bool first = true;
-                foreach (KeyValuePair<string, object?> prop in entry.Properties)
+                foreach (KeyValuePair<string, object> prop in entry.Properties)
                 {
                     if (!first) sb.Append(" ");
                     sb.Append($"{prop.Key}={prop.Value}");
@@ -922,7 +922,7 @@ namespace SyslogLogging
         /// <param name="filename">Log filename.</param>
         private void EnsureDirectoryExists(string filename)
         {
-            string? directory = Path.GetDirectoryName(filename);
+            string directory = Path.GetDirectoryName(filename);
             if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
@@ -980,7 +980,7 @@ namespace SyslogLogging
         /// Timer callback for log retention cleanup.
         /// </summary>
         /// <param name="state">Timer state (unused).</param>
-        private void RetentionTimerCallback(object? state)
+        private void RetentionTimerCallback(object state)
         {
             if (_Disposed) return;
             if (_RetentionCts?.IsCancellationRequested == true) return;

@@ -17,7 +17,7 @@ namespace SyslogLogging
         /// <param name="configure">Configuration action for the logging module.</param>
         /// <returns>The logging builder for method chaining.</returns>
         /// <exception cref="ArgumentNullException">Thrown when builder is null.</exception>
-        public static ILoggingBuilder AddSyslog(this ILoggingBuilder builder, Action<LoggingModule>? configure = null)
+        public static ILoggingBuilder AddSyslog(this ILoggingBuilder builder, Action<LoggingModule> configure = null)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
@@ -39,7 +39,7 @@ namespace SyslogLogging
         /// <param name="configure">Configuration action for the logging module.</param>
         /// <returns>The logging builder for method chaining.</returns>
         /// <exception cref="ArgumentNullException">Thrown when builder or servers is null.</exception>
-        public static ILoggingBuilder AddSyslog(this ILoggingBuilder builder, List<SyslogServer> servers, bool enableConsole = true, Action<LoggingModule>? configure = null)
+        public static ILoggingBuilder AddSyslog(this ILoggingBuilder builder, List<SyslogServer> servers, bool enableConsole = true, Action<LoggingModule> configure = null)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (servers == null) throw new ArgumentNullException(nameof(servers));
@@ -64,7 +64,7 @@ namespace SyslogLogging
         /// <returns>The logging builder for method chaining.</returns>
         /// <exception cref="ArgumentNullException">Thrown when builder or hostname is null.</exception>
         /// <exception cref="ArgumentException">Thrown when port is invalid.</exception>
-        public static ILoggingBuilder AddSyslog(this ILoggingBuilder builder, string hostname, int port, bool enableConsole = true, Action<LoggingModule>? configure = null)
+        public static ILoggingBuilder AddSyslog(this ILoggingBuilder builder, string hostname, int port, bool enableConsole = true, Action<LoggingModule> configure = null)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (string.IsNullOrEmpty(hostname)) throw new ArgumentNullException(nameof(hostname));
@@ -89,7 +89,7 @@ namespace SyslogLogging
         /// <param name="configure">Configuration action for the logging module.</param>
         /// <returns>The logging builder for method chaining.</returns>
         /// <exception cref="ArgumentNullException">Thrown when builder is null.</exception>
-        public static ILoggingBuilder AddFileLogging(this ILoggingBuilder builder, string filename, FileLoggingMode fileLoggingMode = FileLoggingMode.SingleLogFile, bool enableConsole = true, Action<LoggingModule>? configure = null)
+        public static ILoggingBuilder AddFileLogging(this ILoggingBuilder builder, string filename, FileLoggingMode fileLoggingMode = FileLoggingMode.SingleLogFile, bool enableConsole = true, Action<LoggingModule> configure = null)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 

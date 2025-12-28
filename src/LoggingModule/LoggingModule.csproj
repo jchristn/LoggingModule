@@ -1,118 +1,70 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net462;net48;net8.0;net10.0</TargetFrameworks>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.13</Version>
-    <Authors>Joel Christner</Authors>
-    <PackageId>SyslogLogging</PackageId>
-    <Product>SyslogLogging</Product>
-    <Description>The easiest logging library to use to send log messages to syslog, the console, or the file system.  It's.  REALLY.  Easy.</Description>
-    <Copyright>(c)2025 Joel Christner</Copyright>
-    <PackageTags>syslog logging console log logger udp event structured async</PackageTags>
-    <PackageProjectUrl>https://github.com/jchristn/LoggingModule</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
-    <RepositoryType>Github</RepositoryType>
-    <PackageLicenseUrl></PackageLicenseUrl>
-    <PackageReleaseNotes>Added async support, structured logging, background queuing, and Microsoft.Extensions.Logging integration</PackageReleaseNotes>
-    <PackageIconUrl></PackageIconUrl>
-    <RootNamespace>SyslogLogging</RootNamespace>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageIcon>logo.png</PackageIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <DocumentationFile>LoggingModule.xml</DocumentationFile>
-    <ApplicationIcon>logo.ico</ApplicationIcon>
-    <Title>SyslogLogging</Title>
-    <IncludeSymbols>True</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net462;net48;net8.0;net10.0</TargetFrameworks>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Version>2.0.13</Version>
+		<Authors>Joel Christner</Authors>
+		<PackageId>SyslogLogging</PackageId>
+		<Product>SyslogLogging</Product>
+		<Description>The easiest logging library to use to send log messages to syslog, the console, or the file system.  It's.  REALLY.  Easy.</Description>
+		<Copyright>(c)2025 Joel Christner</Copyright>
+		<PackageTags>syslog logging console log logger udp event structured async</PackageTags>
+		<PackageProjectUrl>https://github.com/jchristn/LoggingModule</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
+		<RepositoryType>Github</RepositoryType>
+		<PackageLicenseUrl></PackageLicenseUrl>
+		<PackageReleaseNotes>Added async support, structured logging, background queuing, and Microsoft.Extensions.Logging integration</PackageReleaseNotes>
+		<PackageIconUrl></PackageIconUrl>
+		<RootNamespace>SyslogLogging</RootNamespace>
+		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+		<PackageIcon>logo.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<DocumentationFile>LoggingModule.xml</DocumentationFile>
+		<ApplicationIcon>logo.ico</ApplicationIcon>
+		<Title>SyslogLogging</Title>
+		<IncludeSymbols>True</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0' OR '$(TargetFramework)' == 'net8.0'">
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<NoWarn>1701;1702;CS8600;CS8601;CS8618;CS8625;CS8632</NoWarn>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <NoWarn>1701;1702;CS8600;CS8625;CS8632</NoWarn>
-  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+		<PackageReference Include="System.Text.Json" Version="8.0.5" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
-    <NoWarn>1701;1702;CS8600;CS8625;CS8632</NoWarn>
-  </PropertyGroup>
+	<ItemGroup>
+		<Content Include="logo.ico" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net462|AnyCPU'">
-    <NoWarn>1701;1702;CS8600;CS8625;CS8632</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net48|AnyCPU'">
-    <NoWarn>1701;1702;CS8600;CS8625;CS8632</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
-    <NoWarn>1701;1702;CS8600;CS8625;CS8632</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
-    <NoWarn>1701;1702;CS8600;CS8625;CS8632</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <NoWarn>1701;1702;CS8600;CS8625;CS8632</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.1|AnyCPU'">
-    <NoWarn>1701;1702;CS8600;CS8625;CS8632</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net462|AnyCPU'">
-    <NoWarn>1701;1702;CS8600;CS8625;CS8632</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net48|AnyCPU'">
-    <NoWarn>1701;1702;CS8600;CS8625;CS8632</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
-    <NoWarn>1701;1702;CS8600;CS8625;CS8632</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0|AnyCPU'">
-    <NoWarn>1701;1702;CS8600;CS8625;CS8632</NoWarn>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="logo.ico" />
-  </ItemGroup>
- 
-  <ItemGroup>
-    <None Include="..\..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="assets\logo.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="LICENSE.md">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="assets\logo.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="assets\logo.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="LoggingModule.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="assets\logo.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="assets\logo.ico">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="assets\logo.png">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Include="LoggingModule.xml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 </Project>
