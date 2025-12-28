@@ -144,6 +144,25 @@
         }
 
         /// <summary>
+        /// Number of days to retain log files when using FileWithDate mode.
+        /// Default: 0 (logs persist indefinitely).
+        /// Only applicable when LogFilename is set AND FileLogging is FileWithDate.
+        /// Files older than the specified number of days will be automatically deleted.
+        /// Minimum value: 0 (disabled). Negative values are treated as 0.
+        /// </summary>
+        public int LogRetentionDays
+        {
+            get
+            {
+                return _LogRetentionDays;
+            }
+            set
+            {
+                _LogRetentionDays = value < 0 ? 0 : value;
+            }
+        }
+
+        /// <summary>
         /// The severity level to use when logging exceptions through the .Exception() method.
         /// </summary>
         public Severity ExceptionSeverity { get; set; } = Severity.Alert;
@@ -172,6 +191,7 @@
         private int _MaxMessageLength = 1024;
         private ColorSchema _Colors = new ColorSchema();
         private string _LogFilename = null;
+        private int _LogRetentionDays = 0;
 
         /// <summary>
         /// Instantiate the object.

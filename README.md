@@ -154,6 +154,25 @@ LoggingModule log = new LoggingModule("./logs/app.log", FileLoggingMode.SingleLo
 await log.InfoAsync("File-only message");
 ```
 
+### Log Retention (Automatic Cleanup)
+```csharp
+// Automatically delete log files older than 30 days
+LoggingModule log = new LoggingModule("./logs/app.log", FileLoggingMode.FileWithDate, true);
+LoggingSettings settings = log.Settings;
+settings.LogRetentionDays = 30;  // Keep 30 days of logs (0 = disabled, default)
+log.Settings = settings;         // Re-assign to start cleanup timer
+
+// Or configure settings first
+LoggingSettings settings = new LoggingSettings();
+settings.LogFilename = "./logs/app.log";
+settings.FileLogging = FileLoggingMode.FileWithDate;
+settings.LogRetentionDays = 7;   // Keep 7 days of logs
+LoggingModule log = new LoggingModule();
+log.Settings = settings;
+```
+
+**Note:** Log retention only applies when using `FileLoggingMode.FileWithDate`. The cleanup timer runs every 60 seconds and removes files matching the pattern `filename.ext.yyyyMMdd` that are older than the specified retention period.
+
 ## 🎨 Console Colors & Formatting
 
 ### Enable Colors

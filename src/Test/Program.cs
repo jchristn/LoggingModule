@@ -140,6 +140,7 @@ namespace Test
             await TestFluentLogging();
             await TestExceptionLogging();
             await TestSettings();
+            await TestLogRetention();
             await TestColorSettings();
             await TestHighThroughputProcessing();
             await TestThreadSafety();
@@ -850,6 +851,121 @@ namespace Test
             });
 
             await _Log.DisposeAsync();
+        }
+
+        static async Task TestLogRetention()
+        {
+            WriteTestHeader("Log Retention Tests");
+
+            // Test 1: LogRetentionDays default value
+            await RunTest("LogRetentionDays default is 0", async () =>
+            {
+                LoggingSettings settings = new LoggingSettings();
+                return settings.LogRetentionDays == 0;
+            });
+
+            // Test 2: LogRetentionDays accepts positive values
+            await RunTest("LogRetentionDays accepts positive values", async () =>
+            {
+                LoggingSettings settings = new LoggingSettings();
+                settings.LogRetentionDays = 30;
+                return settings.LogRetentionDays == 30;
+            });
+
+            // Test 3: LogRetentionDays treats negative values as 0
+            await RunTest("LogRetentionDays treats negative as 0", async () =>
+            {
+                LoggingSettings settings = new LoggingSettings();
+                settings.LogRetentionDays = -5;
+                return settings.LogRetentionDays == 0;
+            });
+
+            // Test 4: Log retention cleanup removes old files
+            await RunTest("Log retention cleanup removes old files", async () =>
+            {
+                string testDir = "logs/retention_test";
+                if (Directory.Exists(testDir))
+                    Directory.Delete(testDir, true);
+                Directory.CreateDirectory(testDir);
+
+                string baseFile = Path.Combine(testDir, "test.log");
+
+                // Create some fake dated log files
+                string oldFile = baseFile + ".20200101";  // Very old (5 years ago)
+                string recentFile = baseFile + "." + DateTime.Now.ToString("yyyyMMdd");
+
+                File.WriteAllText(oldFile, "old log content");
+                File.WriteAllText(recentFile, "recent log content");
+
+                // Verify both files exist
+                if (!File.Exists(oldFile) || !File.Exists(recentFile))
+                {
+                    Console.WriteLine("    Failed to create test files");
+                    return false;
+                }
+
+                Console.WriteLine($"    Created old file: {oldFile}");
+                Console.WriteLine($"    Created recent file: {recentFile}");
+
+                // Create logger with retention enabled
+                // Note: Must set LogRetentionDays before assigning Settings to trigger timer start
+                LoggingModule logger = new LoggingModule(baseFile, FileLoggingMode.FileWithDate, false);
+                LoggingSettings settings = logger.Settings;
+                settings.LogRetentionDays = 7;
+                logger.Settings = settings; // Re-assign to trigger cleanup timer start
+
+                // Wait for cleanup timer to run (initial delay is 5 seconds)
+                Console.WriteLine("    Waiting for cleanup timer to run (6 seconds)...");
+                await Task.Delay(6500);
+
+                bool oldFileDeleted = !File.Exists(oldFile);
+                bool recentFileExists = File.Exists(recentFile);
+
+                Console.WriteLine($"    Old file deleted: {oldFileDeleted}");
+                Console.WriteLine($"    Recent file exists: {recentFileExists}");
+
+                await logger.DisposeAsync();
+
+                // Cleanup test directory
+                if (Directory.Exists(testDir))
+                    Directory.Delete(testDir, true);
+
+                return oldFileDeleted && recentFileExists;
+            });
+
+            // Test 5: Retention cleanup doesn't start when LogRetentionDays is 0
+            await RunTest("Retention cleanup doesn't start when disabled", async () =>
+            {
+                string testDir = "logs/retention_disabled_test";
+                if (Directory.Exists(testDir))
+                    Directory.Delete(testDir, true);
+                Directory.CreateDirectory(testDir);
+
+                string baseFile = Path.Combine(testDir, "test.log");
+                string oldFile = baseFile + ".20200101";
+
+                File.WriteAllText(oldFile, "old log content");
+
+                // Create logger with retention DISABLED (default 0)
+                LoggingModule logger = new LoggingModule(baseFile, FileLoggingMode.FileWithDate, false);
+                // LogRetentionDays stays at default 0
+
+                // Wait a bit to see if timer runs
+                await Task.Delay(6500);
+
+                // Old file should still exist since retention is disabled
+                bool oldFileExists = File.Exists(oldFile);
+
+                Console.WriteLine($"    Old file still exists (expected): {oldFileExists}");
+
+                await logger.DisposeAsync();
+
+                // Cleanup test directory
+                if (Directory.Exists(testDir))
+                    Directory.Delete(testDir, true);
+
+                return oldFileExists;
+            });
         }
 
         static async Task TestColorSettings()

@@ -38,6 +38,8 @@ namespace SyslogLogging
             {
                 _Settings = value ?? new LoggingSettings();
                 InitializeHeaderFormat(); // Re-initialize when settings change
+                StopLogfileCleanup();
+                StartLogfileCleanup();
             }
         }
 
@@ -78,6 +80,12 @@ namespace SyslogLogging
         private List<SyslogServer> _Servers = new List<SyslogServer>();
         private readonly object _IoLock = new object(); // Single lock for all I/O operations
 
+        // Log file cleanup members
+        private Timer? _RetentionTimer;
+        private CancellationTokenSource? _RetentionCts;
+        private readonly object _RetentionLock = new object();
+        private bool _RetentionStarted = false;
+
         private string _Hostname = Dns.GetHostName();
 
         // Pre-compiled header format for optimization
@@ -110,6 +118,7 @@ namespace SyslogLogging
         {
             _Servers = new List<SyslogServer> { new SyslogServer("127.0.0.1", 514) };
             InitializeHeaderFormat();
+            StartLogfileCleanup();
         }
 
         /// <summary>
@@ -126,6 +135,7 @@ namespace SyslogLogging
             _Servers = new List<SyslogServer> { new SyslogServer(hostname, port) };
             _Settings.EnableConsole = enableConsole;
             InitializeHeaderFormat();
+            StartLogfileCleanup();
         }
 
         /// <summary>
@@ -141,6 +151,7 @@ namespace SyslogLogging
             _Servers = new List<SyslogServer>(servers);
             _Settings.EnableConsole = enableConsole;
             InitializeHeaderFormat();
+            StartLogfileCleanup();
         }
 
         /// <summary>
@@ -158,6 +169,7 @@ namespace SyslogLogging
             _Settings.FileLogging = fileLogging;
             _Settings.EnableConsole = enableConsole;
             InitializeHeaderFormat();
+            StartLogfileCleanup();
         }
 
         #endregion
@@ -918,6 +930,172 @@ namespace SyslogLogging
         }
 
         /// <summary>
+        /// Start the log file cleanup service if configured.
+        /// </summary>
+        private void StartLogfileCleanup()
+        {
+            // Only start if conditions are met
+            if (_Settings.LogRetentionDays <= 0) return;
+            if (string.IsNullOrEmpty(_Settings.LogFilename)) return;
+            if (_Settings.FileLogging != FileLoggingMode.FileWithDate) return;
+
+            lock (_RetentionLock)
+            {
+                if (_RetentionStarted) return;
+
+                _RetentionCts = new CancellationTokenSource();
+
+                // Timer fires every 60 seconds (60000 ms)
+                // Initial delay of 5 seconds to allow application startup
+                _RetentionTimer = new Timer(
+                    RetentionTimerCallback,
+                    null,
+                    TimeSpan.FromSeconds(5),
+                    TimeSpan.FromMinutes(1));
+
+                _RetentionStarted = true;
+            }
+        }
+
+        /// <summary>
+        /// Stop the log file cleanup service.
+        /// </summary>
+        private void StopLogfileCleanup()
+        {
+            lock (_RetentionLock)
+            {
+                if (!_RetentionStarted) return;
+
+                _RetentionCts?.Cancel();
+                _RetentionTimer?.Dispose();
+                _RetentionCts?.Dispose();
+
+                _RetentionTimer = null;
+                _RetentionCts = null;
+                _RetentionStarted = false;
+            }
+        }
+
+        /// <summary>
+        /// Timer callback for log retention cleanup.
+        /// </summary>
+        /// <param name="state">Timer state (unused).</param>
+        private void RetentionTimerCallback(object? state)
+        {
+            if (_Disposed) return;
+            if (_RetentionCts?.IsCancellationRequested == true) return;
+
+            try
+            {
+                CleanupOldLogFiles();
+            }
+            catch (Exception ex)
+            {
+                OnLoggingError?.Invoke(new Exception("Error during log retention cleanup", ex));
+            }
+        }
+
+        /// <summary>
+        /// Clean up log files older than the configured retention period.
+        /// </summary>
+        private void CleanupOldLogFiles()
+        {
+            string logFilename;
+            int retentionDays;
+            FileLoggingMode fileLoggingMode;
+
+            // Capture settings under lock to ensure consistency
+            lock (_IoLock)
+            {
+                logFilename = _Settings.LogFilename;
+                retentionDays = _Settings.LogRetentionDays;
+                fileLoggingMode = _Settings.FileLogging;
+            }
+
+            // Validate conditions
+            if (string.IsNullOrEmpty(logFilename)) return;
+            if (retentionDays <= 0) return;
+            if (fileLoggingMode != FileLoggingMode.FileWithDate) return;
+
+            // Extract directory and base filename pattern
+            string directory = Path.GetDirectoryName(logFilename);
+            if (string.IsNullOrEmpty(directory))
+            {
+                directory = ".";
+            }
+
+            if (!Directory.Exists(directory)) return;
+
+            string filenameWithoutExtension = Path.GetFileNameWithoutExtension(logFilename);
+            string extension = Path.GetExtension(logFilename);
+
+            // Pattern: {filenameWithoutExtension}{extension}.yyyyMMdd
+            // Example: mylogfile.txt.20251225
+            string basePattern = filenameWithoutExtension + extension + ".";
+
+            DateTime cutoffDate = DateTime.Now.Date.AddDays(-retentionDays);
+
+            try
+            {
+                string[] files = Directory.GetFiles(directory, basePattern + "*");
+
+                foreach (string filePath in files)
+                {
+                    try
+                    {
+                        string fileName = Path.GetFileName(filePath);
+
+                        // Extract date suffix (last 8 characters should be yyyyMMdd)
+                        if (fileName.Length < basePattern.Length + 8) continue;
+
+                        string dateSuffix = fileName.Substring(basePattern.Length);
+
+                        // Validate it's exactly 8 digits
+                        if (dateSuffix.Length != 8) continue;
+                        if (!IsAllDigits(dateSuffix)) continue;
+
+                        // Parse the date
+                        if (DateTime.TryParseExact(
+                            dateSuffix,
+                            "yyyyMMdd",
+                            System.Globalization.CultureInfo.InvariantCulture,
+                            System.Globalization.DateTimeStyles.None,
+                            out DateTime fileDate))
+                        {
+                            if (fileDate < cutoffDate)
+                            {
+                                File.Delete(filePath);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log error but continue with other files
+                        OnLoggingError?.Invoke(new Exception($"Error deleting old log file: {filePath}", ex));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                OnLoggingError?.Invoke(new Exception($"Error enumerating log files in directory: {directory}", ex));
+            }
+        }
+
+        /// <summary>
+        /// Check if a string contains only digit characters.
+        /// </summary>
+        /// <param name="value">String to check.</param>
+        /// <returns>True if all characters are digits, false otherwise.</returns>
+        private static bool IsAllDigits(string value)
+        {
+            foreach (char c in value)
+            {
+                if (c < '0' || c > '9') return false;
+            }
+            return true;
+        }
+
+        /// <summary>
         /// Throw ObjectDisposedException if the object is disposed.
         /// </summary>
         private void ThrowIfDisposed()
@@ -936,7 +1114,7 @@ namespace SyslogLogging
             {
                 if (disposing)
                 {
-                    // No resources to dispose in simplified implementation
+                    StopLogfileCleanup();
                 }
 
                 _Disposed = true;

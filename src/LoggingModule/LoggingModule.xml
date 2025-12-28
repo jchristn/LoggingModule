@@ -549,6 +549,34 @@
             </summary>
             <param name="filename">Log filename.</param>
         </member>
+        <member name="M:SyslogLogging.LoggingModule.StartLogfileCleanup">
+            <summary>
+            Start the log file cleanup service if configured.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.StopLogfileCleanup">
+            <summary>
+            Stop the log file cleanup service.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.RetentionTimerCallback(System.Object)">
+            <summary>
+            Timer callback for log retention cleanup.
+            </summary>
+            <param name="state">Timer state (unused).</param>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.CleanupOldLogFiles">
+            <summary>
+            Clean up log files older than the configured retention period.
+            </summary>
+        </member>
+        <member name="M:SyslogLogging.LoggingModule.IsAllDigits(System.String)">
+            <summary>
+            Check if a string contains only digit characters.
+            </summary>
+            <param name="value">String to check.</param>
+            <returns>True if all characters are digits, false otherwise.</returns>
+        </member>
         <member name="M:SyslogLogging.LoggingModule.ThrowIfDisposed">
             <summary>
             Throw ObjectDisposedException if the object is disposed.
@@ -631,6 +659,15 @@
         <member name="P:SyslogLogging.LoggingSettings.LogFilename">
             <summary>
             The file to which log messages should be appended.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LoggingSettings.LogRetentionDays">
+            <summary>
+            Number of days to retain log files when using FileWithDate mode.
+            Default: 0 (logs persist indefinitely).
+            Only applicable when LogFilename is set AND FileLogging is FileWithDate.
+            Files older than the specified number of days will be automatically deleted.
+            Minimum value: 0 (disabled). Negative values are treated as 0.
             </summary>
         </member>
         <member name="P:SyslogLogging.LoggingSettings.ExceptionSeverity">
