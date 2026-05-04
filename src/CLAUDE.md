@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SyslogLogging is a C# class library for logging to syslog, console, and file systems. The project targets multiple .NET versions including .NET Standard 2.0/2.1, .NET Framework 4.62/4.8, and .NET 6.0/8.0.
+SyslogLogging is a C# class library for logging to syslog, console, and file systems. The project targets multiple .NET versions including .NET Standard 2.0/2.1, .NET Framework 4.6.2/4.8, and .NET 8.0/10.0.
 
 ## Architecture
 
@@ -25,17 +25,20 @@ SyslogLogging is a C# class library for logging to syslog, console, and file sys
 ### Project Structure
 
 - **LoggingModule/**: Main library project containing the logging implementation
-- **Test/**: Console application demonstrating usage patterns and serving as integration tests
+- **Test.Shared/**: Shared Touchstone test descriptors and helpers
+- **Test.Automated/**: Console runner for the shared Touchstone suites
+- **Test.Xunit/**: xUnit adapter project for the shared Touchstone suites
+- **Test.Nunit/**: NUnit adapter project for the shared Touchstone suites
 - **assets/**: Contains logo files and branding assets
 
 ### Multi-targeting Support
 
 The LoggingModule project targets:
 - .NET Standard 2.0 and 2.1 (for broad compatibility)
-- .NET Framework 4.62 and 4.8 (for legacy applications)
-- .NET 6.0 and 8.0 (for modern applications)
+- .NET Framework 4.6.2 and 4.8 (for legacy applications)
+- .NET 8.0 and 10.0 (for modern applications)
 
-## Key Features (v2.0.9+)
+## Key Features (v2.1.0)
 
 ### Async Support
 - All logging methods have async variants with `CancellationToken` support
@@ -81,11 +84,12 @@ dotnet build LoggingModule/LoggingModule.csproj -f netstandard2.0
 
 ### Testing
 ```bash
-# Run the test console application
-dotnet run --project Test/Test.csproj
+# Run the Touchstone CLI runner
+dotnet run --project Test.Automated/Test.Automated.csproj -f net10.0
 
-# Build and run test project for specific framework
-dotnet run --project Test/Test.csproj -f net8.0
+# Run xUnit and NUnit adapters
+dotnet test Test.Xunit/Test.Xunit.csproj
+dotnet test Test.Nunit/Test.Nunit.csproj
 ```
 
 ### Packaging
@@ -120,7 +124,7 @@ LoggingModule.Settings provides extensive configuration:
 
 The project is configured for automatic NuGet package generation with:
 - Package ID: SyslogLogging
-- Version: 2.0.8
+- Version: 2.1.0
 - Multi-framework targeting
 - Includes documentation XML, license, and logo assets
 - Generates symbol packages (.snupkg) for debugging

@@ -510,6 +510,12 @@
             </summary>
             <returns>Process ID or "unknown" if unavailable.</returns>
         </member>
+        <member name="M:SyslogLogging.LoggingModule.GetApplicationName">
+            <summary>
+            Resolve the effective application name.
+            </summary>
+            <returns>Configured application name, entry assembly name, process name, or "unknown".</returns>
+        </member>
         <member name="M:SyslogLogging.LoggingModule.GetProcessName">
             <summary>
             Get process name safely.
@@ -624,6 +630,13 @@
         <member name="P:SyslogLogging.LoggingSettings.UseUtcTime">
             <summary>
             Boolean to enable or disable use of UTC timestamps.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LoggingSettings.ApplicationName">
+            <summary>
+            Override for the application name used by the {app} header token.
+            When null, empty, or whitespace, the logger resolves the application name
+            from the entry assembly and falls back to the process name if needed.
             </summary>
         </member>
         <member name="P:SyslogLogging.LoggingSettings.EnableConsole">

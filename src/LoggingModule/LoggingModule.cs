@@ -8,6 +8,7 @@ namespace SyslogLogging
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
+    using System.Reflection;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -381,7 +382,7 @@ namespace SyslogLogging
             if (exception.StackTrace != null)
                 message += Environment.NewLine + exception.StackTrace;
 
-            Log(Severity.Error, message);
+            Log(_Settings.ExceptionSeverity, message);
         }
 
         /// <summary>
@@ -399,7 +400,7 @@ namespace SyslogLogging
             if (exception.StackTrace != null)
                 message += Environment.NewLine + exception.StackTrace;
 
-            await LogAsync(Severity.Error, message, token).ConfigureAwait(false);
+            await LogAsync(_Settings.ExceptionSeverity, message, token).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -659,17 +660,15 @@ namespace SyslogLogging
                 string filename = GetLogFilename();
                 EnsureDirectoryExists(filename);
 
-#if NET6_0_OR_GREATER
-                // True async file I/O for modern .NET
-                await File.AppendAllTextAsync(filename, formattedMessage, token).ConfigureAwait(false);
-#else
-                // For older frameworks, use FileStream with async
-                using (FileStream fs = new FileStream(filename, FileMode.Append, FileAccess.Write, FileShare.Read, 4096, true))
-                using (StreamWriter writer = new StreamWriter(fs))
+                await Task.Run(() =>
                 {
-                    await writer.WriteAsync(formattedMessage).ConfigureAwait(false);
-                }
-#endif
+                    token.ThrowIfCancellationRequested();
+
+                    lock (_IoLock)
+                    {
+                        File.AppendAllText(filename, formattedMessage);
+                    }
+                }, token).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -766,7 +765,7 @@ namespace SyslogLogging
                 {"{level}", entry => ((int)entry.Severity).ToString()},
                 {"{pid}", _ => GetProcessId()},
                 {"{user}", _ => Environment.UserName ?? "unknown"},
-                {"{app}", _ => GetProcessName()},
+                {"{app}", _ => GetApplicationName()},
                 {"{correlation}", entry => entry.CorrelationId ?? ""},
                 {"{source}", entry => entry.Source ?? ""}
             };
@@ -802,6 +801,33 @@ namespace SyslogLogging
             {
                 return "unknown";
             }
+        }
+
+        /// <summary>
+        /// Resolve the effective application name.
+        /// </summary>
+        /// <returns>Configured application name, entry assembly name, process name, or "unknown".</returns>
+        private string GetApplicationName()
+        {
+            if (!string.IsNullOrWhiteSpace(_Settings.ApplicationName))
+            {
+                return _Settings.ApplicationName;
+            }
+
+            try
+            {
+                string entryAssemblyName = Assembly.GetEntryAssembly()?.GetName().Name;
+                if (!string.IsNullOrWhiteSpace(entryAssemblyName))
+                {
+                    return entryAssemblyName;
+                }
+            }
+            catch
+            {
+                // Fall through to process name fallback.
+            }
+
+            return GetProcessName();
         }
 
         /// <summary>

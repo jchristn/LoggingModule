@@ -2,32 +2,51 @@
 
 # SyslogLogging
 
-[![NuGet Version](https://img.shields.io/nuget/v/SyslogLogging.svg?style=flat)](https://www.nuget.org/packages/SyslogLogging/) [![NuGet](https://img.shields.io/nuget/dt/SyslogLogging.svg)](https://www.nuget.org/packages/SyslogLogging)
+[![NuGet Version](https://img.shields.io/nuget/v/SyslogLogging.svg?style=flat)](https://www.nuget.org/packages/SyslogLogging/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/SyslogLogging.svg)](https://www.nuget.org/packages/SyslogLogging/)
 
-🚀 **Modern, high-performance C# logging library** for syslog, console, and file destinations with **async support**, **structured logging**, and **Microsoft.Extensions.Logging integration**.
+SyslogLogging is a C# logging library for syslog, console, and file destinations. It supports synchronous and asynchronous logging, structured log entries, `Microsoft.Extensions.Logging` integration, and file retention management.
 
-Targeted to .NET Standard 2.0+, .NET Framework 4.6.2+, .NET 6.0+, and .NET 8.0.
+Current release: `2.1.0`
 
-## ✨ What's New in v2.0.9+
+Target builds:
+- `.NET Standard 2.0`
+- `.NET Standard 2.1`
+- `.NET Framework 4.6.2`
+- `.NET Framework 4.8`
+- `.NET 8.0`
+- `.NET 10.0`
 
-### 🔥 **Major New Features**
-- 🌪️ **Full async support** with `CancellationToken` throughout
-- 📊 **Structured logging** with properties, correlation IDs, and JSON serialization
-- 🔌 **Microsoft.Extensions.Logging integration** (ILogger, DI support)
-- 🏗️ **Enterprise-grade thread safety** with comprehensive race condition prevention
-- 🎯 **Integrated SyslogServer** for end-to-end testing
-- 🛡️ **Comprehensive input validation** on all public properties
-- 🧪 **Extensive thread safety testing** (20+ specialized concurrent scenarios)
+## Highlights
 
-### 🔧 **Performance & Reliability**
-- **Thread-safe operations** with proper locking mechanisms
-- **Immediate log delivery** with direct processing
-- **Memory efficient** with minimal overhead
-- **Standards compliant** RFC 3164 syslog format support
+- RFC 3164 syslog output
+- Console and file logging in the same logger
+- Structured logging with `LogEntry`
+- Fluent structured logging builder
+- `Microsoft.Extensions.Logging` provider and DI registration
+- Configurable header format tokens including `{app}`, `{pid}`, `{source}`, and `{correlation}`
+- Configurable exception severity
+- Automatic retention cleanup for dated log files
+- Shared Touchstone test coverage exposed through CLI, xUnit, and NUnit runners
 
-## 🚀 Quick Start
+## What's New in 2.1.0
+
+- Added `LoggingSettings.ApplicationName` so callers can explicitly control the `{app}` header token without changing the existing logging API.
+- Changed `{app}` fallback resolution to use `Assembly.GetEntryAssembly()?.GetName().Name` before falling back to the current process name.
+- Fixed `.Exception()` and `.ExceptionAsync()` so they honor `LoggingSettings.ExceptionSeverity`.
+- Fixed concurrent async file logging so writes are serialized correctly under load.
+- Migrated tests to Touchstone shared suites with CLI, xUnit, and NUnit runners on `net8.0` and `net10.0`.
+
+## Installation
+
+```bash
+dotnet add package SyslogLogging
+```
+
+## Quick Start
 
 ### Simple Logging
+
 ```csharp
 using SyslogLogging;
 
@@ -35,64 +54,61 @@ LoggingModule log = new LoggingModule();
 await log.InfoAsync("Hello, world!");
 ```
 
-### Async with Structured Data
+### Syslog Logging
+
 ```csharp
 using SyslogLogging;
 
 LoggingModule log = new LoggingModule("mysyslogserver", 514);
+await log.WarnAsync("Rate limit exceeded");
+```
 
-// Simple async logging
-await log.ErrorAsync("Something went wrong", cancellationToken);
+### File Logging
 
-// Structured logging with properties
-LogEntry entry = new LogEntry(Severity.Warning, "Rate limit exceeded")
-    .WithProperty("RequestsPerSecond", 150)
-    .WithProperty("ClientId", "user123")
-    .WithCorrelationId(Request.Headers["X-Correlation-ID"]);
+```csharp
+using SyslogLogging;
+
+LoggingModule log = new LoggingModule("./logs/app.log", FileLoggingMode.SingleLogFile);
+await log.InfoAsync("File-only message");
+```
+
+## Structured Logging
+
+### LogEntry
+
+```csharp
+LogEntry entry = new LogEntry(Severity.Error, "Payment processing failed")
+    .WithProperty("OrderId", orderId)
+    .WithProperty("Amount", amount)
+    .WithProperty("Currency", "USD")
+    .WithCorrelationId(correlationId)
+    .WithSource("PaymentService")
+    .WithException(exception);
 
 await log.LogEntryAsync(entry);
 ```
 
-### Fluent Structured Logging
+### Fluent Builder
+
 ```csharp
-log.BeginStructuredLog(Severity.Info, "User login")
+await log.BeginStructuredLog(Severity.Info, "User login")
     .WithProperty("UserId", userId)
     .WithProperty("IpAddress", ipAddress)
-    .WithProperty("Timestamp", DateTime.UtcNow)
     .WithCorrelationId(correlationId)
     .WriteAsync();
 ```
 
-## 🔌 Microsoft.Extensions.Logging Integration
+## Microsoft.Extensions.Logging Integration
 
-### ASP.NET Core / Generic Host
 ```csharp
-// Program.cs or Startup.cs
 services.AddLogging(builder =>
 {
     builder.AddSyslog("syslogserver", 514);
 });
-
-// In your controllers/services
-public class MyController : ControllerBase
-{
-    private readonly ILogger<MyController> _logger;
-
-    public MyController(ILogger<MyController> logger)
-    {
-        _logger = logger;
-    }
-
-    public IActionResult Get()
-    {
-        _logger.LogInformation("API called with correlation {CorrelationId}",
-            HttpContext.TraceIdentifier);
-        return Ok();
-    }
-}
 ```
 
-### Multiple Destinations
+Multiple syslog targets are also supported:
+
 ```csharp
 services.AddLogging(builder =>
 {
@@ -104,208 +120,88 @@ services.AddLogging(builder =>
 });
 ```
 
-## 📊 Advanced Structured Logging
+## Header Formatting
 
-### Rich Metadata
 ```csharp
-LogEntry entry = new LogEntry(Severity.Error, "Payment processing failed")
-    .WithProperty("OrderId", orderId)
-    .WithProperty("Amount", amount)
-    .WithProperty("Currency", "USD")
-    .WithProperty("PaymentProvider", "Stripe")
-    .WithProperty("ErrorCode", errorCode)
-    .WithCorrelationId(correlationId)
-    .WithSource("PaymentService")
-    .WithException(exception);
-
-await log.LogEntryAsync(entry);
-```
-
-### JSON Serialization
-```csharp
-LogEntry entry = new LogEntry(Severity.Info, "User session")
-    .WithProperty("SessionDuration", TimeSpan.FromMinutes(45))
-    .WithProperty("PagesVisited", new[] { "/home", "/products", "/checkout" });
-
-string json = entry.ToJson();
-// Output: {"timestamp":"2023-12-01T10:30:00.000Z","severity":"Info","message":"User session","threadId":1,"properties":{"SessionDuration":"00:45:00","PagesVisited":["/home","/products","/checkout"]}}
-```
-
-## 🎯 Multiple Destinations
-
-### Syslog + Console + File
-```csharp
-List<SyslogServer> servers = new List<SyslogServer>
-{
-    new SyslogServer("primary-syslog", 514),
-    new SyslogServer("backup-syslog", 514)
-};
-
-LoggingModule log = new LoggingModule(servers, enableConsole: true);
-log.Settings.FileLogging = FileLoggingMode.FileWithDate;  // Creates dated files
-log.Settings.LogFilename = "./logs/app.log";
-
-log.Alert("This goes to 2 syslog servers, console, AND file!");
-```
-
-### File-Only Logging
-```csharp
-LoggingModule log = new LoggingModule("./logs/app.log", FileLoggingMode.SingleLogFile);
-await log.InfoAsync("File-only message");
-```
-
-### Log Retention (Automatic Cleanup)
-```csharp
-// Automatically delete log files older than 30 days
-LoggingModule log = new LoggingModule("./logs/app.log", FileLoggingMode.FileWithDate, true);
-LoggingSettings settings = log.Settings;
-settings.LogRetentionDays = 30;  // Keep 30 days of logs (0 = disabled, default)
-log.Settings = settings;         // Re-assign to start cleanup timer
-
-// Or configure settings first
-LoggingSettings settings = new LoggingSettings();
-settings.LogFilename = "./logs/app.log";
-settings.FileLogging = FileLoggingMode.FileWithDate;
-settings.LogRetentionDays = 7;   // Keep 7 days of logs
-LoggingModule log = new LoggingModule();
-log.Settings = settings;
-```
-
-**Note:** Log retention only applies when using `FileLoggingMode.FileWithDate`. The cleanup timer runs every 60 seconds and removes files matching the pattern `filename.ext.yyyyMMdd` that are older than the specified retention period.
-
-## 🎨 Console Colors & Formatting
-
-### Enable Colors
-```csharp
-log.Settings.EnableColors = true;
-log.Settings.Colors.Error = new ColorScheme(ConsoleColor.Red, ConsoleColor.Black);
-log.Settings.Colors.Warning = new ColorScheme(ConsoleColor.Yellow, ConsoleColor.Black);
-```
-
-### Custom Message Format with Rich Variables
-```csharp
-// Basic format
-log.Settings.HeaderFormat = "{ts} [{sev}] {host}:{thread}";
-
-// Detailed production format
 log.Settings.HeaderFormat = "{ts} {host}[{pid}] {sev} [T:{thread}] [{app}]";
-
-// Performance monitoring format
-log.Settings.HeaderFormat = "{ts} {host} CPU:{cpu} MEM:{mem}MB UP:{uptime} {sev}";
-
-// Microservices format
-log.Settings.HeaderFormat = "{ts} [{app}:{pid}] {sev} [{correlation}] [{source}]";
-
+log.Settings.ApplicationName = "MyService";
 log.Settings.TimestampFormat = "yyyy-MM-dd HH:mm:ss.fff";
 log.Settings.UseUtcTime = true;
 ```
 
-#### Available Header Format Variables
+Available header variables:
 
-| Variable | Description | Example Output |
-|----------|-------------|----------------|
+| Variable | Description | Example |
+|----------|-------------|---------|
 | `{ts}` | Timestamp | `2024-01-15 14:30:25.123` |
 | `{host}` | Machine name | `web-server-01` |
 | `{thread}` | Thread ID | `12` |
 | `{sev}` | Severity name | `Info` |
-| `{level}` | Severity number (0-7) | `6` |
+| `{level}` | Severity number | `6` |
 | `{pid}` | Process ID | `1234` |
 | `{user}` | Current username | `john.doe` |
 | `{app}` | Application name | `MyWebApp` |
 | `{domain}` | App domain | `MyWebApp.exe` |
 | `{cpu}` | CPU core count | `8` |
-| `{mem}` | Memory usage (MB) | `256` |
+| `{mem}` | Memory usage in MB | `256` |
 | `{uptime}` | Process uptime | `02:45:30` |
 | `{correlation}` | Correlation ID | `abc-123-def` |
 | `{source}` | Log source | `UserService` |
 
-## 🔧 Configuration Examples
+`{app}` resolves in this order:
 
-### Production Configuration
+1. `log.Settings.ApplicationName`
+2. `Assembly.GetEntryAssembly()?.GetName().Name`
+3. Current process name
+
+## File Retention
+
 ```csharp
-LoggingModule log = new LoggingModule("prod-syslog", 514, enableConsole: false);
-
-// Set appropriate filters
-log.Settings.MinimumSeverity = Severity.Warning;
-log.Settings.MaxMessageLength = 8192;
-
-// Structured logging for analysis
-await log.BeginStructuredLog(Severity.Info, "Application started")
-    .WithProperty("Version", Assembly.GetExecutingAssembly().GetName().Version)
-    .WithProperty("Environment", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"))
-    .WithProperty("MachineName", Environment.MachineName)
-    .WriteAsync();
+LoggingModule log = new LoggingModule("./logs/app.log", FileLoggingMode.FileWithDate, true);
+LoggingSettings settings = log.Settings;
+settings.LogRetentionDays = 30;
+log.Settings = settings;
 ```
 
-### Development Configuration
-```csharp
-LoggingModule log = new LoggingModule("localhost", 514, enableConsole: true);
+Retention cleanup only applies when using `FileLoggingMode.FileWithDate`. The cleanup timer removes files matching the dated filename pattern when they are older than the configured retention period.
 
-// Immediate feedback for development
-log.Settings.EnableColors = true;
-log.Settings.MinimumSeverity = Severity.Debug;
+## Testing
 
-// File logging for detailed debugging
-log.Settings.FileLogging = FileLoggingMode.FileWithDate;
-log.Settings.LogFilename = "./logs/debug.log";
-```
-
-### High-Concurrency Configuration
-```csharp
-LoggingModule log = new LoggingModule("logserver", 514, enableConsole: true);
-
-// Thread-safe operations
-log.Settings.EnableColors = true;
-
-Task.Run(async () =>
-{
-    while (true)
-    {
-        // Even rapid server changes are thread-safe
-        log.Servers = GetAvailableServers();
-        await Task.Delay(1000);
-    }
-});
-
-// Multiple threads can safely log concurrently
-Parallel.For(0, 1000, i =>
-{
-    log.Info($"Concurrent message from thread {Thread.CurrentThread.ManagedThreadId}: {i}");
-});
-```
-
-## 🧪 Testing
-
-Run the comprehensive test suite:
+Run the shared Touchstone suite through the CLI runner:
 
 ```bash
-cd src/Test
-dotnet run
+dotnet run --project src/Test.Automated/Test.Automated.csproj -f net10.0
+dotnet run --project src/Test.Automated/Test.Automated.csproj -f net8.0
 ```
 
-The test program validates each library capability including:
-- ✅ All constructor patterns and validation
-- ✅ Sync and async logging methods
-- ✅ Structured logging with properties and correlation IDs
-- ✅ Comprehensive thread safety under concurrent load
-- ✅ Multiple destination delivery (syslog + console + file)
-- ✅ Error handling and edge cases
-- ✅ Performance benchmarks
-- ✅ SyslogServer integration and end-to-end testing
+Run the same shared descriptors through xUnit and NUnit:
 
-## 🤝 Help or Feedback
+```bash
+dotnet test src/Test.Xunit/Test.Xunit.csproj
+dotnet test src/Test.Nunit/Test.Nunit.csproj
+```
 
-Found a bug or have a feature request? [File an issue](https://github.com/jchristn/LoggingModule/issues) - we'd love to hear from you!
+The shared suite covers:
 
-## 🙏 Special Thanks
+- Constructor and settings validation
+- Severity helpers
+- Structured and fluent logging APIs
+- Exception severity behavior
+- File output and retention cleanup
+- Message ordering and concurrency
+- Syslog delivery and error handling
+- `Microsoft.Extensions.Logging` integration
 
-We'd like to extend a special thank you to those that have helped make this library better:
-@dev-jan @jisotalo
+## Related Project
 
-## 📜 Version History
+The repository also includes `SyslogServer`, a simple utility application for receiving syslog traffic during development and testing.
 
-Please refer to [CHANGELOG.md](./CHANGELOG.md) for detailed version history.
+## Version History
 
----
+See [CHANGELOG.md](./CHANGELOG.md) for release details.
 
-⭐ **Star this repo** if SyslogLogging has helped your project!
+## Help
+
+File issues or feature requests at:
+
+https://github.com/jchristn/LoggingModule/issues

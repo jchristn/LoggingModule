@@ -65,6 +65,23 @@
         public bool UseUtcTime { get; set; } = true;
 
         /// <summary>
+        /// Override for the application name used by the {app} header token.
+        /// When null, empty, or whitespace, the logger resolves the application name
+        /// from the entry assembly and falls back to the process name if needed.
+        /// </summary>
+        public string ApplicationName
+        {
+            get
+            {
+                return _ApplicationName;
+            }
+            set
+            {
+                _ApplicationName = string.IsNullOrWhiteSpace(value) ? null : value;
+            }
+        }
+
+        /// <summary>
         /// Enable or disable console logging.
         /// Setting this to true will first validate if a console exists.
         /// If a console is not available, it will be set to false.
@@ -192,6 +209,7 @@
         private ColorSchema _Colors = new ColorSchema();
         private string _LogFilename = null;
         private int _LogRetentionDays = 0;
+        private string _ApplicationName = null;
 
         /// <summary>
         /// Instantiate the object.
