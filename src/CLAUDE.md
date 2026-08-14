@@ -38,7 +38,13 @@ The LoggingModule project targets:
 - .NET Framework 4.6.2 and 4.8 (for legacy applications)
 - .NET 8.0 and 10.0 (for modern applications)
 
-## Key Features (v2.1.0)
+## Key Features (v2.2.0)
+
+### Message Notifications
+- `LoggingModule.MessageLogged` event raised once per emitted log entry after delivery to all destinations
+- Handlers receive the original, unsplit `LogEntry`
+- Handler exceptions are isolated and routed to `OnLoggingError`; handlers run outside any internal lock
+
 
 ### Async Support
 - All logging methods have async variants with `CancellationToken` support
@@ -124,7 +130,7 @@ LoggingModule.Settings provides extensive configuration:
 
 The project is configured for automatic NuGet package generation with:
 - Package ID: SyslogLogging
-- Version: 2.1.0
+- Version: 2.2.0
 - Multi-framework targeting
 - Includes documentation XML, license, and logo assets
 - Generates symbol packages (.snupkg) for debugging

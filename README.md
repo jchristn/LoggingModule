@@ -7,7 +7,7 @@
 
 SyslogLogging is a C# logging library for syslog, console, and file destinations. It supports synchronous and asynchronous logging, structured log entries, `Microsoft.Extensions.Logging` integration, and file retention management.
 
-Current release: `2.1.0`
+Current release: `2.2.0`
 
 Target builds:
 - `.NET Standard 2.0`
@@ -27,9 +27,15 @@ Target builds:
 - Configurable header format tokens including `{app}`, `{pid}`, `{source}`, and `{correlation}`
 - Configurable exception severity
 - Automatic retention cleanup for dated log files
+- `MessageLogged` event for post-delivery notification of each emitted log entry
 - Shared Touchstone test coverage exposed through CLI, xUnit, and NUnit runners
 
-## What's New in 2.1.0
+## What's New in 2.2.0
+
+- Added the `MessageLogged` event, raised once for each emitted log entry after it has been written to every configured destination. Handlers receive the original, unsplit `LogEntry` even when the message was split for delivery, are invoked outside of any internal lock, and any handler exception is isolated and routed to `OnLoggingError` without interrupting logging.
+- Expanded shared Touchstone coverage with positive and negative `MessageLogged` scenarios across the sync and async paths.
+
+### Previously in 2.1.0
 
 - Added `LoggingSettings.ApplicationName` so callers can explicitly control the `{app}` header token without changing the existing logging API.
 - Changed `{app}` fallback resolution to use `Assembly.GetEntryAssembly()?.GetName().Name` before falling back to the current process name.
@@ -118,6 +124,34 @@ services.AddLogging(builder =>
         new SyslogServer("backup-log", 514)
     }, enableConsole: true);
 });
+```
+
+## Message Notifications
+
+Subscribe to `MessageLogged` to observe each log entry after it has been delivered to all configured destinations. The handler receives the original `LogEntry` even when a long message is split into multiple parts for delivery, so the event fires exactly once per logged entry:
+
+```csharp
+log.MessageLogged += entry =>
+{
+    metrics.Increment("logs." + entry.Severity);
+    if (entry.Severity >= Severity.Error) alerting.Notify(entry);
+};
+
+await log.ErrorAsync("Payment gateway timeout");
+```
+
+Notes:
+
+- The event is raised only for entries that pass `Settings.MinimumSeverity`; filtered messages do not fire it.
+- Handlers are invoked outside of any internal lock, so a slow handler does not block other log writers, but it does run on the logging thread &mdash; keep handlers fast or hand off to your own queue.
+- Exceptions thrown by a handler are isolated and routed to `OnLoggingError`; they never interrupt logging or reach the caller.
+
+## Error Notifications
+
+Subscribe to `OnLoggingError` to observe failures in the logging pipeline itself, such as file write or syslog delivery errors:
+
+```csharp
+log.OnLoggingError += ex => Console.Error.WriteLine(ex);
 ```
 
 ## Header Formatting

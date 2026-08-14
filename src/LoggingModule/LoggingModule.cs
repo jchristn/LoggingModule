@@ -27,6 +27,15 @@ namespace SyslogLogging
         public event Action<Exception> OnLoggingError;
 
         /// <summary>
+        /// Event fired once for each log entry after it has been written to all configured
+        /// destinations (console, file, and syslog). The original, unsplit <see cref="LogEntry"/>
+        /// is provided even when the message was split into multiple parts for delivery.
+        /// Handlers are invoked outside of any internal lock. Exceptions thrown by a handler are
+        /// isolated and routed to <see cref="OnLoggingError"/>; they never interrupt logging.
+        /// </summary>
+        public event Action<LogEntry> MessageLogged;
+
+        /// <summary>
         /// Logging settings.
         /// </summary>
         public LoggingSettings Settings
@@ -480,6 +489,8 @@ namespace SyslogLogging
 
                     sequenceNumber++;
                 }
+
+                RaiseMessageLogged(entry);
             }
             catch (Exception ex)
             {
@@ -530,10 +541,27 @@ namespace SyslogLogging
 
                     sequenceNumber++;
                 }
+
+                RaiseMessageLogged(entry);
             }
             catch (Exception ex)
             {
                 OnLoggingError?.Invoke(new Exception("Error processing log entry async", ex));
+            }
+        }
+
+        private void RaiseMessageLogged(LogEntry entry)
+        {
+            Action<LogEntry> handler = MessageLogged;
+            if (handler == null) return;
+
+            try
+            {
+                handler(entry);
+            }
+            catch (Exception ex)
+            {
+                OnLoggingError?.Invoke(new Exception("Error in MessageLogged handler", ex));
             }
         }
 

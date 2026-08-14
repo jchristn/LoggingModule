@@ -1,5 +1,11 @@
 # Change Log
 
+## v2.2.0
+
+- Added the `LoggingModule.MessageLogged` event, raised once for each emitted log entry after it has been written to all configured destinations (console, file, and syslog). Handlers receive the original, unsplit `LogEntry` even when the message was split for delivery.
+- Isolated `MessageLogged` handler exceptions so a throwing subscriber is routed to `OnLoggingError` and never interrupts logging; handlers are invoked outside of any internal lock.
+- Expanded shared Touchstone coverage with positive and negative `MessageLogged` scenarios across sync and async paths, including split-message, minimum-severity, null/empty, multi-subscriber, concurrency, and handler-failure cases.
+
 ## v2.1.0
 
 - Added `LoggingSettings.ApplicationName` so callers can override the `{app}` header token without materially changing the existing API surface.

@@ -223,6 +223,15 @@
             Event fired when a logging error occurs. Provides visibility into logging failures.
             </summary>
         </member>
+        <member name="E:SyslogLogging.LoggingModule.MessageLogged">
+            <summary>
+            Event fired once for each log entry after it has been written to all configured
+            destinations (console, file, and syslog). The original, unsplit <see cref="M:SyslogLogging.LoggingModule.LogEntry(SyslogLogging.LogEntry)"/>
+            is provided even when the message was split into multiple parts for delivery.
+            Handlers are invoked outside of any internal lock. Exceptions thrown by a handler are
+            isolated and routed to <see cref="E:SyslogLogging.LoggingModule.OnLoggingError"/>; they never interrupt logging.
+            </summary>
+        </member>
         <member name="P:SyslogLogging.LoggingModule.Settings">
             <summary>
             Logging settings.

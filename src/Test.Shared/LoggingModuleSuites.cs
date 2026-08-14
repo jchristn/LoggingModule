@@ -34,6 +34,7 @@ namespace SyslogLogging.Tests.Shared
                     ThreadSafetySuite(),
                     SyslogSuite(),
                     IntegrationSuite(),
+                    MessageLoggedSuite(),
                 };
             }
         }
@@ -1646,6 +1647,418 @@ namespace SyslogLogging.Tests.Shared
                             TestHelpers.AssertTrue(!File.Exists(logFile), "Empty logger messages without exceptions should be ignored.");
 
                             return Task.CompletedTask;
+                        }),
+                });
+        }
+
+        public static TestSuiteDescriptor MessageLoggedSuite()
+        {
+            return new TestSuiteDescriptor(
+                suiteId: "MessageLogged",
+                displayName: "MessageLogged Event",
+                cases: new List<TestCaseDescriptor>
+                {
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "FiresOnceSync",
+                        displayName: "MessageLogged fires once for a synchronous log",
+                        executeAsync: _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-sync");
+                            string logFile = temp.GetPath("event-sync.log");
+
+                            int count = 0;
+                            LogEntry? captured = null;
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT");
+                            log.MessageLogged += entry =>
+                            {
+                                count++;
+                                captured = entry;
+                            };
+
+                            log.Info("event-sync-message");
+
+                            TestHelpers.AssertEqual(1, count, "MessageLogged should fire exactly once for a single sync log.");
+                            TestHelpers.AssertTrue(captured != null, "MessageLogged should provide the emitted log entry.");
+                            TestHelpers.AssertEqual("event-sync-message", captured!.Message, "The emitted entry should carry the original message.");
+                            TestHelpers.AssertEqual(Severity.Info, captured.Severity, "The emitted entry should carry the original severity.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "FiresOnceAsync",
+                        displayName: "MessageLogged fires once for an asynchronous log",
+                        executeAsync: async ct =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-async");
+                            string logFile = temp.GetPath("event-async.log");
+
+                            int count = 0;
+                            LogEntry? captured = null;
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT");
+                            log.MessageLogged += entry =>
+                            {
+                                count++;
+                                captured = entry;
+                            };
+
+                            await log.InfoAsync("event-async-message", ct).ConfigureAwait(false);
+
+                            TestHelpers.AssertEqual(1, count, "MessageLogged should fire exactly once for a single async log.");
+                            TestHelpers.AssertTrue(captured != null, "MessageLogged should provide the emitted log entry.");
+                            TestHelpers.AssertEqual("event-async-message", captured!.Message, "The emitted async entry should carry the original message.");
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "FiresOnceForSplitSync",
+                        displayName: "MessageLogged fires once with the unsplit entry for a split sync message",
+                        executeAsync: _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-split-sync");
+                            string logFile = temp.GetPath("event-split-sync.log");
+
+                            int count = 0;
+                            LogEntry? captured = null;
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT", settings => settings.MaxMessageLength = 32);
+                            log.MessageLogged += entry =>
+                            {
+                                count++;
+                                captured = entry;
+                            };
+
+                            string original = new string('X', 96);
+                            log.Info(original);
+
+                            string[] lines = TestHelpers.ReadAllLines(logFile);
+                            TestHelpers.AssertTrue(lines.Length >= 3, "The message should have been split across multiple file lines.");
+                            TestHelpers.AssertEqual(1, count, "MessageLogged should fire exactly once even when the message is split.");
+                            TestHelpers.AssertTrue(captured != null, "MessageLogged should provide the emitted log entry.");
+                            TestHelpers.AssertEqual(original, captured!.Message, "The emitted entry should carry the original, unsplit message.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "FiresOnceForSplitAsync",
+                        displayName: "MessageLogged fires once with the unsplit entry for a split async message",
+                        executeAsync: async ct =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-split-async");
+                            string logFile = temp.GetPath("event-split-async.log");
+
+                            int count = 0;
+                            LogEntry? captured = null;
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT", settings => settings.MaxMessageLength = 32);
+                            log.MessageLogged += entry =>
+                            {
+                                count++;
+                                captured = entry;
+                            };
+
+                            string original = new string('Y', 128);
+                            await log.InfoAsync(original, ct).ConfigureAwait(false);
+
+                            string[] lines = TestHelpers.ReadAllLines(logFile);
+                            TestHelpers.AssertTrue(lines.Length >= 4, "The async message should have been split across multiple file lines.");
+                            TestHelpers.AssertEqual(1, count, "MessageLogged should fire exactly once even when the async message is split.");
+                            TestHelpers.AssertTrue(captured != null, "MessageLogged should provide the emitted log entry.");
+                            TestHelpers.AssertEqual(original, captured!.Message, "The emitted async entry should carry the original, unsplit message.");
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "PreservesStructuredMetadata",
+                        displayName: "MessageLogged provides the original entry with structured metadata intact",
+                        executeAsync: _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-structured");
+                            string logFile = temp.GetPath("event-structured.log");
+
+                            LogEntry? captured = null;
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT");
+                            log.MessageLogged += entry => captured = entry;
+
+                            LogEntry entry = new LogEntry(Severity.Warn, "event-structured-message")
+                                .WithProperty("OrderId", 99)
+                                .WithCorrelationId("corr-event")
+                                .WithSource("EventSuite");
+
+                            log.LogEntry(entry);
+
+                            TestHelpers.AssertTrue(captured != null, "MessageLogged should provide the emitted log entry.");
+                            TestHelpers.AssertTrue(ReferenceEquals(entry, captured), "MessageLogged should provide the original entry instance.");
+                            TestHelpers.AssertEqual("corr-event", captured!.CorrelationId, "The emitted entry should preserve the correlation id.");
+                            TestHelpers.AssertEqual("EventSuite", captured.Source, "The emitted entry should preserve the source.");
+                            TestHelpers.AssertTrue(captured.Properties.ContainsKey("OrderId"), "The emitted entry should preserve structured properties.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "InvokesMultipleSubscribers",
+                        displayName: "MessageLogged invokes every subscribed handler",
+                        executeAsync: _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-multi-subscriber");
+                            string logFile = temp.GetPath("event-multi-subscriber.log");
+
+                            int first = 0;
+                            int second = 0;
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT");
+                            log.MessageLogged += _ => first++;
+                            log.MessageLogged += _ => second++;
+
+                            log.Info("event-multi-subscriber-message");
+
+                            TestHelpers.AssertEqual(1, first, "The first subscriber should be invoked once.");
+                            TestHelpers.AssertEqual(1, second, "The second subscriber should be invoked once.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "UnsubscribedHandlerNotInvoked",
+                        displayName: "MessageLogged does not invoke an unsubscribed handler",
+                        executeAsync: _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-unsubscribe");
+                            string logFile = temp.GetPath("event-unsubscribe.log");
+
+                            int count = 0;
+                            Action<LogEntry> handler = _ => count++;
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT");
+                            log.MessageLogged += handler;
+                            log.MessageLogged -= handler;
+
+                            log.Info("event-unsubscribe-message");
+
+                            TestHelpers.AssertEqual(0, count, "A handler removed before logging should not be invoked.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "FiresOncePerMessage",
+                        displayName: "MessageLogged fires once for each of several sequential messages",
+                        executeAsync: _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-per-message");
+                            string logFile = temp.GetPath("event-per-message.log");
+
+                            List<string> observed = new List<string>();
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT");
+                            log.MessageLogged += entry => observed.Add(entry.Message);
+
+                            for (int i = 0; i < 5; i++)
+                            {
+                                log.Info("event-message-" + i);
+                            }
+
+                            TestHelpers.AssertEqual(5, observed.Count, "MessageLogged should fire once per emitted message.");
+                            for (int i = 0; i < 5; i++)
+                            {
+                                TestHelpers.AssertEqual("event-message-" + i, observed[i], "MessageLogged should preserve message order.");
+                            }
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "FiresOncePerConcurrentMessage",
+                        displayName: "MessageLogged fires once per message under concurrent logging",
+                        executeAsync: async _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-concurrent");
+                            string logFile = temp.GetPath("event-concurrent.log");
+
+                            int count = 0;
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT");
+                            log.MessageLogged += _ => Interlocked.Increment(ref count);
+
+                            List<Task> tasks = Enumerable.Range(0, 50)
+                                .Select(i => Task.Run(() => log.Info("event-concurrent-" + i)))
+                                .ToList();
+
+                            await Task.WhenAll(tasks).ConfigureAwait(false);
+
+                            TestHelpers.AssertEqual(50, count, "MessageLogged should fire exactly once per concurrent message.");
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "DoesNotFireBelowMinimumSeveritySync",
+                        displayName: "MessageLogged does not fire for sync messages below MinimumSeverity",
+                        executeAsync: _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-min-severity-sync");
+                            string logFile = temp.GetPath("event-min-severity-sync.log");
+
+                            int count = 0;
+                            LogEntry? captured = null;
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT", settings => settings.MinimumSeverity = Severity.Error);
+                            log.MessageLogged += entry =>
+                            {
+                                count++;
+                                captured = entry;
+                            };
+
+                            log.Info("filtered-info");
+                            TestHelpers.AssertEqual(0, count, "MessageLogged should not fire for messages below the minimum severity.");
+
+                            log.Error("accepted-error");
+                            TestHelpers.AssertEqual(1, count, "MessageLogged should fire for messages at or above the minimum severity.");
+                            TestHelpers.AssertEqual("accepted-error", captured!.Message, "Only the accepted message should be emitted.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "DoesNotFireBelowMinimumSeverityAsync",
+                        displayName: "MessageLogged does not fire for async messages below MinimumSeverity",
+                        executeAsync: async ct =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-min-severity-async");
+                            string logFile = temp.GetPath("event-min-severity-async.log");
+
+                            int count = 0;
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT", settings => settings.MinimumSeverity = Severity.Error);
+                            log.MessageLogged += _ => count++;
+
+                            await log.InfoAsync("filtered-info-async", ct).ConfigureAwait(false);
+                            TestHelpers.AssertEqual(0, count, "MessageLogged should not fire for async messages below the minimum severity.");
+
+                            await log.ErrorAsync("accepted-error-async", ct).ConfigureAwait(false);
+                            TestHelpers.AssertEqual(1, count, "MessageLogged should fire for async messages at or above the minimum severity.");
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "DoesNotFireForNullMessage",
+                        displayName: "MessageLogged does not fire for null messages",
+                        executeAsync: _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-null-message");
+                            string logFile = temp.GetPath("event-null-message.log");
+
+                            int count = 0;
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT");
+                            log.MessageLogged += _ => count++;
+
+                            log.Info(null!);
+
+                            TestHelpers.AssertEqual(0, count, "MessageLogged should not fire for ignored null messages.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "DoesNotFireForEmptyMessage",
+                        displayName: "MessageLogged does not fire for empty messages",
+                        executeAsync: async ct =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-empty-message");
+                            string logFile = temp.GetPath("event-empty-message.log");
+
+                            int count = 0;
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT");
+                            log.MessageLogged += _ => count++;
+
+                            log.Info(string.Empty);
+                            await log.InfoAsync(string.Empty, ct).ConfigureAwait(false);
+
+                            TestHelpers.AssertEqual(0, count, "MessageLogged should not fire for ignored empty messages.");
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "NoSubscribersDoesNotThrowSync",
+                        displayName: "Logging without a MessageLogged subscriber succeeds synchronously",
+                        executeAsync: _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-no-subscriber-sync");
+                            string logFile = temp.GetPath("event-no-subscriber-sync.log");
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT");
+                            log.Info("event-no-subscriber-message");
+
+                            string contents = TestHelpers.ReadAllText(logFile);
+                            TestHelpers.AssertContains(contents, "EVENT event-no-subscriber-message", "Logging without subscribers should still write output.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "HandlerExceptionRoutedToOnLoggingErrorSync",
+                        displayName: "A throwing sync handler routes to OnLoggingError without breaking delivery",
+                        executeAsync: _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-handler-throws-sync");
+                            string logFile = temp.GetPath("event-handler-throws-sync.log");
+
+                            Exception? captured = null;
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT");
+                            log.OnLoggingError += ex => captured = ex;
+                            log.MessageLogged += _ => throw new InvalidOperationException("handler-boom");
+
+                            log.Info("event-handler-throws-message");
+
+                            TestHelpers.AssertTrue(captured != null, "A throwing handler should surface through OnLoggingError.");
+                            TestHelpers.AssertContains(captured!.Message, "Error in MessageLogged handler", "The routed error should identify the MessageLogged handler.");
+                            TestHelpers.AssertTrue(captured.InnerException is InvalidOperationException, "The original handler exception should be preserved as the inner exception.");
+
+                            string contents = TestHelpers.ReadAllText(logFile);
+                            TestHelpers.AssertContains(contents, "EVENT event-handler-throws-message", "A throwing handler must not prevent the message from being written.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "MessageLogged",
+                        caseId: "HandlerExceptionRoutedToOnLoggingErrorAsync",
+                        displayName: "A throwing async handler routes to OnLoggingError without breaking delivery",
+                        executeAsync: async ct =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("event-handler-throws-async");
+                            string logFile = temp.GetPath("event-handler-throws-async.log");
+
+                            Exception? captured = null;
+
+                            using LoggingModule log = CreateFileLogger(logFile, "EVENT");
+                            log.OnLoggingError += ex => captured = ex;
+                            log.MessageLogged += _ => throw new InvalidOperationException("handler-boom-async");
+
+                            await log.InfoAsync("event-handler-throws-async-message", ct).ConfigureAwait(false);
+
+                            TestHelpers.AssertTrue(captured != null, "A throwing async handler should surface through OnLoggingError.");
+                            TestHelpers.AssertContains(captured!.Message, "Error in MessageLogged handler", "The routed error should identify the MessageLogged handler.");
+
+                            string contents = TestHelpers.ReadAllText(logFile);
+                            TestHelpers.AssertContains(contents, "EVENT event-handler-throws-async-message", "A throwing async handler must not prevent the message from being written.");
                         }),
                 });
         }
