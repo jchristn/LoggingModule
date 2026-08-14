@@ -1,7 +1,8 @@
 # Change Log
 
-## v2.2.0
+## v2.2.1
 
+- Republished with the correct binaries. The 2.2.0 package was inadvertently packed from a pre-feature build and shipped without the `MessageLogged` event; use 2.2.1 or later. No source changes versus the intended 2.2.0 — the additions below ship in 2.2.1.
 - Added the `LoggingModule.MessageLogged` event, raised once for each emitted log entry after it has been written to all configured destinations (console, file, and syslog). Handlers receive the original, unsplit `LogEntry` even when the message was split for delivery.
 - Isolated `MessageLogged` handler exceptions so a throwing subscriber is routed to `OnLoggingError` and never interrupts logging; handlers are invoked outside of any internal lock.
 - Expanded shared Touchstone coverage with positive and negative `MessageLogged` scenarios across sync and async paths, including split-message, minimum-severity, null/empty, multi-subscriber, concurrency, and handler-failure cases.

@@ -7,7 +7,7 @@
 
 SyslogLogging is a C# logging library for syslog, console, and file destinations. It supports synchronous and asynchronous logging, structured log entries, `Microsoft.Extensions.Logging` integration, and file retention management.
 
-Current release: `2.2.0`
+Current release: `2.2.1`
 
 Target builds:
 - `.NET Standard 2.0`
@@ -30,7 +30,7 @@ Target builds:
 - `MessageLogged` event for post-delivery notification of each emitted log entry
 - Shared Touchstone test coverage exposed through CLI, xUnit, and NUnit runners
 
-## What's New in 2.2.0
+## What's New in 2.2.1
 
 - Added the `MessageLogged` event, raised once for each emitted log entry after it has been written to every configured destination. Handlers receive the original, unsplit `LogEntry` even when the message was split for delivery, are invoked outside of any internal lock, and any handler exception is isolated and routed to `OnLoggingError` without interrupting logging.
 - Expanded shared Touchstone coverage with positive and negative `MessageLogged` scenarios across the sync and async paths.
