@@ -35,6 +35,7 @@ namespace SyslogLogging.Tests.Shared
                     SyslogSuite(),
                     IntegrationSuite(),
                     MessageLoggedSuite(),
+                    DisposalSuite(),
                 };
             }
         }
@@ -2059,6 +2060,122 @@ namespace SyslogLogging.Tests.Shared
 
                             string contents = TestHelpers.ReadAllText(logFile);
                             TestHelpers.AssertContains(contents, "EVENT event-handler-throws-async-message", "A throwing async handler must not prevent the message from being written.");
+                        }),
+                });
+        }
+
+        public static TestSuiteDescriptor DisposalSuite()
+        {
+            return new TestSuiteDescriptor(
+                suiteId: "Disposal",
+                displayName: "Disposal and Object Lifetime",
+                cases: new List<TestCaseDescriptor>
+                {
+                    new TestCaseDescriptor(
+                        suiteId: "Disposal",
+                        caseId: "SyncLogAfterDisposeThrows",
+                        displayName: "Synchronous logging after Dispose throws ObjectDisposedException",
+                        executeAsync: _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("dispose-sync-log");
+                            string logFile = temp.GetPath("dispose-sync-log.log");
+
+                            LoggingModule log = CreateFileLogger(logFile, "DISPOSE");
+                            log.Dispose();
+
+                            TestHelpers.ExpectThrows<ObjectDisposedException>(() => log.Info("after-dispose"));
+                            TestHelpers.ExpectThrows<ObjectDisposedException>(() => log.Log(Severity.Error, "after-dispose"));
+                            TestHelpers.AssertTrue(!File.Exists(logFile), "Logging after Dispose should not write any output.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "Disposal",
+                        caseId: "AsyncLogAfterDisposeThrows",
+                        displayName: "Asynchronous logging after Dispose throws ObjectDisposedException",
+                        executeAsync: async _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("dispose-async-log");
+                            string logFile = temp.GetPath("dispose-async-log.log");
+
+                            LoggingModule log = CreateFileLogger(logFile, "DISPOSE");
+                            log.Dispose();
+
+                            await TestHelpers.ExpectThrowsAsync<ObjectDisposedException>(() => log.InfoAsync("after-dispose")).ConfigureAwait(false);
+                            await TestHelpers.ExpectThrowsAsync<ObjectDisposedException>(() => log.LogAsync(Severity.Error, "after-dispose")).ConfigureAwait(false);
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "Disposal",
+                        caseId: "LogEntryAfterDisposeThrows",
+                        displayName: "LogEntry and LogEntryAsync after Dispose throw ObjectDisposedException",
+                        executeAsync: async _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("dispose-entry");
+                            string logFile = temp.GetPath("dispose-entry.log");
+
+                            LoggingModule log = CreateFileLogger(logFile, "DISPOSE");
+                            log.Dispose();
+
+                            LogEntry entry = new LogEntry(Severity.Info, "after-dispose-entry");
+                            TestHelpers.ExpectThrows<ObjectDisposedException>(() => log.LogEntry(entry));
+                            await TestHelpers.ExpectThrowsAsync<ObjectDisposedException>(() => log.LogEntryAsync(entry)).ConfigureAwait(false);
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "Disposal",
+                        caseId: "DisposeIsIdempotent",
+                        displayName: "Calling Dispose more than once is safe",
+                        executeAsync: _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("dispose-idempotent");
+                            string logFile = temp.GetPath("dispose-idempotent.log");
+
+                            LoggingModule log = CreateFileLogger(logFile, "DISPOSE");
+                            log.Info("before-dispose");
+
+                            log.Dispose();
+                            log.Dispose();
+
+                            string contents = TestHelpers.ReadAllText(logFile);
+                            TestHelpers.AssertContains(contents, "DISPOSE before-dispose", "Messages written before Dispose should be preserved.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "Disposal",
+                        caseId: "DisposeAsyncThenLogThrows",
+                        displayName: "Logging after DisposeAsync throws ObjectDisposedException",
+                        executeAsync: async _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("dispose-async");
+                            string logFile = temp.GetPath("dispose-async.log");
+
+                            LoggingModule log = CreateFileLogger(logFile, "DISPOSE");
+                            await log.DisposeAsync().ConfigureAwait(false);
+
+                            TestHelpers.ExpectThrows<ObjectDisposedException>(() => log.Info("after-dispose-async"));
+                            await TestHelpers.ExpectThrowsAsync<ObjectDisposedException>(() => log.InfoAsync("after-dispose-async")).ConfigureAwait(false);
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "Disposal",
+                        caseId: "DisposeAsyncIsIdempotent",
+                        displayName: "Calling DisposeAsync more than once (and mixing with Dispose) is safe",
+                        executeAsync: async _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("dispose-async-idempotent");
+                            string logFile = temp.GetPath("dispose-async-idempotent.log");
+
+                            LoggingModule log = CreateFileLogger(logFile, "DISPOSE");
+
+                            await log.DisposeAsync().ConfigureAwait(false);
+                            await log.DisposeAsync().ConfigureAwait(false);
+                            log.Dispose();
+
+                            return;
                         }),
                 });
         }

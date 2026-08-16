@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFrameworks>net462;net48;net8.0;net10.0</TargetFrameworks>
-		<Version>2.2.1</Version>
+		<Version>2.2.2</Version>
 		<Authors>Joel Christner</Authors>
 		<Company>Joel Christner</Company>
 		<Product>Syslog Server</Product>
@@ -13,7 +13,7 @@
 		<RepositoryUrl>https://github.com/view-io/viewsyslogserver</RepositoryUrl>
 		<RepositoryType>Github</RepositoryType>
 		<PackageTags>syslog logging log message debug event warn info</PackageTags>
-		<PackageReleaseNotes>Version alignment with SyslogLogging 2.2.1</PackageReleaseNotes>
+		<PackageReleaseNotes>Version alignment with SyslogLogging 2.2.2</PackageReleaseNotes>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 		<PlatformTarget>AnyCPU</PlatformTarget>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -27,8 +27,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="SerializationHelper" Version="2.0.1" />
-		<PackageReference Include="System.Text.Json" Version="8.0.5" />
+		<PackageReference Include="SerializationHelper" Version="2.0.3" />
+		<PackageReference Include="System.Text.Json" Version="10.0.11" />
 	</ItemGroup>
 
 </Project>

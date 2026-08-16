@@ -1,5 +1,11 @@
 # Change Log
 
+## v2.2.2
+
+- Dependency maintenance release. Updated `System.Text.Json` (8.0.5 → 10.0.11) and `Microsoft.Extensions.Logging.Abstractions` (8.0.0 → 10.0.11) in the library, and `SerializationHelper` (2.0.1 → 2.0.3) plus `System.Text.Json` in the bundled `SyslogServer`. No public API changes; this is a drop-in upgrade from 2.2.1.
+- Refreshed the test toolchain (`Microsoft.NET.Test.Sdk`, `coverlet.collector`, `xunit.runner.visualstudio`, `NUnit`, `NUnit3TestAdapter`, `NUnit.Analyzers`, and `Microsoft.Extensions.Logging`) to their current releases.
+- Added a shared Touchstone `Disposal` suite covering object-lifetime behavior: use-after-`Dispose`/`DisposeAsync` throws `ObjectDisposedException` across the sync, async, and `LogEntry` paths, and `Dispose`/`DisposeAsync` are idempotent.
+
 ## v2.2.1
 
 - Republished with the correct binaries. The 2.2.0 package was inadvertently packed from a pre-feature build and shipped without the `MessageLogged` event; use 2.2.1 or later. No source changes versus the intended 2.2.0 — the additions below ship in 2.2.1.

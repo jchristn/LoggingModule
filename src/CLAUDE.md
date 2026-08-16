@@ -130,7 +130,7 @@ LoggingModule.Settings provides extensive configuration:
 
 The project is configured for automatic NuGet package generation with:
 - Package ID: SyslogLogging
-- Version: 2.2.1
+- Version: 2.2.2
 - Multi-framework targeting
 - Includes documentation XML, license, and logo assets
 - Generates symbol packages (.snupkg) for debugging
