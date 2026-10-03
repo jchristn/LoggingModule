@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net462;net48;net8.0;net10.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>2.3.1</Version>
+		<Version>2.3.2</Version>
 		<Authors>Joel Christner</Authors>
 		<PackageId>SyslogLogging</PackageId>
 		<Product>SyslogLogging</Product>
@@ -14,7 +14,7 @@
 		<RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
 		<RepositoryType>Github</RepositoryType>
 		<PackageLicenseUrl></PackageLicenseUrl>
-		<PackageReleaseNotes>Fixes DisposeAsync so it stops the log retention timer (previously only Dispose did, leaving a timer running after DisposeAsync). 2.3.0 added built-in OpenTelemetry-compatible metrics and traces through a BCL Meter and ActivitySource named SyslogLogging; see TELEMETRY.md.</PackageReleaseNotes>
+		<PackageReleaseNotes>Dependency maintenance release: updates System.Text.Json, Microsoft.Extensions.Logging.Abstractions, and System.Diagnostics.DiagnosticSource to 10.0.12. No public API changes. 2.3.0 added built-in OpenTelemetry-compatible metrics and traces through a BCL Meter and ActivitySource named SyslogLogging; see TELEMETRY.md.</PackageReleaseNotes>
 		<PackageIconUrl></PackageIconUrl>
 		<RootNamespace>SyslogLogging</RootNamespace>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
@@ -33,12 +33,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
-		<PackageReference Include="System.Text.Json" Version="10.0.11" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
+		<PackageReference Include="System.Text.Json" Version="10.0.12" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' != 'net10.0'">
-		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.11" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.12" />
 	</ItemGroup>
 
 	<ItemGroup>

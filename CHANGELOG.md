@@ -1,5 +1,10 @@
 # Change Log
 
+## v2.3.2
+
+- Dependency maintenance release. Updated `System.Text.Json`, `Microsoft.Extensions.Logging.Abstractions`, and `System.Diagnostics.DiagnosticSource` (10.0.11 → 10.0.12) in the library, and `SerializationHelper` (2.0.3 → 2.1.0) plus `System.Text.Json` in the bundled `SyslogServer` (now versioned 2.3.2 to align with the library). No public API changes; this is a drop-in upgrade from 2.3.1.
+- Refreshed the test toolchain: `Touchstone.*` (0.1.12 → 0.2.0), `NUnit` (4.6.1 → 5.0.0), `NUnit.Analyzers` (4.14.0 → 4.15.0), `NUnit3TestAdapter` (6.2.0 → 6.3.0), `Microsoft.NET.Test.Sdk` (18.9.0 → 18.10.1), `coverlet.collector` (10.0.1 → 10.1.0), and `Microsoft.Extensions.Logging` (10.0.11 → 10.0.12). All 132 shared cases pass on net8.0 and net10.0 under the CLI, xUnit, and NUnit runners.
+
 ## v2.3.1
 
 - Fixed `DisposeAsync()`, which called `Dispose(false)` and so skipped stopping the log retention timer. It now releases the same resources as `Dispose()`. Modules disposed with `await using` or `DisposeAsync()` no longer leave a retention timer running.

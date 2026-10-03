@@ -7,7 +7,7 @@
 
 SyslogLogging is a C# logging library for syslog, console, and file destinations. It supports synchronous and asynchronous logging, structured log entries, `Microsoft.Extensions.Logging` integration, file retention management, and built-in OpenTelemetry-compatible metrics and traces.
 
-Current release: `2.3.1`
+Current release: `2.3.2`
 
 Target builds:
 - `.NET Standard 2.0`
@@ -31,7 +31,11 @@ Target builds:
 - Built-in metrics and traces on a `SyslogLogging` `Meter`/`ActivitySource` (no exporter dependency), plus `{trace}`/`{span}` header tokens for log-to-trace correlation
 - Shared Touchstone test coverage exposed through CLI, xUnit, and NUnit runners
 
-## What's New in 2.3.1
+## What's New in 2.3.2
+
+- Dependency maintenance release: updated `System.Text.Json`, `Microsoft.Extensions.Logging.Abstractions`, and `System.Diagnostics.DiagnosticSource` to `10.0.12`, and `SerializationHelper` to `2.1.0` in the bundled `SyslogServer`. No public API changes — a drop-in upgrade from 2.3.1.
+
+### Previously in 2.3.1
 
 - Fixed `DisposeAsync()` so it stops the log retention timer. Previously only `Dispose()` did, so a module released with `await using` or `DisposeAsync()` left its retention timer running.
 
