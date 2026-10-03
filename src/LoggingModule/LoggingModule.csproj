@@ -3,18 +3,18 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net462;net48;net8.0;net10.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>2.2.2</Version>
+		<Version>2.3.0</Version>
 		<Authors>Joel Christner</Authors>
 		<PackageId>SyslogLogging</PackageId>
 		<Product>SyslogLogging</Product>
 		<Description>The easiest logging library to use to send log messages to syslog, the console, or the file system.  It's.  REALLY.  Easy.</Description>
 		<Copyright>(c)2025 Joel Christner</Copyright>
-		<PackageTags>syslog logging console log logger udp event structured async</PackageTags>
+		<PackageTags>syslog logging console log logger udp event structured async telemetry opentelemetry metrics tracing</PackageTags>
 		<PackageProjectUrl>https://github.com/jchristn/LoggingModule</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
 		<RepositoryType>Github</RepositoryType>
 		<PackageLicenseUrl></PackageLicenseUrl>
-		<PackageReleaseNotes>Dependency maintenance release: updated System.Text.Json and Microsoft.Extensions.Logging.Abstractions to 10.0.11. No public API changes; drop-in upgrade from 2.2.1.</PackageReleaseNotes>
+		<PackageReleaseNotes>Adds built-in OpenTelemetry-compatible observability: a System.Diagnostics.Metrics Meter and an ActivitySource, both named SyslogLogging, covering per-entry and per-destination latency and outcome, syslog bytes sent, I/O lock wait, errors by type, MessageLogged handler time, retention cleanup runs, and lifecycle. Log entries now capture the current W3C trace and span IDs ({trace}/{span} header tokens, traceId/spanId in JSON). New LoggingSettings.EnableMetrics and EnableTracing toggles. No exporter dependency; near-zero cost when nothing subscribes. See TELEMETRY.md.</PackageReleaseNotes>
 		<PackageIconUrl></PackageIconUrl>
 		<RootNamespace>SyslogLogging</RootNamespace>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
@@ -35,6 +35,10 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
 		<PackageReference Include="System.Text.Json" Version="10.0.11" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' != 'net10.0'">
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.11" />
 	</ItemGroup>
 
 	<ItemGroup>

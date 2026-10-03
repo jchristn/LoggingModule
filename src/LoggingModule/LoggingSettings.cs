@@ -20,12 +20,10 @@
         /// {pid}: Process ID
         /// {user}: Current username
         /// {app}: Application/process name
-        /// {domain}: Application domain name
-        /// {cpu}: Number of processor cores
-        /// {mem}: Current working set memory (MB)
-        /// {uptime}: Process uptime (HH:mm:ss)
         /// {correlation}: Correlation ID (if present in log entry)
         /// {source}: Log source (if present in log entry)
+        /// {trace}: W3C trace ID of the Activity current when the entry was created (empty if none)
+        /// {span}: W3C span ID of the Activity current when the entry was created (empty if none)
         /// Default: {ts} {host} {sev}
         /// A space will be inserted between the header and the message.
         /// Setting to null or empty will result in an empty header.
@@ -183,6 +181,21 @@
         /// The severity level to use when logging exceptions through the .Exception() method.
         /// </summary>
         public Severity ExceptionSeverity { get; set; } = Severity.Alert;
+
+        /// <summary>
+        /// Enable or disable metric emission on the <c>SyslogLogging</c> meter. Default is true.
+        /// Metrics cost effectively nothing unless a host subscribes to the meter (see TELEMETRY.md).
+        /// Set to false to suppress this module's metrics even when the host subscribes.
+        /// </summary>
+        public bool EnableMetrics { get; set; } = true;
+
+        /// <summary>
+        /// Enable or disable span emission on the <c>SyslogLogging</c> activity source. Default is true.
+        /// Spans are created only when a host subscribes to the activity source (see TELEMETRY.md).
+        /// When enabled and subscribed, each log entry produces one write span plus one child span per destination write.
+        /// Set to false to keep metrics but suppress per-entry spans on high-volume loggers.
+        /// </summary>
+        public bool EnableTracing { get; set; } = true;
 
         /// <summary>
         /// Maximum message length. Valid range: 32 or greater. Default is 1024.

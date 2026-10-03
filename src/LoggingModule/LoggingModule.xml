@@ -155,6 +155,19 @@
             Thread ID where the log entry was created.
             </summary>
         </member>
+        <member name="P:SyslogLogging.LogEntry.TraceId">
+            <summary>
+            W3C trace ID (32 hex characters) of the <see cref="T:System.Diagnostics.Activity"/> that was current when
+            the entry was created, or null when there was none. Used by the {trace} header token and JSON output
+            to correlate log lines with distributed traces.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LogEntry.SpanId">
+            <summary>
+            W3C span ID (16 hex characters) of the <see cref="T:System.Diagnostics.Activity"/> that was current when
+            the entry was created, or null when there was none. Used by the {span} header token and JSON output.
+            </summary>
+        </member>
         <member name="M:SyslogLogging.LogEntry.#ctor">
             <summary>
             Create a new log entry.
@@ -466,39 +479,49 @@
             <param name="isMultiPart">Whether this is part of a multi-part message.</param>
             <returns>Split log entry.</returns>
         </member>
-        <member name="M:SyslogLogging.LoggingModule.WriteToConsole(SyslogLogging.LogEntry)">
+        <member name="M:SyslogLogging.LoggingModule.WriteToConsole(SyslogLogging.LogEntry,System.Int32)">
             <summary>
             Write log entry to console with color coding.
             </summary>
             <param name="entry">Log entry to write.</param>
+            <param name="part">1-based part sequence number.</param>
+            <returns>True if the write succeeded.</returns>
         </member>
-        <member name="M:SyslogLogging.LoggingModule.WriteToFile(SyslogLogging.LogEntry)">
+        <member name="M:SyslogLogging.LoggingModule.WriteToFile(SyslogLogging.LogEntry,System.Int32)">
             <summary>
             Write log entry to file.
             </summary>
             <param name="entry">Log entry to write.</param>
+            <param name="part">1-based part sequence number.</param>
+            <returns>True if the write succeeded.</returns>
         </member>
-        <member name="M:SyslogLogging.LoggingModule.WriteToFileAsync(SyslogLogging.LogEntry,System.Threading.CancellationToken)">
+        <member name="M:SyslogLogging.LoggingModule.WriteToFileAsync(SyslogLogging.LogEntry,System.Int32,System.Threading.CancellationToken)">
             <summary>
             Write log entry to file asynchronously.
             </summary>
             <param name="entry">Log entry to write.</param>
+            <param name="part">1-based part sequence number.</param>
             <param name="token">Cancellation token.</param>
+            <returns>True if the write succeeded.</returns>
         </member>
-        <member name="M:SyslogLogging.LoggingModule.SendToSyslog(SyslogLogging.SyslogServer,SyslogLogging.LogEntry)">
+        <member name="M:SyslogLogging.LoggingModule.SendToSyslog(SyslogLogging.SyslogServer,SyslogLogging.LogEntry,System.Int32)">
             <summary>
             Send log entry to syslog server.
             </summary>
             <param name="server">Syslog server.</param>
             <param name="entry">Log entry to send.</param>
+            <param name="part">1-based part sequence number.</param>
+            <returns>True if the datagram was sent.</returns>
         </member>
-        <member name="M:SyslogLogging.LoggingModule.SendToSyslogAsync(SyslogLogging.SyslogServer,SyslogLogging.LogEntry,System.Threading.CancellationToken)">
+        <member name="M:SyslogLogging.LoggingModule.SendToSyslogAsync(SyslogLogging.SyslogServer,SyslogLogging.LogEntry,System.Int32,System.Threading.CancellationToken)">
             <summary>
             Send log entry to syslog server asynchronously.
             </summary>
             <param name="server">Syslog server.</param>
             <param name="entry">Log entry to send.</param>
+            <param name="part">1-based part sequence number.</param>
             <param name="token">Cancellation token.</param>
+            <returns>True if the datagram was sent.</returns>
         </member>
         <member name="M:SyslogLogging.LoggingModule.CreateUdpClient(System.String,System.Int32)">
             <summary>
@@ -619,12 +642,10 @@
             {pid}: Process ID
             {user}: Current username
             {app}: Application/process name
-            {domain}: Application domain name
-            {cpu}: Number of processor cores
-            {mem}: Current working set memory (MB)
-            {uptime}: Process uptime (HH:mm:ss)
             {correlation}: Correlation ID (if present in log entry)
             {source}: Log source (if present in log entry)
+            {trace}: W3C trace ID of the Activity current when the entry was created (empty if none)
+            {span}: W3C span ID of the Activity current when the entry was created (empty if none)
             Default: {ts} {host} {sev}
             A space will be inserted between the header and the message.
             Setting to null or empty will result in an empty header.
@@ -695,6 +716,21 @@
         <member name="P:SyslogLogging.LoggingSettings.ExceptionSeverity">
             <summary>
             The severity level to use when logging exceptions through the .Exception() method.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LoggingSettings.EnableMetrics">
+            <summary>
+            Enable or disable metric emission on the <c>SyslogLogging</c> meter. Default is true.
+            Metrics cost effectively nothing unless a host subscribes to the meter (see TELEMETRY.md).
+            Set to false to suppress this module's metrics even when the host subscribes.
+            </summary>
+        </member>
+        <member name="P:SyslogLogging.LoggingSettings.EnableTracing">
+            <summary>
+            Enable or disable span emission on the <c>SyslogLogging</c> activity source. Default is true.
+            Spans are created only when a host subscribes to the activity source (see TELEMETRY.md).
+            When enabled and subscribed, each log entry produces one write span plus one child span per destination write.
+            Set to false to keep metrics but suppress per-entry spans on high-volume loggers.
             </summary>
         </member>
         <member name="P:SyslogLogging.LoggingSettings.MaxMessageLength">
@@ -936,6 +972,208 @@
             Dispose of the logger provider.
             </summary>
         </member>
+        <member name="T:SyslogLogging.SyslogLoggingTelemetry">
+            <summary>
+            Stable public names for the telemetry SyslogLogging emits through the base class library.
+            The library emits metrics through a <c>System.Diagnostics.Metrics.Meter</c> and traces through a
+            <c>System.Diagnostics.ActivitySource</c>, both named <see cref="F:SyslogLogging.SyslogLoggingTelemetry.MeterName"/> / <see cref="F:SyslogLogging.SyslogLoggingTelemetry.ActivitySourceName"/>.
+            It takes no dependency on any exporter or SDK. A host subscribes to these names (for example with
+            Radiant's <c>settings.Sources.AddMeter(SyslogLoggingTelemetry.MeterName)</c> or the OpenTelemetry SDK's
+            <c>AddMeter</c>/<c>AddSource</c>) and exports them. When nothing subscribes, emission is effectively free.
+            These names are a public contract consumed by dashboards and alerts; they do not change between minor versions.
+            See TELEMETRY.md in the repository root for the full catalog.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.MeterName">
+            <summary>
+            Name of the meter that carries all SyslogLogging metrics. Value: <c>SyslogLogging</c>.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.ActivitySourceName">
+            <summary>
+            Name of the activity source that carries all SyslogLogging spans. Value: <c>SyslogLogging</c>.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.EntriesMetric">
+            <summary>
+            Counter of log entries submitted to a <see cref="T:SyslogLogging.LoggingModule"/>, by severity, mode, and outcome. Unit: {entry}.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.EntryDurationMetric">
+            <summary>
+            Histogram of end-to-end time to deliver one log entry to every configured destination, by mode and outcome. Unit: s.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.EntriesSplitMetric">
+            <summary>
+            Counter of log entries that exceeded <see cref="P:SyslogLogging.LoggingSettings.MaxMessageLength"/> and were split into multiple parts. Unit: {entry}.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.IoLockWaitMetric">
+            <summary>
+            Histogram of time spent waiting to acquire the module's I/O lock (the single concurrency slot that serializes delivery). Unit: s.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.DestinationWritesMetric">
+            <summary>
+            Counter of writes to a single destination (console, file, syslog), by destination and outcome. Unit: {write}.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.DestinationDurationMetric">
+            <summary>
+            Histogram of time spent writing to a single destination, by destination and outcome. Unit: s.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.SyslogSentBytesMetric">
+            <summary>
+            Counter of UDP payload bytes sent to syslog servers, by server. Unit: By.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.ErrorsMetric">
+            <summary>
+            Counter of errors routed to <see cref="E:SyslogLogging.LoggingModule.OnLoggingError"/>, by component and error type. Unit: {error}.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.EventHandlerDurationMetric">
+            <summary>
+            Histogram of time spent inside <see cref="E:SyslogLogging.LoggingModule.MessageLogged"/> handlers, by outcome. Unit: s.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.RetentionRunsMetric">
+            <summary>
+            Counter of log retention cleanup runs, by outcome. Unit: {run}.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.RetentionDurationMetric">
+            <summary>
+            Histogram of log retention cleanup run time, by outcome. Unit: s.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.RetentionFilesDeletedMetric">
+            <summary>
+            Counter of expired log files deleted by retention cleanup. Unit: {file}.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.RetentionLastSuccessMetric">
+            <summary>
+            Gauge of the Unix time (seconds) of the most recent successful retention cleanup run in this process. Unit: s.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.ModulesActiveMetric">
+            <summary>
+            Up-down counter of <see cref="T:SyslogLogging.LoggingModule"/> instances that have been constructed and not yet disposed. Unit: {module}.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.BuildInfoMetric">
+            <summary>
+            Gauge that is always 1, labeled with the library version. No unit (so Prometheus exporters do not append a suffix).
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.WriteSpan">
+            <summary>
+            Span covering delivery of one log entry to every configured destination. Kind: Internal.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.ConsoleWriteSpan">
+            <summary>
+            Span covering one console write. Kind: Internal.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.FileWriteSpan">
+            <summary>
+            Span covering one file append. Kind: Internal.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.SyslogSendSpan">
+            <summary>
+            Span covering one UDP datagram sent to one syslog server, including client creation and name resolution. Kind: Client.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.EventHandlerSpan">
+            <summary>
+            Span covering invocation of the <see cref="E:SyslogLogging.LoggingModule.MessageLogged"/> handlers for one entry. Kind: Internal.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.RetentionSpan">
+            <summary>
+            Root span covering one log retention cleanup run. Kind: Internal.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.SeverityAttribute">
+            <summary>
+            Attribute: entry severity name (Debug, Info, Warn, Error, Alert, Critical, Emergency).
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.ModeAttribute">
+            <summary>
+            Attribute: API mode, <c>sync</c> or <c>async</c>.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.OutcomeAttribute">
+            <summary>
+            Attribute: operation outcome. Entries: success, degraded, failure, filtered. Other operations: success, failure.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.DestinationAttribute">
+            <summary>
+            Attribute: destination, <c>console</c>, <c>file</c>, or <c>syslog</c>.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.ComponentAttribute">
+            <summary>
+            Attribute: component that reported an error (console, file, syslog, pipeline, event_handler, retention).
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.EventAttribute">
+            <summary>
+            Attribute: name of the event whose handler ran, currently always <c>MessageLogged</c>.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.PartsAttribute">
+            <summary>
+            Span attribute: number of parts the entry was split into.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.PartAttribute">
+            <summary>
+            Span attribute: 1-based part sequence number of a destination write.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.SourceAttribute">
+            <summary>
+            Span attribute: source context of the entry (for example the Microsoft.Extensions.Logging category).
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.FilesDeletedAttribute">
+            <summary>
+            Span attribute: number of files deleted by a retention run.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.VersionAttribute">
+            <summary>
+            Attribute: library version (build info only).
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.ServerAddressAttribute">
+            <summary>
+            OpenTelemetry semantic-convention attribute: syslog server host name or address.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.ServerPortAttribute">
+            <summary>
+            OpenTelemetry semantic-convention attribute: syslog server port.
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.NetworkTransportAttribute">
+            <summary>
+            OpenTelemetry semantic-convention attribute: network transport (always <c>udp</c> for syslog).
+            </summary>
+        </member>
+        <member name="F:SyslogLogging.SyslogLoggingTelemetry.ErrorTypeAttribute">
+            <summary>
+            OpenTelemetry semantic-convention attribute: full type name of the exception that caused a failure.
+            </summary>
+        </member>
         <member name="T:SyslogLogging.SyslogServer">
             <summary>
             Syslog server with proper resource management and thread safety.
@@ -990,6 +1228,12 @@
         <member name="M:SyslogLogging.SyslogServer.Finalize">
             <summary>
             Finalizer to ensure resources are cleaned up.
+            </summary>
+        </member>
+        <member name="T:SyslogLogging.TelemetryInstruments">
+            <summary>
+            Process-wide meter, activity source, and instruments for SyslogLogging.
+            Every recording method is best-effort: it never throws into the logging path.
             </summary>
         </member>
     </members>

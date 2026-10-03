@@ -169,6 +169,10 @@ Comprehensive thread-safe operations:
 - Lock-free queue operations where possible
 - Proper disposal in multi-threaded environments
 
+## Telemetry
+
+The library emits metrics and traces through a BCL `Meter` and `ActivitySource`, both named `SyslogLogging`. Names are constants on `SyslogLoggingTelemetry`, and instruments live in the internal `TelemetryInstruments` class. The library takes no exporter dependency. The full catalog is in `TELEMETRY.md`, which must be kept in sync with any change to instrumentation. Tests are in `src/Test.Shared/TelemetrySuites.cs`.
+
 ## Development Commands
 
 ### Build

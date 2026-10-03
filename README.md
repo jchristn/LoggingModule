@@ -5,9 +5,9 @@
 [![NuGet Version](https://img.shields.io/nuget/v/SyslogLogging.svg?style=flat)](https://www.nuget.org/packages/SyslogLogging/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/SyslogLogging.svg)](https://www.nuget.org/packages/SyslogLogging/)
 
-SyslogLogging is a C# logging library for syslog, console, and file destinations. It supports synchronous and asynchronous logging, structured log entries, `Microsoft.Extensions.Logging` integration, and file retention management.
+SyslogLogging is a C# logging library for syslog, console, and file destinations. It supports synchronous and asynchronous logging, structured log entries, `Microsoft.Extensions.Logging` integration, file retention management, and built-in OpenTelemetry-compatible metrics and traces.
 
-Current release: `2.2.2`
+Current release: `2.3.0`
 
 Target builds:
 - `.NET Standard 2.0`
@@ -28,9 +28,16 @@ Target builds:
 - Configurable exception severity
 - Automatic retention cleanup for dated log files
 - `MessageLogged` event for post-delivery notification of each emitted log entry
+- Built-in metrics and traces on a `SyslogLogging` `Meter`/`ActivitySource` (no exporter dependency), plus `{trace}`/`{span}` header tokens for log-to-trace correlation
 - Shared Touchstone test coverage exposed through CLI, xUnit, and NUnit runners
 
-## What's New in 2.2.2
+## What's New in 2.3.0
+
+- Added built-in observability. A `System.Diagnostics.Metrics.Meter` and an `ActivitySource`, both named `SyslogLogging`, cover end-to-end and per-destination latency and outcome (console, file, each syslog server), syslog bytes sent, I/O lock wait, errors by component and `error.type`, `MessageLogged` handler time, retention cleanup runs, active modules, and build info. Nothing is emitted unless your host subscribes, and the library takes no exporter dependency. See [TELEMETRY.md](./TELEMETRY.md).
+- `LogEntry` now captures the caller's W3C trace and span IDs (`TraceId`, `SpanId`). They are available as the `{trace}` and `{span}` header tokens and in `ToJson()`, so log lines link to traces even across the syslog boundary.
+- Added `LoggingSettings.EnableMetrics` and `LoggingSettings.EnableTracing` (both default `true`).
+
+### Previously in 2.2.2
 
 - Dependency maintenance release: updated `System.Text.Json` and `Microsoft.Extensions.Logging.Abstractions` to `10.0.11` (and the bundled `SyslogServer` dependencies). No public API changes — a drop-in upgrade from 2.2.1.
 - Added a shared Touchstone `Disposal` suite verifying that use-after-dispose throws `ObjectDisposedException` and that `Dispose`/`DisposeAsync` are idempotent.
@@ -176,16 +183,14 @@ Available header variables:
 | `{host}` | Machine name | `web-server-01` |
 | `{thread}` | Thread ID | `12` |
 | `{sev}` | Severity name | `Info` |
-| `{level}` | Severity number | `6` |
+| `{level}` | Severity number | `1` |
 | `{pid}` | Process ID | `1234` |
 | `{user}` | Current username | `john.doe` |
 | `{app}` | Application name | `MyWebApp` |
-| `{domain}` | App domain | `MyWebApp.exe` |
-| `{cpu}` | CPU core count | `8` |
-| `{mem}` | Memory usage in MB | `256` |
-| `{uptime}` | Process uptime | `02:45:30` |
 | `{correlation}` | Correlation ID | `abc-123-def` |
 | `{source}` | Log source | `UserService` |
+| `{trace}` | W3C trace ID of the caller's current `Activity` (empty if none) | `4bf92f3577b34da6a3ce929d0e0e4736` |
+| `{span}` | W3C span ID of the caller's current `Activity` (empty if none) | `00f067aa0ba902b7` |
 
 `{app}` resolves in this order:
 
@@ -203,6 +208,31 @@ log.Settings = settings;
 ```
 
 Retention cleanup only applies when using `FileLoggingMode.FileWithDate`. The cleanup timer removes files matching the dated filename pattern when they are older than the configured retention period.
+
+## Telemetry
+
+SyslogLogging emits metrics and traces through the .NET base class library: a `Meter` and an `ActivitySource`, both named `SyslogLogging`. It never references an exporter. Subscribe from your host and the data flows to Prometheus, Tempo, or any OTLP backend:
+
+```csharp
+// Radiant
+settings.Sources.AddMeter(SyslogLoggingTelemetry.MeterName);
+settings.Sources.AddActivitySource(SyslogLoggingTelemetry.ActivitySourceName);
+
+// OpenTelemetry SDK
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(m => m.AddMeter(SyslogLoggingTelemetry.MeterName))
+    .WithTracing(t => t.AddSource(SyslogLoggingTelemetry.ActivitySourceName));
+```
+
+What you get:
+
+- `sysloglogging.entries` by severity and outcome (`success`, `degraded`, `failure`, `filtered`), and `sysloglogging.entry.duration`
+- `sysloglogging.destination.writes` / `.duration` per destination and per syslog server, with `error.type` on failures
+- `sysloglogging.syslog.sent` bytes, `sysloglogging.io_lock.wait.duration`, `sysloglogging.errors`, `sysloglogging.event_handler.duration`
+- Retention job runs, duration, files deleted, and last-success time; active modules; build info
+- Spans `sysloglogging write` with `console write`, `file write`, `syslog send` (Client), and `sysloglogging MessageLogged` children, nested under your request span. Retention runs get their own root span.
+
+Turn telemetry off per module with `Settings.EnableMetrics = false` / `Settings.EnableTracing = false`. Add `{trace}` and `{span}` to `HeaderFormat` to correlate log lines with traces. [TELEMETRY.md](./TELEMETRY.md) has the full metric and span catalog, recommended PromQL alerts, and a Grafana dashboard map.
 
 ## Testing
 
@@ -230,6 +260,7 @@ The shared suite covers:
 - Message ordering and concurrency
 - Syslog delivery and error handling
 - `Microsoft.Extensions.Logging` integration
+- Telemetry emission (metrics and spans for every operation, failure paths, toggles, trace correlation, and the no-listener path) via an in-memory `MeterListener`/`ActivityListener`
 
 ## Related Project
 

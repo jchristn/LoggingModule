@@ -2,6 +2,7 @@ namespace SyslogLogging
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Text.Json;
 
     /// <summary>
@@ -49,6 +50,19 @@ namespace SyslogLogging
         /// Thread ID where the log entry was created.
         /// </summary>
         public int ThreadId { get; set; } = System.Threading.Thread.CurrentThread.ManagedThreadId;
+
+        /// <summary>
+        /// W3C trace ID (32 hex characters) of the <see cref="Activity"/> that was current when
+        /// the entry was created, or null when there was none. Used by the {trace} header token and JSON output
+        /// to correlate log lines with distributed traces.
+        /// </summary>
+        public string TraceId { get; set; } = CaptureTraceId();
+
+        /// <summary>
+        /// W3C span ID (16 hex characters) of the <see cref="Activity"/> that was current when
+        /// the entry was created, or null when there was none. Used by the {span} header token and JSON output.
+        /// </summary>
+        public string SpanId { get; set; } = CaptureSpanId();
 
         /// <summary>
         /// Create a new log entry.
@@ -155,6 +169,12 @@ namespace SyslogLogging
             if (!string.IsNullOrEmpty(CorrelationId))
                 serializable["correlationId"] = CorrelationId;
 
+            if (!string.IsNullOrEmpty(TraceId))
+                serializable["traceId"] = TraceId;
+
+            if (!string.IsNullOrEmpty(SpanId))
+                serializable["spanId"] = SpanId;
+
             if (Exception != null)
             {
                 serializable["exception"] = new Dictionary<string, object>
@@ -169,6 +189,20 @@ namespace SyslogLogging
                 serializable["properties"] = Properties;
 
             return JsonSerializer.Serialize(serializable, new JsonSerializerOptions { WriteIndented = false });
+        }
+
+        private static string CaptureTraceId()
+        {
+            Activity current = Activity.Current;
+            if (current == null || current.IdFormat != ActivityIdFormat.W3C) return null;
+            return current.TraceId.ToHexString();
+        }
+
+        private static string CaptureSpanId()
+        {
+            Activity current = Activity.Current;
+            if (current == null || current.IdFormat != ActivityIdFormat.W3C) return null;
+            return current.SpanId.ToHexString();
         }
     }
 }

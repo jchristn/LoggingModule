@@ -1,5 +1,17 @@
 # Change Log
 
+## v2.3.0
+
+- Added built-in observability through the base class library: a `Meter` and an `ActivitySource`, both named `SyslogLogging` (constants on the new public `SyslogLoggingTelemetry` class). No exporter or SDK dependency, and near-zero cost when nothing subscribes. See `TELEMETRY.md`.
+- Metrics: `sysloglogging.entries` (severity/mode/outcome), `sysloglogging.entry.duration`, `sysloglogging.entries.split`, `sysloglogging.io_lock.wait.duration`, `sysloglogging.destination.writes` and `sysloglogging.destination.duration` (per destination and per syslog server, `error.type` on failure), `sysloglogging.syslog.sent` (bytes), `sysloglogging.errors` (component/`error.type`), `sysloglogging.event_handler.duration`, `sysloglogging.retention.runs` / `.duration` / `.files_deleted` / `.last_success`, `sysloglogging.modules.active`, and `sysloglogging.build.info`.
+- Spans: `sysloglogging write` with `console write`, `file write`, `syslog send` (Client), and `sysloglogging MessageLogged` children, and a root `sysloglogging retention` span per cleanup run. Explicit status, `exception` events, and no message payloads.
+- `LogEntry` captures the current W3C trace and span IDs (`TraceId`, `SpanId`). New `{trace}` and `{span}` header tokens, and `traceId`/`spanId` in `ToJson()`.
+- Added `LoggingSettings.EnableMetrics` and `LoggingSettings.EnableTracing` (default `true`).
+- The retention timer no longer captures the constructing thread's execution context, so retention runs start their own trace.
+- Added an explicit `System.Diagnostics.DiagnosticSource` 10.0.11 reference for non-`net10.0` targets. It was already a transitive dependency through `Microsoft.Extensions.Logging.Abstractions`.
+- Added a shared Touchstone `Telemetry` suite (21 cases) that verifies emission for every operation and failure path with an in-memory listener.
+- README: fixed the `{level}` example and removed the `{domain}`, `{cpu}`, `{mem}`, and `{uptime}` header tokens, which were documented but never implemented.
+
 ## v2.2.2
 
 - Dependency maintenance release. Updated `System.Text.Json` (8.0.5 → 10.0.11) and `Microsoft.Extensions.Logging.Abstractions` (8.0.0 → 10.0.11) in the library, and `SerializationHelper` (2.0.1 → 2.0.3) plus `System.Text.Json` in the bundled `SyslogServer`. No public API changes; this is a drop-in upgrade from 2.2.1.

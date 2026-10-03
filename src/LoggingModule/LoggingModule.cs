@@ -129,6 +129,7 @@ namespace SyslogLogging
             _Servers = new List<SyslogServer> { new SyslogServer("127.0.0.1", 514) };
             InitializeHeaderFormat();
             StartLogfileCleanup();
+            TelemetryInstruments.ModuleCreated();
         }
 
         /// <summary>
@@ -146,6 +147,7 @@ namespace SyslogLogging
             _Settings.EnableConsole = enableConsole;
             InitializeHeaderFormat();
             StartLogfileCleanup();
+            TelemetryInstruments.ModuleCreated();
         }
 
         /// <summary>
@@ -162,6 +164,7 @@ namespace SyslogLogging
             _Settings.EnableConsole = enableConsole;
             InitializeHeaderFormat();
             StartLogfileCleanup();
+            TelemetryInstruments.ModuleCreated();
         }
 
         /// <summary>
@@ -180,6 +183,7 @@ namespace SyslogLogging
             _Settings.EnableConsole = enableConsole;
             InitializeHeaderFormat();
             StartLogfileCleanup();
+            TelemetryInstruments.ModuleCreated();
         }
 
         #endregion
@@ -328,7 +332,11 @@ namespace SyslogLogging
         {
             ThrowIfDisposed();
             if (string.IsNullOrEmpty(message)) return;
-            if (severity < _Settings.MinimumSeverity) return;
+            if (severity < _Settings.MinimumSeverity)
+            {
+                RecordFiltered(severity, TelemetryInstruments.ModeSync);
+                return;
+            }
 
             LogEntry entry = new LogEntry(severity, message);
             ProcessLogEntry(entry);
@@ -344,7 +352,11 @@ namespace SyslogLogging
         {
             ThrowIfDisposed();
             if (string.IsNullOrEmpty(message)) return;
-            if (severity < _Settings.MinimumSeverity) return;
+            if (severity < _Settings.MinimumSeverity)
+            {
+                RecordFiltered(severity, TelemetryInstruments.ModeAsync);
+                return;
+            }
 
             LogEntry entry = new LogEntry(severity, message);
             await ProcessLogEntryAsync(entry, token).ConfigureAwait(false);
@@ -358,7 +370,11 @@ namespace SyslogLogging
         {
             ThrowIfDisposed();
             if (entry == null) throw new ArgumentNullException(nameof(entry));
-            if (entry.Severity < _Settings.MinimumSeverity) return;
+            if (entry.Severity < _Settings.MinimumSeverity)
+            {
+                RecordFiltered(entry.Severity, TelemetryInstruments.ModeSync);
+                return;
+            }
 
             ProcessLogEntry(entry);
         }
@@ -372,7 +388,11 @@ namespace SyslogLogging
         {
             ThrowIfDisposed();
             if (entry == null) throw new ArgumentNullException(nameof(entry));
-            if (entry.Severity < _Settings.MinimumSeverity) return;
+            if (entry.Severity < _Settings.MinimumSeverity)
+            {
+                RecordFiltered(entry.Severity, TelemetryInstruments.ModeAsync);
+                return;
+            }
 
             await ProcessLogEntryAsync(entry, token).ConfigureAwait(false);
         }
@@ -461,29 +481,45 @@ namespace SyslogLogging
         /// <param name="entry">Log entry to process.</param>
         private void ProcessLogEntry(LogEntry entry)
         {
+            LoggingSettings settings = _Settings;
+            bool metrics = settings.EnableMetrics;
+            long start = TelemetryInstruments.Timestamp();
+            Activity activity = null;
+            Exception failure = null;
+            int destinationFailures = 0;
+
             try
             {
-                IEnumerable<string> messageParts = SplitMessage(entry.Message, _Settings.MaxMessageLength);
+                List<string> messageParts = SplitMessage(entry.Message, settings.MaxMessageLength).ToList();
                 int sequenceNumber = 1;
-                bool isMultiPart = messageParts.Count() > 1;
+                bool isMultiPart = messageParts.Count > 1;
+
+                if (settings.EnableTracing) activity = TelemetryInstruments.StartEntryActivity(entry, TelemetryInstruments.ModeSync, messageParts.Count);
+                if (isMultiPart && metrics) TelemetryInstruments.RecordSplit(TelemetryInstruments.ModeSync);
 
                 foreach (string messagePart in messageParts)
                 {
                     LogEntry splitEntry = CreateSplitEntry(entry, messagePart, sequenceNumber, isMultiPart);
 
+                    long waitStart = TelemetryInstruments.Timestamp();
                     lock (_IoLock)
                     {
-                        if (_Settings.EnableConsole) WriteToConsole(splitEntry);
+                        if (metrics) TelemetryInstruments.RecordIoLockWait(TelemetryInstruments.ModeSync, TelemetryInstruments.ElapsedSeconds(waitStart));
+
+                        if (_Settings.EnableConsole)
+                        {
+                            if (!WriteToConsole(splitEntry, sequenceNumber)) destinationFailures++;
+                        }
 
                         if (_Settings.FileLogging != FileLoggingMode.Disabled 
                             && !string.IsNullOrEmpty(_Settings.LogFilename))
                         {
-                            WriteToFile(splitEntry);
+                            if (!WriteToFile(splitEntry, sequenceNumber)) destinationFailures++;
                         }
 
                         foreach (SyslogServer server in _Servers)
                         {
-                            SendToSyslog(server, splitEntry);
+                            if (!SendToSyslog(server, splitEntry, sequenceNumber)) destinationFailures++;
                         }
                     }
 
@@ -494,7 +530,12 @@ namespace SyslogLogging
             }
             catch (Exception ex)
             {
-                OnLoggingError?.Invoke(new Exception("Error processing log entry", ex));
+                failure = ex;
+                RaiseLoggingError(TelemetryInstruments.ComponentPipeline, new Exception("Error processing log entry", ex));
+            }
+            finally
+            {
+                CompleteEntry(entry, TelemetryInstruments.ModeSync, metrics, start, activity, failure, destinationFailures);
             }
         }
 
@@ -505,11 +546,21 @@ namespace SyslogLogging
         /// <param name="token">Cancellation token.</param>
         private async Task ProcessLogEntryAsync(LogEntry entry, CancellationToken token)
         {
+            LoggingSettings settings = _Settings;
+            bool metrics = settings.EnableMetrics;
+            long start = TelemetryInstruments.Timestamp();
+            Activity activity = null;
+            Exception failure = null;
+            int destinationFailures = 0;
+
             try
             {
-                IEnumerable<string> messageParts = SplitMessage(entry.Message, _Settings.MaxMessageLength);
+                List<string> messageParts = SplitMessage(entry.Message, settings.MaxMessageLength).ToList();
                 int sequenceNumber = 1;
-                bool isMultiPart = messageParts.Count() > 1;
+                bool isMultiPart = messageParts.Count > 1;
+
+                if (settings.EnableTracing) activity = TelemetryInstruments.StartEntryActivity(entry, TelemetryInstruments.ModeAsync, messageParts.Count);
+                if (isMultiPart && metrics) TelemetryInstruments.RecordSplit(TelemetryInstruments.ModeAsync);
 
                 foreach (string messagePart in messageParts)
                 {
@@ -517,15 +568,17 @@ namespace SyslogLogging
 
                     if (_Settings.EnableConsole)
                     {
+                        long waitStart = TelemetryInstruments.Timestamp();
                         lock (_IoLock)
                         {
-                            WriteToConsole(splitEntry);
+                            if (metrics) TelemetryInstruments.RecordIoLockWait(TelemetryInstruments.ModeAsync, TelemetryInstruments.ElapsedSeconds(waitStart));
+                            if (!WriteToConsole(splitEntry, sequenceNumber)) destinationFailures++;
                         }
                     }
 
                     if (_Settings.FileLogging != FileLoggingMode.Disabled && !string.IsNullOrEmpty(_Settings.LogFilename))
                     {
-                        await WriteToFileAsync(splitEntry, token).ConfigureAwait(false);
+                        if (!await WriteToFileAsync(splitEntry, sequenceNumber, token).ConfigureAwait(false)) destinationFailures++;
                     }
 
                     List<SyslogServer> servers;
@@ -536,7 +589,7 @@ namespace SyslogLogging
 
                     foreach (SyslogServer server in servers)
                     {
-                        await SendToSyslogAsync(server, splitEntry, token).ConfigureAwait(false);
+                        if (!await SendToSyslogAsync(server, splitEntry, sequenceNumber, token).ConfigureAwait(false)) destinationFailures++;
                     }
 
                     sequenceNumber++;
@@ -546,8 +599,65 @@ namespace SyslogLogging
             }
             catch (Exception ex)
             {
-                OnLoggingError?.Invoke(new Exception("Error processing log entry async", ex));
+                failure = ex;
+                RaiseLoggingError(TelemetryInstruments.ComponentPipeline, new Exception("Error processing log entry async", ex));
             }
+            finally
+            {
+                CompleteEntry(entry, TelemetryInstruments.ModeAsync, metrics, start, activity, failure, destinationFailures);
+            }
+        }
+
+        private void CompleteEntry(
+            LogEntry entry,
+            string mode,
+            bool metrics,
+            long start,
+            Activity activity,
+            Exception failure,
+            int destinationFailures)
+        {
+            string outcome;
+            if (failure != null) outcome = TelemetryInstruments.OutcomeFailure;
+            else if (destinationFailures > 0) outcome = TelemetryInstruments.OutcomeDegraded;
+            else outcome = TelemetryInstruments.OutcomeSuccess;
+
+            if (metrics) TelemetryInstruments.RecordEntry(entry.Severity, mode, outcome, TelemetryInstruments.ElapsedSeconds(start));
+            TelemetryInstruments.CompleteActivity(activity, outcome, failure);
+        }
+
+        private void RecordFiltered(Severity severity, string mode)
+        {
+            if (_Settings.EnableMetrics) TelemetryInstruments.RecordEntry(severity, mode, TelemetryInstruments.OutcomeFiltered, null);
+        }
+
+        private void RaiseLoggingError(string component, Exception exception)
+        {
+            if (_Settings.EnableMetrics) TelemetryInstruments.RecordError(component, exception.InnerException ?? exception);
+            OnLoggingError?.Invoke(exception);
+        }
+
+        private Activity StartDestinationActivity(string destination, int part, SyslogServer server)
+        {
+            if (!_Settings.EnableTracing) return null;
+            return TelemetryInstruments.StartDestinationActivity(destination, part, server?.Hostname, server != null ? server.Port : 0);
+        }
+
+        private void CompleteDestination(string destination, long start, Activity activity, Exception exception, SyslogServer server)
+        {
+            string outcome = exception == null ? TelemetryInstruments.OutcomeSuccess : TelemetryInstruments.OutcomeFailure;
+            if (_Settings.EnableMetrics)
+            {
+                TelemetryInstruments.RecordDestination(
+                    destination,
+                    outcome,
+                    TelemetryInstruments.ElapsedSeconds(start),
+                    exception,
+                    server?.Hostname,
+                    server != null ? server.Port : 0);
+            }
+
+            TelemetryInstruments.CompleteActivity(activity, outcome, exception);
         }
 
         private void RaiseMessageLogged(LogEntry entry)
@@ -555,13 +665,28 @@ namespace SyslogLogging
             Action<LogEntry> handler = MessageLogged;
             if (handler == null) return;
 
+            long start = TelemetryInstruments.Timestamp();
+            Activity activity = _Settings.EnableTracing ? TelemetryInstruments.StartEventHandlerActivity() : null;
+            Exception failure = null;
+
             try
             {
                 handler(entry);
             }
             catch (Exception ex)
             {
-                OnLoggingError?.Invoke(new Exception("Error in MessageLogged handler", ex));
+                failure = ex;
+            }
+            finally
+            {
+                string outcome = failure == null ? TelemetryInstruments.OutcomeSuccess : TelemetryInstruments.OutcomeFailure;
+                if (_Settings.EnableMetrics) TelemetryInstruments.RecordEventHandler(outcome, TelemetryInstruments.ElapsedSeconds(start));
+                TelemetryInstruments.CompleteActivity(activity, outcome, failure);
+            }
+
+            if (failure != null)
+            {
+                RaiseLoggingError(TelemetryInstruments.ComponentEventHandler, new Exception("Error in MessageLogged handler", failure));
             }
         }
 
@@ -605,7 +730,9 @@ namespace SyslogLogging
                 ThreadId = originalEntry.ThreadId,
                 Source = originalEntry.Source,
                 CorrelationId = originalEntry.CorrelationId,
-                Exception = originalEntry.Exception
+                Exception = originalEntry.Exception,
+                TraceId = originalEntry.TraceId,
+                SpanId = originalEntry.SpanId
             };
 
             // Copy properties
@@ -628,8 +755,14 @@ namespace SyslogLogging
         /// Write log entry to console with color coding.
         /// </summary>
         /// <param name="entry">Log entry to write.</param>
-        private void WriteToConsole(LogEntry entry)
+        /// <param name="part">1-based part sequence number.</param>
+        /// <returns>True if the write succeeded.</returns>
+        private bool WriteToConsole(LogEntry entry, int part)
         {
+            long start = TelemetryInstruments.Timestamp();
+            Activity activity = StartDestinationActivity(TelemetryInstruments.DestinationConsole, part, null);
+            Exception failure = null;
+
             try
             {
                 string formattedMessage = FormatLogEntry(entry);
@@ -650,16 +783,29 @@ namespace SyslogLogging
             }
             catch (Exception ex)
             {
-                OnLoggingError?.Invoke(new Exception("Error writing to console", ex));
+                failure = ex;
             }
+            finally
+            {
+                CompleteDestination(TelemetryInstruments.DestinationConsole, start, activity, failure, null);
+            }
+
+            if (failure != null) RaiseLoggingError(TelemetryInstruments.DestinationConsole, new Exception("Error writing to console", failure));
+            return failure == null;
         }
 
         /// <summary>
         /// Write log entry to file.
         /// </summary>
         /// <param name="entry">Log entry to write.</param>
-        private void WriteToFile(LogEntry entry)
+        /// <param name="part">1-based part sequence number.</param>
+        /// <returns>True if the write succeeded.</returns>
+        private bool WriteToFile(LogEntry entry, int part)
         {
+            long start = TelemetryInstruments.Timestamp();
+            Activity activity = StartDestinationActivity(TelemetryInstruments.DestinationFile, part, null);
+            Exception failure = null;
+
             try
             {
                 string formattedMessage = FormatLogEntry(entry);
@@ -671,17 +817,31 @@ namespace SyslogLogging
             }
             catch (Exception ex)
             {
-                OnLoggingError?.Invoke(new Exception("Error writing to file", ex));
+                failure = ex;
             }
+            finally
+            {
+                CompleteDestination(TelemetryInstruments.DestinationFile, start, activity, failure, null);
+            }
+
+            if (failure != null) RaiseLoggingError(TelemetryInstruments.DestinationFile, new Exception("Error writing to file", failure));
+            return failure == null;
         }
 
         /// <summary>
         /// Write log entry to file asynchronously.
         /// </summary>
         /// <param name="entry">Log entry to write.</param>
+        /// <param name="part">1-based part sequence number.</param>
         /// <param name="token">Cancellation token.</param>
-        private async Task WriteToFileAsync(LogEntry entry, CancellationToken token)
+        /// <returns>True if the write succeeded.</returns>
+        private async Task<bool> WriteToFileAsync(LogEntry entry, int part, CancellationToken token)
         {
+            long start = TelemetryInstruments.Timestamp();
+            Activity activity = StartDestinationActivity(TelemetryInstruments.DestinationFile, part, null);
+            bool metrics = _Settings.EnableMetrics;
+            Exception failure = null;
+
             try
             {
                 string formattedMessage = FormatLogEntry(entry) + Environment.NewLine;
@@ -692,16 +852,25 @@ namespace SyslogLogging
                 {
                     token.ThrowIfCancellationRequested();
 
+                    long waitStart = TelemetryInstruments.Timestamp();
                     lock (_IoLock)
                     {
+                        if (metrics) TelemetryInstruments.RecordIoLockWait(TelemetryInstruments.ModeAsync, TelemetryInstruments.ElapsedSeconds(waitStart));
                         File.AppendAllText(filename, formattedMessage);
                     }
                 }, token).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                OnLoggingError?.Invoke(new Exception("Error writing to file async", ex));
+                failure = ex;
             }
+            finally
+            {
+                CompleteDestination(TelemetryInstruments.DestinationFile, start, activity, failure, null);
+            }
+
+            if (failure != null) RaiseLoggingError(TelemetryInstruments.DestinationFile, new Exception("Error writing to file async", failure));
+            return failure == null;
         }
 
         /// <summary>
@@ -709,21 +878,35 @@ namespace SyslogLogging
         /// </summary>
         /// <param name="server">Syslog server.</param>
         /// <param name="entry">Log entry to send.</param>
-        private void SendToSyslog(SyslogServer server, LogEntry entry)
+        /// <param name="part">1-based part sequence number.</param>
+        /// <returns>True if the datagram was sent.</returns>
+        private bool SendToSyslog(SyslogServer server, LogEntry entry, int part)
         {
+            long start = TelemetryInstruments.Timestamp();
+            Activity activity = StartDestinationActivity(TelemetryInstruments.DestinationSyslog, part, server);
+            Exception failure = null;
+
             try
             {
                 using (UdpClient client = CreateUdpClient(server.Hostname, server.Port))
                 {
                     string syslogMessage = BuildSyslogMessage(entry);
                     byte[] data = Encoding.UTF8.GetBytes(syslogMessage);
-                    client.Send(data, data.Length);
+                    int sent = client.Send(data, data.Length);
+                    if (_Settings.EnableMetrics) TelemetryInstruments.RecordSyslogBytes(server.Hostname, server.Port, sent);
                 }
             }
             catch (Exception ex)
             {
-                OnLoggingError?.Invoke(new Exception($"Error sending to syslog {server.IpPort}", ex));
+                failure = ex;
             }
+            finally
+            {
+                CompleteDestination(TelemetryInstruments.DestinationSyslog, start, activity, failure, server);
+            }
+
+            if (failure != null) RaiseLoggingError(TelemetryInstruments.DestinationSyslog, new Exception($"Error sending to syslog {server.IpPort}", failure));
+            return failure == null;
         }
 
         /// <summary>
@@ -731,22 +914,36 @@ namespace SyslogLogging
         /// </summary>
         /// <param name="server">Syslog server.</param>
         /// <param name="entry">Log entry to send.</param>
+        /// <param name="part">1-based part sequence number.</param>
         /// <param name="token">Cancellation token.</param>
-        private async Task SendToSyslogAsync(SyslogServer server, LogEntry entry, CancellationToken token)
+        /// <returns>True if the datagram was sent.</returns>
+        private async Task<bool> SendToSyslogAsync(SyslogServer server, LogEntry entry, int part, CancellationToken token)
         {
+            long start = TelemetryInstruments.Timestamp();
+            Activity activity = StartDestinationActivity(TelemetryInstruments.DestinationSyslog, part, server);
+            Exception failure = null;
+
             try
             {
                 using (UdpClient client = CreateUdpClient(server.Hostname, server.Port))
                 {
                     string syslogMessage = BuildSyslogMessage(entry);
                     byte[] data = Encoding.UTF8.GetBytes(syslogMessage);
-                    await client.SendAsync(data, data.Length).ConfigureAwait(false);
+                    int sent = await client.SendAsync(data, data.Length).ConfigureAwait(false);
+                    if (_Settings.EnableMetrics) TelemetryInstruments.RecordSyslogBytes(server.Hostname, server.Port, sent);
                 }
             }
             catch (Exception ex)
             {
-                OnLoggingError?.Invoke(new Exception($"Error sending to syslog async {server.IpPort}", ex));
+                failure = ex;
             }
+            finally
+            {
+                CompleteDestination(TelemetryInstruments.DestinationSyslog, start, activity, failure, server);
+            }
+
+            if (failure != null) RaiseLoggingError(TelemetryInstruments.DestinationSyslog, new Exception($"Error sending to syslog async {server.IpPort}", failure));
+            return failure == null;
         }
 
         /// <summary>
@@ -795,7 +992,9 @@ namespace SyslogLogging
                 {"{user}", _ => Environment.UserName ?? "unknown"},
                 {"{app}", _ => GetApplicationName()},
                 {"{correlation}", entry => entry.CorrelationId ?? ""},
-                {"{source}", entry => entry.Source ?? ""}
+                {"{source}", entry => entry.Source ?? ""},
+                {"{trace}", entry => entry.TraceId ?? ""},
+                {"{span}", entry => entry.SpanId ?? ""}
             };
 
             // Find all dynamic variables in the header format
@@ -1001,11 +1200,22 @@ namespace SyslogLogging
 
                 // Timer fires every 60 seconds (60000 ms)
                 // Initial delay of 5 seconds to allow application startup
-                _RetentionTimer = new Timer(
-                    RetentionTimerCallback,
-                    null,
-                    TimeSpan.FromSeconds(5),
-                    TimeSpan.FromMinutes(1));
+                // Suppress execution-context flow so retention runs start their own root trace
+                // instead of inheriting whatever Activity was current when the module was configured.
+                bool restoreFlow = !ExecutionContext.IsFlowSuppressed();
+                if (restoreFlow) ExecutionContext.SuppressFlow();
+                try
+                {
+                    _RetentionTimer = new Timer(
+                        RetentionTimerCallback,
+                        null,
+                        TimeSpan.FromSeconds(5),
+                        TimeSpan.FromMinutes(1));
+                }
+                finally
+                {
+                    if (restoreFlow) ExecutionContext.RestoreFlow();
+                }
 
                 _RetentionStarted = true;
             }
@@ -1045,7 +1255,7 @@ namespace SyslogLogging
             }
             catch (Exception ex)
             {
-                OnLoggingError?.Invoke(new Exception("Error during log retention cleanup", ex));
+                RaiseLoggingError(TelemetryInstruments.ComponentRetention, new Exception("Error during log retention cleanup", ex));
             }
         }
 
@@ -1053,6 +1263,32 @@ namespace SyslogLogging
         /// Clean up log files older than the configured retention period.
         /// </summary>
         private void CleanupOldLogFiles()
+        {
+            bool metrics = _Settings.EnableMetrics;
+            long start = TelemetryInstruments.Timestamp();
+            Activity activity = _Settings.EnableTracing ? TelemetryInstruments.StartRetentionActivity() : null;
+            int filesDeleted = 0;
+            Exception failure = null;
+
+            try
+            {
+                CleanupOldLogFilesCore(ref filesDeleted, ref failure);
+            }
+            catch (Exception ex)
+            {
+                failure = ex;
+                throw;
+            }
+            finally
+            {
+                string outcome = failure == null ? TelemetryInstruments.OutcomeSuccess : TelemetryInstruments.OutcomeFailure;
+                if (metrics) TelemetryInstruments.RecordRetention(outcome, TelemetryInstruments.ElapsedSeconds(start), filesDeleted);
+                activity?.SetTag(SyslogLoggingTelemetry.FilesDeletedAttribute, filesDeleted);
+                TelemetryInstruments.CompleteActivity(activity, outcome, failure);
+            }
+        }
+
+        private void CleanupOldLogFilesCore(ref int filesDeleted, ref Exception failure)
         {
             string logFilename;
             int retentionDays;
@@ -1119,19 +1355,22 @@ namespace SyslogLogging
                             if (fileDate < cutoffDate)
                             {
                                 File.Delete(filePath);
+                                filesDeleted++;
                             }
                         }
                     }
                     catch (Exception ex)
                     {
                         // Log error but continue with other files
-                        OnLoggingError?.Invoke(new Exception($"Error deleting old log file: {filePath}", ex));
+                        if (failure == null) failure = ex;
+                        RaiseLoggingError(TelemetryInstruments.ComponentRetention, new Exception($"Error deleting old log file: {filePath}", ex));
                     }
                 }
             }
             catch (Exception ex)
             {
-                OnLoggingError?.Invoke(new Exception($"Error enumerating log files in directory: {directory}", ex));
+                failure = ex;
+                RaiseLoggingError(TelemetryInstruments.ComponentRetention, new Exception($"Error enumerating log files in directory: {directory}", ex));
             }
         }
 
@@ -1172,6 +1411,7 @@ namespace SyslogLogging
                 }
 
                 _Disposed = true;
+                TelemetryInstruments.ModuleDisposed();
             }
         }
 

@@ -38,7 +38,16 @@ The LoggingModule project targets:
 - .NET Framework 4.6.2 and 4.8 (for legacy applications)
 - .NET 8.0 and 10.0 (for modern applications)
 
-## Key Features (v2.2.1)
+## Key Features (v2.3.0)
+
+### Telemetry (v2.3.0)
+- BCL-only: `Meter` and `ActivitySource` both named `SyslogLogging`. No OpenTelemetry/Radiant/exporter reference in the library, ever.
+- All metric, span, and attribute names live in the public `SyslogLoggingTelemetry` constants class (a public contract; never rename within a major version).
+- Instruments and recording helpers live in the internal `TelemetryInstruments` class. Every helper is best-effort (try/catch) and must never throw into logging.
+- Metric labels must stay bounded (severity, mode, outcome, destination, component, configured server.address/port, error.type). Never put message text, properties, correlation IDs, or file paths on metrics or spans.
+- `LoggingSettings.EnableMetrics` / `EnableTracing` gate per-module emission.
+- Any new code path (destination, background job, event) gets a duration histogram with an outcome, an errors entry, and a span. Add a case to `Test.Shared/TelemetrySuites.cs` and update `TELEMETRY.md`.
+- Tests capture telemetry with `TelemetryCapture` (MeterListener + ActivityListener isolated per test via AsyncLocal).
 
 ### Message Notifications
 - `LoggingModule.MessageLogged` event raised once per emitted log entry after delivery to all destinations
@@ -130,7 +139,7 @@ LoggingModule.Settings provides extensive configuration:
 
 The project is configured for automatic NuGet package generation with:
 - Package ID: SyslogLogging
-- Version: 2.2.2
+- Version: 2.3.0
 - Multi-framework targeting
 - Includes documentation XML, license, and logo assets
 - Generates symbol packages (.snupkg) for debugging
