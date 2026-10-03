@@ -1,5 +1,10 @@
 # Change Log
 
+## v2.3.1
+
+- Fixed `DisposeAsync()`, which called `Dispose(false)` and so skipped stopping the log retention timer. It now releases the same resources as `Dispose()`. Modules disposed with `await using` or `DisposeAsync()` no longer leave a retention timer running.
+- Added `Disposal` suite cases verifying that both `Dispose()` and `DisposeAsync()` stop the retention timer.
+
 ## v2.3.0
 
 - Added built-in observability through the base class library: a `Meter` and an `ActivitySource`, both named `SyslogLogging` (constants on the new public `SyslogLoggingTelemetry` class). No exporter or SDK dependency, and near-zero cost when nothing subscribes. See `TELEMETRY.md`.

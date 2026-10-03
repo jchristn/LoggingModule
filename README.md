@@ -7,7 +7,7 @@
 
 SyslogLogging is a C# logging library for syslog, console, and file destinations. It supports synchronous and asynchronous logging, structured log entries, `Microsoft.Extensions.Logging` integration, file retention management, and built-in OpenTelemetry-compatible metrics and traces.
 
-Current release: `2.3.0`
+Current release: `2.3.1`
 
 Target builds:
 - `.NET Standard 2.0`
@@ -31,7 +31,11 @@ Target builds:
 - Built-in metrics and traces on a `SyslogLogging` `Meter`/`ActivitySource` (no exporter dependency), plus `{trace}`/`{span}` header tokens for log-to-trace correlation
 - Shared Touchstone test coverage exposed through CLI, xUnit, and NUnit runners
 
-## What's New in 2.3.0
+## What's New in 2.3.1
+
+- Fixed `DisposeAsync()` so it stops the log retention timer. Previously only `Dispose()` did, so a module released with `await using` or `DisposeAsync()` left its retention timer running.
+
+### Previously in 2.3.0
 
 - Added built-in observability. A `System.Diagnostics.Metrics.Meter` and an `ActivitySource`, both named `SyslogLogging`, cover end-to-end and per-destination latency and outcome (console, file, each syslog server), syslog bytes sent, I/O lock wait, errors by component and `error.type`, `MessageLogged` handler time, retention cleanup runs, active modules, and build info. Nothing is emitted unless your host subscribes, and the library takes no exporter dependency. See [TELEMETRY.md](./TELEMETRY.md).
 - `LogEntry` now captures the caller's W3C trace and span IDs (`TraceId`, `SpanId`). They are available as the `{trace}` and `{span}` header tokens and in `ToJson()`, so log lines link to traces even across the syslog boundary.

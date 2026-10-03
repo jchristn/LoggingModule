@@ -465,10 +465,11 @@ namespace SyslogLogging
         /// <summary>
         /// Dispose of the object asynchronously.
         /// </summary>
-        public async ValueTask DisposeAsync()
+        public ValueTask DisposeAsync()
         {
-            Dispose(false);
+            Dispose(true);
             GC.SuppressFinalize(this);
+            return default;
         }
 
         #endregion

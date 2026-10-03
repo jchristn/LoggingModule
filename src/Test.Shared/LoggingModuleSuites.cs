@@ -2178,7 +2178,57 @@ namespace SyslogLogging.Tests.Shared
 
                             return;
                         }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "Disposal",
+                        caseId: "DisposeStopsRetentionTimer",
+                        displayName: "Dispose stops the log retention timer",
+                        executeAsync: _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("dispose-retention-sync");
+                            LoggingModule log = CreateRetentionLogger(temp.GetPath("dispose-retention-sync.log"));
+                            AssertRetentionRunning(log, true, "Retention should be running before Dispose.");
+
+                            log.Dispose();
+
+                            AssertRetentionRunning(log, false, "Dispose should stop retention.");
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "Disposal",
+                        caseId: "DisposeAsyncStopsRetentionTimer",
+                        displayName: "DisposeAsync stops the log retention timer",
+                        executeAsync: async _ =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("dispose-retention-async");
+                            LoggingModule log = CreateRetentionLogger(temp.GetPath("dispose-retention-async.log"));
+                            AssertRetentionRunning(log, true, "Retention should be running before DisposeAsync.");
+
+                            await log.DisposeAsync().ConfigureAwait(false);
+
+                            AssertRetentionRunning(log, false, "DisposeAsync should stop retention.");
+                        }),
                 });
+        }
+
+        private static LoggingModule CreateRetentionLogger(string logFile)
+        {
+            LoggingModule log = new LoggingModule(logFile, FileLoggingMode.FileWithDate, false);
+            TestHelpers.ConfigureSettings(log, settings => settings.LogRetentionDays = 5);
+            return log;
+        }
+
+        private static void AssertRetentionRunning(LoggingModule log, bool expected, string message)
+        {
+            FieldInfo? startedField = typeof(LoggingModule).GetField("_RetentionStarted", BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo? timerField = typeof(LoggingModule).GetField("_RetentionTimer", BindingFlags.Instance | BindingFlags.NonPublic);
+            TestHelpers.AssertTrue(startedField != null && timerField != null, "Retention fields should exist.");
+
+            bool started = (bool)startedField!.GetValue(log)!;
+            object? timer = timerField!.GetValue(log);
+            TestHelpers.AssertEqual(expected, started, message);
+            TestHelpers.AssertEqual(expected, timer != null, message);
         }
 
         private static IEnumerable<TestCaseDescriptor> CreateSyncSeverityCases()

@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net462;net48;net8.0;net10.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>2.3.0</Version>
+		<Version>2.3.1</Version>
 		<Authors>Joel Christner</Authors>
 		<PackageId>SyslogLogging</PackageId>
 		<Product>SyslogLogging</Product>
@@ -14,7 +14,7 @@
 		<RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
 		<RepositoryType>Github</RepositoryType>
 		<PackageLicenseUrl></PackageLicenseUrl>
-		<PackageReleaseNotes>Adds built-in OpenTelemetry-compatible observability: a System.Diagnostics.Metrics Meter and an ActivitySource, both named SyslogLogging, covering per-entry and per-destination latency and outcome, syslog bytes sent, I/O lock wait, errors by type, MessageLogged handler time, retention cleanup runs, and lifecycle. Log entries now capture the current W3C trace and span IDs ({trace}/{span} header tokens, traceId/spanId in JSON). New LoggingSettings.EnableMetrics and EnableTracing toggles. No exporter dependency; near-zero cost when nothing subscribes. See TELEMETRY.md.</PackageReleaseNotes>
+		<PackageReleaseNotes>Fixes DisposeAsync so it stops the log retention timer (previously only Dispose did, leaving a timer running after DisposeAsync). 2.3.0 added built-in OpenTelemetry-compatible metrics and traces through a BCL Meter and ActivitySource named SyslogLogging; see TELEMETRY.md.</PackageReleaseNotes>
 		<PackageIconUrl></PackageIconUrl>
 		<RootNamespace>SyslogLogging</RootNamespace>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
