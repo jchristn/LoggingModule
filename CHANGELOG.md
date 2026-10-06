@@ -1,5 +1,21 @@
 # Change Log
 
+## v2.4.0
+
+Native AOT and trimming support. This is a minor release: the only API addition is a new overload, and `ToJson()` output in regular (JIT) applications is byte-identical to 2.3.x.
+
+- The `net8.0` and `net10.0` builds are marked `IsAotCompatible` (which also marks them trimmable). The trim, AOT, and single-file analyzers report no warnings, and the trim/AOT warning codes are now build errors so a regression fails the build. The `netstandard2.0`, `netstandard2.1`, `net462`, and `net48` builds are unchanged.
+- `LogEntry.ToJson()` no longer uses reflection-based `System.Text.Json` for the entry itself. It writes with `Utf8JsonWriter`, so fixed fields and property values of common scalar types (string, bool, every numeric type, char, enums, `DateTime`, `DateTimeOffset`, `DateOnly`, `TimeOnly`, `TimeSpan`, `Guid`, `Uri`, `Version`, `byte[]`) serialize without reflection in exactly the format `System.Text.Json` uses.
+  - In regular applications, other property values (objects, collections, dictionaries) still go through reflection-based `System.Text.Json`, so output is unchanged. A new shared test suite compares the new writer byte-for-byte against a verbatim copy of the 2.3.x implementation.
+  - In trimmed and Native AOT applications, where reflection-based serialization is disabled by default (`JsonSerializer.IsReflectionEnabledByDefault` is false), dictionaries are written as JSON objects, other enumerables as arrays, and any remaining object as its invariant-culture string. Previously `ToJson()` threw `InvalidOperationException` in those applications.
+- Added `LogEntry.ToJson(JsonSerializerOptions options)`. Property values are serialized with the contract the options resolve, so a source-generated `JsonSerializerContext` serializes complex property values in full under Native AOT. The options also control indentation, the encoder, maximum depth, and converters. Values the resolver doesn't know are written as `ToJson()` would write them.
+- Fixed: a `NaN`, `Infinity`, or `-Infinity` property value made `ToJson()` throw `ArgumentException`. It is now written as the string `"NaN"`, `"Infinity"`, or `"-Infinity"`.
+- Fixed: `ToJson()` threw `NullReferenceException` when `LogEntry.Properties` had been set to null. A null dictionary is now treated as empty.
+- Fixed `LoggingModule.csproj` copying `LoggingModule.xml` to the output twice, which made `dotnet publish` fail with `NETSDK1152` for projects that reference the library project directly. The NuGet package was not affected and still ships the XML documentation for every target.
+- `SyslogServer` (2.4.0): now reads and writes `syslog.json` with `System.Text.Json` source generation and can be published as a native executable (`-p:NativeAot=true`). Removed the `SerializationHelper` and `Microsoft.CSharp` dependencies. Existing settings files load unchanged (property names are matched case-insensitively, and comments and trailing commas are allowed), and a newly created `syslog.json` is byte-identical to the one 2.3.2 wrote.
+- Added `Test.Aot`, a Native AOT smoke test that runs as a native binary and covers JSON serialization, file, dated-file, syslog, and console logging, structured logging, events, exception severity, `Microsoft.Extensions.Logging`, metrics and traces, concurrency, and disposal. It treats every trim/AOT warning as an error.
+- Added a shared Touchstone `Json` suite (25 cases) covering the documented format, 2.3.x parity in both modes, enums, non-finite numbers, key escaping, depth limiting, cycles, every `ToJson(options)` behavior, concurrency, `ILogger` template arguments, and the trimmable assembly marker. All 157 shared cases pass on net8.0 and net10.0 under the CLI, xUnit, and NUnit runners.
+
 ## v2.3.2
 
 - Dependency maintenance release. Updated `System.Text.Json`, `Microsoft.Extensions.Logging.Abstractions`, and `System.Diagnostics.DiagnosticSource` (10.0.11 → 10.0.12) in the library, and `SerializationHelper` (2.0.3 → 2.1.0) plus `System.Text.Json` in the bundled `SyslogServer` (now versioned 2.3.2 to align with the library). No public API changes; this is a drop-in upgrade from 2.3.1.

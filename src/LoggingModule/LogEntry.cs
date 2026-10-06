@@ -3,6 +3,8 @@ namespace SyslogLogging
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
+    using System.Text;
     using System.Text.Json;
 
     /// <summary>
@@ -150,45 +152,121 @@ namespace SyslogLogging
         }
 
         /// <summary>
-        /// Serialize the log entry to JSON format.
+        /// Serialize the log entry to compact JSON.
+        /// <para>
+        /// Safe for trimmed and Native AOT applications. The fixed fields (timestamp, severity, message, threadId,
+        /// source, correlationId, traceId, spanId, exception) are always written without reflection. Property values
+        /// of common scalar types (string, bool, every numeric type, char, enums, DateTime, DateTimeOffset, DateOnly,
+        /// TimeOnly, TimeSpan, Guid, Uri, Version, and byte arrays) are also written without reflection, in the same
+        /// format System.Text.Json uses.
+        /// </para>
+        /// <para>
+        /// Other property values (objects, collections, dictionaries) are serialized with reflection-based
+        /// System.Text.Json when the runtime allows it (<see cref="JsonSerializer.IsReflectionEnabledByDefault"/>),
+        /// which is the default for regular JIT applications. When reflection-based serialization is disabled, which is
+        /// the default for trimmed and Native AOT applications, dictionaries are written as JSON objects, other
+        /// enumerables as JSON arrays, and any remaining value as its invariant-culture string representation. Use
+        /// <see cref="ToJson(JsonSerializerOptions)"/> with a source-generated resolver to serialize complex values in full
+        /// under Native AOT.
+        /// </para>
+        /// <para>
+        /// A non-finite floating-point property value (NaN, positive or negative infinity) is written as the JSON string
+        /// "NaN", "Infinity", or "-Infinity" instead of throwing. Inside a complex value serialized by reflection,
+        /// System.Text.Json number handling applies instead.
+        /// </para>
+        /// <para>
+        /// This method is not thread-safe with respect to concurrent modification of <see cref="Properties"/>.
+        /// </para>
         /// </summary>
-        /// <returns>JSON representation of the log entry.</returns>
+        /// <returns>JSON representation of the log entry. Never null.</returns>
+        /// <exception cref="JsonException">Thrown when a complex property value cannot be serialized by reflection-based System.Text.Json, for example an object graph containing a cycle.</exception>
+        /// <exception cref="NotSupportedException">Thrown when a complex property value is of a type reflection-based System.Text.Json does not support.</exception>
         public string ToJson()
         {
-            Dictionary<string, object> serializable = new Dictionary<string, object>
+            return ToJsonCore(null, JsonSerializer.IsReflectionEnabledByDefault);
+        }
+
+        /// <summary>
+        /// Serialize the log entry to JSON using the supplied <see cref="JsonSerializerOptions"/> for property values.
+        /// <para>
+        /// The fixed field names are unchanged by the options. The options control indentation
+        /// (<see cref="JsonSerializerOptions.WriteIndented"/>), character escaping (<see cref="JsonSerializerOptions.Encoder"/>),
+        /// maximum depth (<see cref="JsonSerializerOptions.MaxDepth"/>), and how each property value is serialized.
+        /// </para>
+        /// <para>
+        /// Each non-null property value is serialized with the contract the options resolve for its runtime type.
+        /// When <see cref="JsonSerializerOptions.TypeInfoResolver"/> is null, reflection-based System.Text.Json is used
+        /// with these options if the runtime allows it (<see cref="JsonSerializer.IsReflectionEnabledByDefault"/>).
+        /// To serialize complex values in trimmed or Native AOT applications, set
+        /// <see cref="JsonSerializerOptions.TypeInfoResolver"/> to a source-generated <see cref="System.Text.Json.Serialization.JsonSerializerContext"/>
+        /// that includes those types. A value whose type the options cannot resolve is written exactly as <see cref="ToJson()"/>
+        /// would write it. Non-finite floating-point property values are always written as strings, as with <see cref="ToJson()"/>.
+        /// </para>
+        /// <para>
+        /// As with any System.Text.Json call, the options instance becomes read-only once a property value has been
+        /// serialized with it.
+        /// </para>
+        /// </summary>
+        /// <param name="options">Serializer options. Cannot be null.</param>
+        /// <returns>JSON representation of the log entry. Never null.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when options is null.</exception>
+        /// <exception cref="JsonException">Thrown when a property value cannot be serialized, for example an object graph containing a cycle.</exception>
+        /// <exception cref="NotSupportedException">Thrown when a property value is of a type the resolved contract does not support.</exception>
+        public string ToJson(JsonSerializerOptions options)
+        {
+            if (options == null) throw new ArgumentNullException(nameof(options));
+            return ToJsonCore(options, JsonSerializer.IsReflectionEnabledByDefault);
+        }
+
+        internal string ToJsonCore(JsonSerializerOptions options, bool allowReflection)
+        {
+            JsonWriterOptions writerOptions = new JsonWriterOptions
             {
-                ["timestamp"] = Timestamp.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-                ["severity"] = Severity.ToString(),
-                ["message"] = Message,
-                ["threadId"] = ThreadId
+                Indented = options != null && options.WriteIndented,
+                Encoder = options?.Encoder,
+                MaxDepth = options != null ? options.MaxDepth : 0
             };
 
-            if (!string.IsNullOrEmpty(Source))
-                serializable["source"] = Source;
-
-            if (!string.IsNullOrEmpty(CorrelationId))
-                serializable["correlationId"] = CorrelationId;
-
-            if (!string.IsNullOrEmpty(TraceId))
-                serializable["traceId"] = TraceId;
-
-            if (!string.IsNullOrEmpty(SpanId))
-                serializable["spanId"] = SpanId;
-
-            if (Exception != null)
+            using (MemoryStream stream = new MemoryStream())
             {
-                serializable["exception"] = new Dictionary<string, object>
+                using (Utf8JsonWriter writer = new Utf8JsonWriter(stream, writerOptions))
                 {
-                    ["type"] = Exception.GetType().FullName,
-                    ["message"] = Exception.Message,
-                    ["stackTrace"] = Exception.StackTrace
-                };
+                    writer.WriteStartObject();
+                    writer.WriteString("timestamp", Timestamp.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
+                    writer.WriteString("severity", Severity.ToString());
+                    writer.WriteString("message", Message);
+                    writer.WriteNumber("threadId", ThreadId);
+
+                    if (!string.IsNullOrEmpty(Source)) writer.WriteString("source", Source);
+                    if (!string.IsNullOrEmpty(CorrelationId)) writer.WriteString("correlationId", CorrelationId);
+                    if (!string.IsNullOrEmpty(TraceId)) writer.WriteString("traceId", TraceId);
+                    if (!string.IsNullOrEmpty(SpanId)) writer.WriteString("spanId", SpanId);
+
+                    if (Exception != null)
+                    {
+                        writer.WriteStartObject("exception");
+                        writer.WriteString("type", Exception.GetType().FullName);
+                        writer.WriteString("message", Exception.Message);
+                        writer.WriteString("stackTrace", Exception.StackTrace);
+                        writer.WriteEndObject();
+                    }
+
+                    if (Properties != null && Properties.Count > 0)
+                    {
+                        writer.WriteStartObject("properties");
+                        foreach (KeyValuePair<string, object> kvp in Properties)
+                        {
+                            writer.WritePropertyName(kvp.Key);
+                            LogEntryJsonWriter.WriteValue(writer, kvp.Value, options, allowReflection, 0);
+                        }
+                        writer.WriteEndObject();
+                    }
+
+                    writer.WriteEndObject();
+                }
+
+                return Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int)stream.Length);
             }
-
-            if (Properties.Count > 0)
-                serializable["properties"] = Properties;
-
-            return JsonSerializer.Serialize(serializable, new JsonSerializerOptions { WriteIndented = false });
         }
 
         private static string CaptureTraceId()

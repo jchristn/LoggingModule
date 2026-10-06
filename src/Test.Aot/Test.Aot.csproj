@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Native AOT smoke test. Exercises the library end to end as a native executable and fails on any
+    trim or AOT analysis warning. Run with:
+
+      dotnet publish Test.Aot/Test.Aot.csproj -c Release -f net10.0 -r <rid> -o ./aot-out
+      ./aot-out/Test.Aot (pass the require-native switch to fail when not running natively)
+
+    It can also run under the JIT (dotnet run) to compare behavior with reflection enabled.
+  -->
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <PublishAot>true</PublishAot>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LoggingModule\LoggingModule.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.12" />
+  </ItemGroup>
+
+</Project>

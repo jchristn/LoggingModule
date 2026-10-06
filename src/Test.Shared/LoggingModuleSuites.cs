@@ -37,6 +37,7 @@ namespace SyslogLogging.Tests.Shared
                     MessageLoggedSuite(),
                     DisposalSuite(),
                     TelemetrySuites.TelemetrySuite(),
+                    JsonSuites.JsonSuite(),
                 };
             }
         }

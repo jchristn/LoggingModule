@@ -11,7 +11,8 @@ SyslogLogging is a C# class library for logging to syslog, console, and file sys
 ### Core Components
 
 - **LoggingModule.cs**: Main class implementing `IDisposable` and `IAsyncDisposable`. Provides sync/async API for logging with background processing, structured logging, and persistent queuing.
-- **LogEntry.cs**: Structured log entry with properties, correlation IDs, and metadata support.
+- **LogEntry.cs**: Structured log entry with properties, correlation IDs, and metadata support. `ToJson()` / `ToJson(JsonSerializerOptions)` write with `Utf8JsonWriter`.
+- **LogEntryJsonWriter.cs** (internal): Reflection-free writer for property values. Falls back to reflection-based System.Text.Json only when `JsonSerializer.IsReflectionEnabledByDefault` is true.
 - **PersistentLogQueue.cs**: File-backed queue system for reliable log message delivery that survives application restarts.
 - **LogProcessingService.cs**: Background service handling batched processing of log entries with per-target queues.
 - **SyslogLoggerProvider.cs**: Microsoft.Extensions.Logging integration provider.
@@ -29,6 +30,8 @@ SyslogLogging is a C# class library for logging to syslog, console, and file sys
 - **Test.Automated/**: Console runner for the shared Touchstone suites
 - **Test.Xunit/**: xUnit adapter project for the shared Touchstone suites
 - **Test.Nunit/**: NUnit adapter project for the shared Touchstone suites
+- **Test.Aot/**: Native AOT smoke test; publishes as a native binary and fails on any trim/AOT warning
+- **SyslogServer/**: Development syslog receiver; settings via source-generated `SettingsJsonContext`, publishable with `-p:NativeAot=true`
 - **assets/**: Contains logo files and branding assets
 
 ### Multi-targeting Support
@@ -38,7 +41,13 @@ The LoggingModule project targets:
 - .NET Framework 4.6.2 and 4.8 (for legacy applications)
 - .NET 8.0 and 10.0 (for modern applications)
 
-## Key Features (v2.3.2)
+## Key Features (v2.4.0)
+
+### Native AOT and Trimming (v2.4.0)
+- net8.0/net10.0 builds are `IsAotCompatible`; trim/AOT warning codes are build errors (see `WarningsAsErrors` in `LoggingModule.csproj`).
+- No reflection-based `JsonSerializer` calls except `LogEntryJsonWriter.WriteWithReflection`, which is only reached when `JsonSerializer.IsReflectionEnabledByDefault` is true.
+- `LogEntry.ToJson()` JIT output is a compatibility contract, verified byte-for-byte against a 2.3.x copy by `Test.Shared/JsonSuites.cs`. Use the internal `LogEntry.ToJsonCore(options, allowReflection: false)` (InternalsVisibleTo Test.Shared) to test the AOT path under the JIT.
+- New features need a check in `Test.Aot/Program.cs`. Verify with `dotnet publish Test.Aot/Test.Aot.csproj -c Release -f net10.0 -r <rid> -o ./aot-out && ./aot-out/Test.Aot --require-native`.
 
 ### Telemetry (v2.3.0)
 - BCL-only: `Meter` and `ActivitySource` both named `SyslogLogging`. No OpenTelemetry/Radiant/exporter reference in the library, ever.
@@ -105,6 +114,10 @@ dotnet run --project Test.Automated/Test.Automated.csproj -f net10.0
 # Run xUnit and NUnit adapters
 dotnet test Test.Xunit/Test.Xunit.csproj
 dotnet test Test.Nunit/Test.Nunit.csproj
+
+# Native AOT smoke test (native binary)
+dotnet publish Test.Aot/Test.Aot.csproj -c Release -f net10.0 -r osx-arm64 -o ./aot-out
+./aot-out/Test.Aot --require-native
 ```
 
 ### Packaging
@@ -139,7 +152,7 @@ LoggingModule.Settings provides extensive configuration:
 
 The project is configured for automatic NuGet package generation with:
 - Package ID: SyslogLogging
-- Version: 2.3.2
+- Version: 2.4.0
 - Multi-framework targeting
 - Includes documentation XML, license, and logo assets
 - Generates symbol packages (.snupkg) for debugging

@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFrameworks>net462;net48;net8.0;net10.0</TargetFrameworks>
-		<Version>2.3.2</Version>
+		<Version>2.4.0</Version>
 		<Authors>Joel Christner</Authors>
 		<Company>Joel Christner</Company>
 		<Product>Syslog Server</Product>
@@ -13,7 +13,7 @@
 		<RepositoryUrl>https://github.com/view-io/viewsyslogserver</RepositoryUrl>
 		<RepositoryType>Github</RepositoryType>
 		<PackageTags>syslog logging log message debug event warn info</PackageTags>
-		<PackageReleaseNotes>Version alignment with SyslogLogging 2.3.2</PackageReleaseNotes>
+		<PackageReleaseNotes>Native AOT support: settings are read and written with System.Text.Json source generation; SerializationHelper and Microsoft.CSharp dependencies removed. Version alignment with SyslogLogging 2.4.0.</PackageReleaseNotes>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 		<PlatformTarget>AnyCPU</PlatformTarget>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -25,9 +25,19 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
+	<!--
+		Native AOT: the net8.0+ builds run the trim and AOT analyzers. Publish a native executable with:
+		dotnet publish SyslogServer/SyslogServer.csproj -c Release -f net10.0 -r <rid> -p:NativeAot=true
+	-->
+	<PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(NativeAot)' == 'true' AND $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+		<PublishAot>true</PublishAot>
+	</PropertyGroup>
+
 	<ItemGroup>
-		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="SerializationHelper" Version="2.1.0" />
 		<PackageReference Include="System.Text.Json" Version="10.0.12" />
 	</ItemGroup>
 

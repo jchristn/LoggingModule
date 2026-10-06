@@ -8,9 +8,9 @@ namespace Syslog
     using System.Net.Sockets;
     using System.Reflection;
     using System.Text;
+    using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
-    using SerializationHelper;
 
     /// <summary>
     /// Syslog server.
@@ -19,7 +19,6 @@ namespace Syslog
     {
 #pragma warning disable CS8632
         private static string _Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown";
-        private static Serializer _Serializer = new Serializer();
         private static Settings _Settings = new Settings();
         private static Thread? _ListenerThread;
         private static UdpClient? _ListenerUdp;
@@ -39,12 +38,12 @@ namespace Syslog
 
             if (File.Exists(_SettingsFile))
             {
-                _Settings = _Serializer.DeserializeJson<Settings>(File.ReadAllText(_SettingsFile));
+                _Settings = JsonSerializer.Deserialize(File.ReadAllText(_SettingsFile), SettingsJsonContext.Default.Settings) ?? new Settings();
             }
             else
             {
                 Console.WriteLine("Settings file " + _SettingsFile + " does not exist, creating");
-                File.WriteAllText(_SettingsFile, _Serializer.SerializeJson(_Settings, true));
+                File.WriteAllText(_SettingsFile, JsonSerializer.Serialize(_Settings, SettingsJsonContext.Default.Settings));
             }
 
             if (!Directory.Exists(_Settings.LogFileDirectory))

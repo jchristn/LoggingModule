@@ -263,3 +263,4 @@ For traces, search Tempo for `{ resource.service.name = "<your service>" && name
 - **No in-process quantiles.** Durations are histograms in seconds (UCUM `s`). Derive percentiles in PromQL.
 - **Process scope.** Instruments are static and shared by every `LoggingModule` in the process. Per-module breakdowns come from the bounded attributes (destination, server), not from module identity.
 - **Dependency.** The library uses `System.Diagnostics.DiagnosticSource` (in-box on .NET 10, a package on other targets, which `Microsoft.Extensions.Logging.Abstractions` already brought in transitively).
+- **Native AOT and trimming.** The instrumentation uses only `Meter`, `ActivitySource`, and their listeners, all of which are AOT-safe. Every metric and span in this catalog is emitted unchanged in trimmed and Native AOT applications (net8.0 and later), which the `Test.Aot` smoke test verifies as a native binary.

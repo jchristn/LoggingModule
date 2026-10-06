@@ -1,7 +1,7 @@
 # SyslogLogging Library - Developer Guide
 
 ## Overview
-SyslogLogging is a comprehensive .NET logging library that provides high-performance, thread-safe logging to multiple destinations including syslog servers, console, and files. The library features async support, structured logging, Microsoft.Extensions.Logging integration, background queuing, and message batching.
+SyslogLogging is a comprehensive .NET logging library that provides high-performance, thread-safe logging to multiple destinations including syslog servers, console, and files. The library features async support, structured logging, Microsoft.Extensions.Logging integration, background queuing, message batching, and Native AOT/trimming compatibility on net8.0+.
 
 ## Code Style Rules (STRICTLY ENFORCED)
 
@@ -91,6 +91,16 @@ lock (_ConsoleLock)
     Console.ResetColor(); // CRITICAL for thread safety
 }
 ```
+
+## Native AOT and Trimming (STRICTLY ENFORCED)
+
+The `net8.0` and `net10.0` builds are `IsAotCompatible`, and the trim/AOT warning codes (IL2026, IL3050, and related) are build errors. Every change must keep them that way:
+- NEVER call reflection-based `JsonSerializer` overloads (those without a `JsonTypeInfo`/`JsonSerializerContext`) outside `LogEntryJsonWriter.WriteWithReflection`, which is only reached when `JsonSerializer.IsReflectionEnabledByDefault` is true
+- NEVER use `Type.GetType(string)`, `Activator.CreateInstance(Type)`, `MakeGenericType`, `Reflection.Emit`, `dynamic`, or `Assembly.Location`
+- Do not suppress a trim/AOT warning unless the code is unreachable when the matching feature switch is off, and give the reason in the `Justification`
+- `LogEntry.ToJson()` output in JIT applications is a compatibility contract: the `Json` suite in `src/Test.Shared/JsonSuites.cs` checks it byte-for-byte against a copy of the 2.3.x implementation
+- Guard `System.Diagnostics.CodeAnalysis` trimming attributes with `#if NET5_0_OR_GREATER` (they don't exist on netstandard2.x/net4x)
+- Verify with the native smoke test: `dotnet publish src/Test.Aot/Test.Aot.csproj -c Release -f net10.0 -r <rid> -o ./aot-out && ./aot-out/Test.Aot --require-native`. Add a check to `src/Test.Aot/Program.cs` for any new feature
 
 ## Architecture Overview
 
@@ -182,8 +192,15 @@ dotnet build
 
 ### Test
 ```bash
-cd src/Test
-dotnet run
+dotnet run --project src/Test.Automated/Test.Automated.csproj -f net10.0
+dotnet test src/Test.Xunit/Test.Xunit.csproj
+dotnet test src/Test.Nunit/Test.Nunit.csproj
+```
+
+### Native AOT smoke test
+```bash
+dotnet publish src/Test.Aot/Test.Aot.csproj -c Release -f net10.0 -r osx-arm64 -o ./aot-out
+./aot-out/Test.Aot --require-native
 ```
 
 ### Package
@@ -208,8 +225,11 @@ src/
 │   ├── SyslogLoggerProvider.cs # ILogger integration
 │   ├── SyslogExtensions.cs     # DI extensions
 │   └── [Other core files]
-├── Test/                   # Comprehensive test suite
-│   └── Program.cs          # All capability testing
+├── Test.Shared/            # Shared Touchstone suites (incl. JsonSuites.cs, TelemetrySuites.cs)
+├── Test.Automated/         # Touchstone CLI runner
+├── Test.Xunit/             # xUnit adapter
+├── Test.Nunit/             # NUnit adapter
+├── Test.Aot/               # Native AOT smoke test (runs as a native binary)
 └── SyslogServer/           # Integrated syslog server
     ├── SyslogServer.cs     # UDP syslog receiver
     └── Settings.cs         # Server configuration
@@ -246,14 +266,17 @@ Each test category includes both success and failure cases with clear pass/fail 
 
 ## Dependencies
 
-- **.NET Standard 2.0+** / **.NET Framework 4.6.2+** / **.NET 6.0+**
-- **Microsoft.Extensions.Logging.Abstractions** (8.0.0)
-- **System.Text.Json** (8.0.5)
-- **SerializationHelper** (2.0.1) - for SyslogServer
+- **.NET Standard 2.0+** / **.NET Framework 4.6.2+** / **.NET 8.0+**
+- **Microsoft.Extensions.Logging.Abstractions** (10.0.12)
+- **System.Text.Json** (10.0.12)
+- **System.Diagnostics.DiagnosticSource** (10.0.12, non-net10.0 targets)
+- SyslogServer uses System.Text.Json source generation (`SettingsJsonContext`); it has no other dependencies
 
 ## Version History
 
-- **v2.0.9** - Latest release with all new features
+- **v2.4.0** - Latest release: Native AOT and trimming support, reflection-free `LogEntry.ToJson()`, `ToJson(JsonSerializerOptions)`, native SyslogServer (see CHANGELOG.md)
+- **v2.3.0** - Built-in metrics and traces
+- **v2.0.9** - Async, structured logging, ILogger integration
 - Added async support with CancellationToken
 - Implemented structured logging and semantic patterns
 - Created ILogger implementation and Microsoft.Extensions.Logging integration

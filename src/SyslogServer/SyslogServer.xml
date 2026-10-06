@@ -49,6 +49,51 @@
             </summary>
             <returns>String.</returns>
         </member>
+        <member name="T:Syslog.SettingsJsonContext">
+            <summary>
+            Source-generated System.Text.Json metadata for <see cref="T:Syslog.Settings"/>, used to read and write syslog.json
+            without reflection so the server can be published with Native AOT.
+            </summary>
+        </member>
+        <member name="P:Syslog.SettingsJsonContext.Boolean">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Syslog.SettingsJsonContext.Settings">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Syslog.SettingsJsonContext.Int32">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Syslog.SettingsJsonContext.String">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:Syslog.SettingsJsonContext.Default">
+            <summary>
+            The default <see cref="T:System.Text.Json.Serialization.JsonSerializerContext"/> associated with a default <see cref="T:System.Text.Json.JsonSerializerOptions"/> instance.
+            </summary>
+        </member>
+        <member name="P:Syslog.SettingsJsonContext.GeneratedSerializerOptions">
+            <summary>
+            The source-generated options associated with this context.
+            </summary>
+        </member>
+        <member name="M:Syslog.SettingsJsonContext.#ctor">
+            <inheritdoc/>
+        </member>
+        <member name="M:Syslog.SettingsJsonContext.#ctor(System.Text.Json.JsonSerializerOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Syslog.SettingsJsonContext.GetTypeInfo(System.Type)">
+            <inheritdoc/>
+        </member>
         <member name="T:Syslog.SyslogServer">
             <summary>
             Syslog server.

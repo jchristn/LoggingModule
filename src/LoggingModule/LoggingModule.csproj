@@ -3,18 +3,18 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net462;net48;net8.0;net10.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>2.3.2</Version>
+		<Version>2.4.0</Version>
 		<Authors>Joel Christner</Authors>
 		<PackageId>SyslogLogging</PackageId>
 		<Product>SyslogLogging</Product>
 		<Description>The easiest logging library to use to send log messages to syslog, the console, or the file system.  It's.  REALLY.  Easy.</Description>
 		<Copyright>(c)2025 Joel Christner</Copyright>
-		<PackageTags>syslog logging console log logger udp event structured async telemetry opentelemetry metrics tracing</PackageTags>
+		<PackageTags>syslog logging console log logger udp event structured async telemetry opentelemetry metrics tracing aot trimming nativeaot</PackageTags>
 		<PackageProjectUrl>https://github.com/jchristn/LoggingModule</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
 		<RepositoryType>Github</RepositoryType>
 		<PackageLicenseUrl></PackageLicenseUrl>
-		<PackageReleaseNotes>Dependency maintenance release: updates System.Text.Json, Microsoft.Extensions.Logging.Abstractions, and System.Diagnostics.DiagnosticSource to 10.0.12. No public API changes. 2.3.0 added built-in OpenTelemetry-compatible metrics and traces through a BCL Meter and ActivitySource named SyslogLogging; see TELEMETRY.md.</PackageReleaseNotes>
+		<PackageReleaseNotes>Native AOT and trimming support: the net8.0 and net10.0 builds are marked IsAotCompatible and produce no trim or AOT warnings. LogEntry.ToJson() no longer needs reflection for its fixed fields or for scalar property values, and its output is unchanged in regular JIT applications. New ToJson(JsonSerializerOptions) overload serializes complex property values with a source-generated resolver under Native AOT. NaN and Infinity property values now serialize as strings instead of throwing. See CHANGELOG.md.</PackageReleaseNotes>
 		<PackageIconUrl></PackageIconUrl>
 		<RootNamespace>SyslogLogging</RootNamespace>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
@@ -28,6 +28,11 @@
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+		<IsAotCompatible>true</IsAotCompatible>
+		<WarningsAsErrors>$(WarningsAsErrors);IL2026;IL2046;IL2057;IL2060;IL2067;IL2070;IL2072;IL2075;IL2076;IL2080;IL2087;IL2090;IL2091;IL2111;IL3050;IL3051;IL3058</WarningsAsErrors>
+	</PropertyGroup>
+
 	<PropertyGroup>
 		<NoWarn>1701;1702;CS8600;CS8601;CS8618;CS8625;CS8632</NoWarn>
 	</PropertyGroup>
@@ -39,6 +44,10 @@
 
 	<ItemGroup Condition="'$(TargetFramework)' != 'net10.0'">
 		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.12" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="Test.Shared" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -64,9 +73,6 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Include="assets\logo.png">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Include="LoggingModule.xml">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
