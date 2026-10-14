@@ -406,6 +406,134 @@ namespace SyslogLogging.Tests.Shared
 
                             return Task.CompletedTask;
                         }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "Settings",
+                        caseId: "DetectConsoleDefault",
+                        displayName: "DetectConsole defaults to true",
+                        executeAsync: _ =>
+                        {
+                            LoggingSettings settings = new LoggingSettings();
+                            TestHelpers.AssertTrue(settings.DetectConsole, "A new LoggingSettings should default DetectConsole to true.");
+
+                            using LoggingModule log = new LoggingModule();
+                            TestHelpers.AssertTrue(log.Settings.DetectConsole, "A default LoggingModule should default DetectConsole to true.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "Settings",
+                        caseId: "DetectConsoleDisabledEnablesConsole",
+                        displayName: "EnableConsole stays true without the probe when DetectConsole is false",
+                        executeAsync: _ =>
+                        {
+                            LoggingSettings settings = new LoggingSettings();
+                            settings.DetectConsole = false;
+                            settings.EnableConsole = false;
+                            settings.EnableConsole = true;
+
+                            TestHelpers.AssertTrue(settings.EnableConsole, "EnableConsole should be true when DetectConsole is false, even without a console.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "Settings",
+                        caseId: "DetectConsoleDefaultMatchesProbe",
+                        displayName: "EnableConsole with DetectConsole true matches the 2.4.0 console probe",
+                        executeAsync: _ =>
+                        {
+                            bool expected;
+                            try
+                            {
+                                expected = Environment.UserInteractive && Console.WindowHeight > 0;
+                            }
+                            catch (Exception)
+                            {
+                                expected = false;
+                            }
+
+                            LoggingSettings settings = new LoggingSettings();
+                            settings.EnableConsole = true;
+
+                            TestHelpers.AssertEqual(expected, settings.EnableConsole, "EnableConsole should store the result of the console probe when DetectConsole is true.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "Settings",
+                        caseId: "DetectConsoleEnableConsoleFalse",
+                        displayName: "EnableConsole false is stored for both DetectConsole values",
+                        executeAsync: _ =>
+                        {
+                            LoggingSettings detecting = new LoggingSettings();
+                            detecting.DetectConsole = true;
+                            detecting.EnableConsole = false;
+                            TestHelpers.AssertTrue(!detecting.EnableConsole, "EnableConsole should be false when DetectConsole is true.");
+
+                            LoggingSettings notDetecting = new LoggingSettings();
+                            notDetecting.DetectConsole = false;
+                            notDetecting.EnableConsole = false;
+                            TestHelpers.AssertTrue(!notDetecting.EnableConsole, "EnableConsole should be false when DetectConsole is false.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "Settings",
+                        caseId: "DetectConsoleDoesNotChangeCurrentValue",
+                        displayName: "Changing DetectConsole does not change the current EnableConsole value",
+                        executeAsync: _ =>
+                        {
+                            LoggingSettings enabled = new LoggingSettings();
+                            enabled.DetectConsole = false;
+                            enabled.EnableConsole = true;
+                            enabled.DetectConsole = true;
+                            TestHelpers.AssertTrue(enabled.EnableConsole, "Turning DetectConsole on should not re-run the probe or clear EnableConsole.");
+
+                            LoggingSettings disabled = new LoggingSettings();
+                            disabled.EnableConsole = false;
+                            disabled.DetectConsole = false;
+                            TestHelpers.AssertTrue(!disabled.EnableConsole, "Turning DetectConsole off should not set EnableConsole.");
+
+                            return Task.CompletedTask;
+                        }),
+
+                    new TestCaseDescriptor(
+                        suiteId: "Settings",
+                        caseId: "DetectConsoleDisabledWritesToStdout",
+                        displayName: "Messages reach stdout when DetectConsole is false and EnableConsole is true",
+                        executeAsync: async ct =>
+                        {
+                            using TemporaryDirectory temp = new TemporaryDirectory("detect-console");
+                            using LoggingModule log = new LoggingModule(temp.GetPath("unused.log"), FileLoggingMode.Disabled, false);
+
+                            TestHelpers.ConfigureSettings(log, settings =>
+                            {
+                                settings.EnableColors = false;
+                                settings.DetectConsole = false;
+                                settings.EnableConsole = true;
+                            });
+
+                            TextWriter original = Console.Out;
+                            StringWriter captured = new StringWriter();
+                            try
+                            {
+                                Console.SetOut(captured);
+                                log.Info("detect-console-sync");
+                                await log.InfoAsync("detect-console-async", ct).ConfigureAwait(false);
+                            }
+                            finally
+                            {
+                                Console.SetOut(original);
+                            }
+
+                            string output = captured.ToString();
+                            TestHelpers.AssertContains(output, "detect-console-sync", "Sync message should reach stdout.");
+                            TestHelpers.AssertContains(output, "detect-console-async", "Async message should reach stdout.");
+                        }),
                 });
         }
 

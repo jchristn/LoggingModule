@@ -274,7 +274,8 @@ Each test category includes both success and failure cases with clear pass/fail 
 
 ## Version History
 
-- **v2.4.0** - Latest release: Native AOT and trimming support, reflection-free `LogEntry.ToJson()`, `ToJson(JsonSerializerOptions)`, native SyslogServer (see CHANGELOG.md)
+- **v2.4.1** - Latest release: `LoggingSettings.DetectConsole` for console output in containers and services (see CHANGELOG.md)
+- **v2.4.0** - Native AOT and trimming support, reflection-free `LogEntry.ToJson()`, `ToJson(JsonSerializerOptions)`, native SyslogServer (see CHANGELOG.md)
 - **v2.3.0** - Built-in metrics and traces
 - **v2.0.9** - Async, structured logging, ILogger integration
 - Added async support with CancellationToken

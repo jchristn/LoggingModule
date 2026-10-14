@@ -7,7 +7,7 @@
 
 SyslogLogging is a C# logging library for syslog, console, and file destinations. It supports synchronous and asynchronous logging, structured log entries, `Microsoft.Extensions.Logging` integration, file retention management, built-in OpenTelemetry-compatible metrics and traces, and Native AOT and trimmed applications.
 
-Current release: `2.4.0`
+Current release: `2.4.1`
 
 Target builds:
 - `.NET Standard 2.0`
@@ -32,7 +32,11 @@ Target builds:
 - Native AOT and trimming compatible on `.NET 8.0` and `.NET 10.0`, with zero trim or AOT warnings
 - Shared Touchstone test coverage exposed through CLI, xUnit, and NUnit runners
 
-## What's New in 2.4.0
+## What's New in 2.4.1
+
+- Added `LoggingSettings.DetectConsole` (default `true`, no behavior change). Set it to `false` before setting `EnableConsole` to `true` to turn on console output in containers, Kubernetes pods, systemd services, or with redirected stdout, where the interactive terminal check would otherwise leave console logging off. See [Console Output in Containers and Services](#console-output-in-containers-and-services).
+
+### Previously in 2.4.0
 
 - **Native AOT and trimming support.** The `net8.0` and `net10.0` builds are marked `IsAotCompatible` and produce no trim or AOT warnings, so you can publish with `PublishAot` or `PublishTrimmed` without suppressions. See [Native AOT and Trimming](#native-aot-and-trimming).
 - `LogEntry.ToJson()` no longer depends on reflection-based serialization. Its output in regular (JIT) applications is byte-identical to 2.3.x. Under Native AOT it writes the entry and all scalar property values natively, and previously it threw.
@@ -107,6 +111,28 @@ using SyslogLogging;
 LoggingModule log = new LoggingModule("./logs/app.log", FileLoggingMode.SingleLogFile);
 await log.InfoAsync("File-only message");
 ```
+
+### Console Output in Containers and Services
+
+By default, setting `EnableConsole` to `true` (directly, or through a constructor or `AddSyslog`/`AddFileLogging`) first checks for an interactive terminal, and leaves console logging off if none is found. In a container, a Kubernetes pod, a systemd service, or with stdout redirected to a file or pipe there is no terminal, but stdout is still collected (`docker logs`, `kubectl logs`, journald). Turn off the check with `DetectConsole` before enabling the console:
+
+```csharp
+LoggingModule log = new LoggingModule("127.0.0.1", 514, enableConsole: false);
+log.Settings.DetectConsole = false;
+log.Settings.EnableConsole = true;
+```
+
+With `Microsoft.Extensions.Logging`, use the `configure` callback:
+
+```csharp
+builder.AddSyslog("syslogserver", 514, enableConsole: false, configure: m =>
+{
+    m.Settings.DetectConsole = false;
+    m.Settings.EnableConsole = true;
+});
+```
+
+`DetectConsole` only affects later assignments to `EnableConsole`, so set it first. If you bind `LoggingSettings` from configuration, make sure `DetectConsole` is applied before `EnableConsole`.
 
 ## Structured Logging
 

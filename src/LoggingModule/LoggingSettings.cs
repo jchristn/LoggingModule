@@ -80,9 +80,32 @@
         }
 
         /// <summary>
+        /// Whether setting <see cref="EnableConsole"/> to true first checks that an interactive console exists.
+        /// Default: true, which keeps the behavior of earlier versions: if no console is detected,
+        /// <see cref="EnableConsole"/> stays false.
+        /// Set this to false before setting <see cref="EnableConsole"/> to true when output goes to a
+        /// non-interactive stdout that is still collected, for example in containers, Kubernetes pods,
+        /// systemd services, or when stdout is redirected to a file or pipe.
+        /// The setting only affects later assignments to <see cref="EnableConsole"/>; it does not change the current value.
+        /// When binding settings from configuration, make sure this property is applied before <see cref="EnableConsole"/>.
+        /// </summary>
+        public bool DetectConsole
+        {
+            get
+            {
+                return _DetectConsole;
+            }
+            set
+            {
+                _DetectConsole = value;
+            }
+        }
+
+        /// <summary>
         /// Enable or disable console logging.
-        /// Setting this to true will first validate if a console exists.
-        /// If a console is not available, it will be set to false.
+        /// When <see cref="DetectConsole"/> is true (the default), setting this to true will first validate if a console exists,
+        /// and if a console is not available, it will be set to false.
+        /// When <see cref="DetectConsole"/> is false, setting this to true enables console logging without the check.
         /// </summary>
         public bool EnableConsole
         {
@@ -92,7 +115,7 @@
             }
             set
             {
-                if (value) _EnableConsole = ConsoleExists();
+                if (value) _EnableConsole = _DetectConsole ? ConsoleExists() : true;
                 else _EnableConsole = false;
             }
         }
@@ -217,6 +240,7 @@
 
         private string _HeaderFormat = "{ts} {host} {sev}";
         private string _TimestampFormat = "yyyy-MM-dd HH:mm:ss";
+        private bool _DetectConsole = true;
         private bool _EnableConsole = true;
         private int _MaxMessageLength = 1024;
         private ColorSchema _Colors = new ColorSchema();

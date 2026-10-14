@@ -739,11 +739,24 @@
             from the entry assembly and falls back to the process name if needed.
             </summary>
         </member>
+        <member name="P:SyslogLogging.LoggingSettings.DetectConsole">
+            <summary>
+            Whether setting <see cref="P:SyslogLogging.LoggingSettings.EnableConsole"/> to true first checks that an interactive console exists.
+            Default: true, which keeps the behavior of earlier versions: if no console is detected,
+            <see cref="P:SyslogLogging.LoggingSettings.EnableConsole"/> stays false.
+            Set this to false before setting <see cref="P:SyslogLogging.LoggingSettings.EnableConsole"/> to true when output goes to a
+            non-interactive stdout that is still collected, for example in containers, Kubernetes pods,
+            systemd services, or when stdout is redirected to a file or pipe.
+            The setting only affects later assignments to <see cref="P:SyslogLogging.LoggingSettings.EnableConsole"/>; it does not change the current value.
+            When binding settings from configuration, make sure this property is applied before <see cref="P:SyslogLogging.LoggingSettings.EnableConsole"/>.
+            </summary>
+        </member>
         <member name="P:SyslogLogging.LoggingSettings.EnableConsole">
             <summary>
             Enable or disable console logging.
-            Setting this to true will first validate if a console exists.
-            If a console is not available, it will be set to false.
+            When <see cref="P:SyslogLogging.LoggingSettings.DetectConsole"/> is true (the default), setting this to true will first validate if a console exists,
+            and if a console is not available, it will be set to false.
+            When <see cref="P:SyslogLogging.LoggingSettings.DetectConsole"/> is false, setting this to true enables console logging without the check.
             </summary>
         </member>
         <member name="P:SyslogLogging.LoggingSettings.MinimumSeverity">

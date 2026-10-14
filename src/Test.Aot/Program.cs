@@ -69,6 +69,7 @@ namespace SyslogLogging.Tests.Aot
                 new AotCheck("Dated file logging with retention", DatedFileLogging),
                 new AotCheck("Syslog UDP delivery and header tokens", SyslogDelivery),
                 new AotCheck("Console logging with colors", ConsoleLogging),
+                new AotCheck("Console logging with DetectConsole disabled", ConsoleLoggingWithoutDetection),
                 new AotCheck("Structured logging builder and LogEntry", StructuredLogging),
                 new AotCheck("Exception logging honors ExceptionSeverity", ExceptionLogging),
                 new AotCheck("MessageLogged and OnLoggingError events", Events),
@@ -372,6 +373,32 @@ namespace SyslogLogging.Tests.Aot
             string output = captured.ToString();
             AssertContains(output, "console-sync", "Console sync output");
             AssertContains(output, "console-async", "Console async output");
+        }
+
+        private static async Task ConsoleLoggingWithoutDetection()
+        {
+            TextWriter original = Console.Out;
+            StringWriter captured = new StringWriter();
+            Console.SetOut(captured);
+            try
+            {
+                using LoggingModule log = new LoggingModule(Path.Combine(_WorkDirectory, "console-nodetect.log"), FileLoggingMode.Disabled, false);
+                log.Settings.EnableColors = false;
+                log.Settings.DetectConsole = false;
+                log.Settings.EnableConsole = true;
+                if (!log.Settings.EnableConsole) throw new InvalidOperationException("EnableConsole should be true when DetectConsole is false.");
+
+                log.Info("nodetect-sync");
+                await log.InfoAsync("nodetect-async").ConfigureAwait(false);
+            }
+            finally
+            {
+                Console.SetOut(original);
+            }
+
+            string output = captured.ToString();
+            AssertContains(output, "nodetect-sync", "Console sync output without detection");
+            AssertContains(output, "nodetect-async", "Console async output without detection");
         }
 
         private static async Task StructuredLogging()

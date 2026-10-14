@@ -1,5 +1,13 @@
 # Change Log
 
+## v2.4.1
+
+Console output for containers and services. This is a patch release with no behavior change for existing code.
+
+- Added `LoggingSettings.DetectConsole` (default `true`). Setting `EnableConsole` to `true` runs the interactive terminal check only when `DetectConsole` is `true`, which is the behavior of earlier versions. Set `DetectConsole` to `false` before setting `EnableConsole` to `true` to turn on console output in containers, Kubernetes pods, systemd services, or with stdout redirected to a file or pipe. Previously the check failed in those environments and console logging silently stayed off. Changing `DetectConsole` does not change the current value of `EnableConsole`.
+- The console check itself, every constructor, and the `AddSyslog`/`AddFileLogging` extension methods are unchanged. No overloads were added.
+- Added six `Settings` suite cases (default value, enabling without the check, parity with the 2.4.0 check, disabling, ordering, and stdout delivery) and a `Test.Aot` check for console logging with `DetectConsole` disabled.
+
 ## v2.4.0
 
 Native AOT and trimming support. This is a minor release: the only API addition is a new overload, and `ToJson()` output in regular (JIT) applications is byte-identical to 2.3.x.
