@@ -3,19 +3,17 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net462;net48;net8.0;net10.0</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>2.4.1</Version>
+		<Version>2.4.2</Version>
 		<Authors>Joel Christner</Authors>
 		<PackageId>SyslogLogging</PackageId>
 		<Product>SyslogLogging</Product>
 		<Description>The easiest logging library to use to send log messages to syslog, the console, or the file system.  It's.  REALLY.  Easy.</Description>
-		<Copyright>(c)2025 Joel Christner</Copyright>
+		<Copyright>(c)2026 Joel Christner</Copyright>
 		<PackageTags>syslog logging console log logger udp event structured async telemetry opentelemetry metrics tracing aot trimming nativeaot</PackageTags>
 		<PackageProjectUrl>https://github.com/jchristn/LoggingModule</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/jchristn/LoggingModule</RepositoryUrl>
-		<RepositoryType>Github</RepositoryType>
-		<PackageLicenseUrl></PackageLicenseUrl>
+		<RepositoryType>git</RepositoryType>
 		<PackageReleaseNotes>Added LoggingSettings.DetectConsole (default true, no behavior change). Set it to false before setting EnableConsole to true so containers, Kubernetes pods, systemd services, and redirected stdout can turn on console output without the interactive terminal check. See CHANGELOG.md.</PackageReleaseNotes>
-		<PackageIconUrl></PackageIconUrl>
 		<RootNamespace>SyslogLogging</RootNamespace>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 		<PackageIcon>logo.png</PackageIcon>
@@ -26,6 +24,9 @@
 		<IncludeSymbols>True</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<LangVersion>latest</LangVersion>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
